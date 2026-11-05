@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 252 76" width="252" height="76" role="img" aria-label="Skill 指北">
+  <defs>
+    <linearGradient id="sc-lock-g" x1="4" y1="2" x2="60" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E4693F"/>
+      <stop offset="1" stop-color="#A83A22"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(0,6)">
+    <rect width="64" height="64" rx="15" fill="url(#sc-lock-g)"/>
+    <path d="M32 11 41 32 23 32Z" fill="#FFF9F0"/>
+    <path d="M32 53 41 32 23 32Z" fill="#FFF9F0" opacity=".42"/>
+    <circle cx="32" cy="32" r="2.6" fill="#8E2E19"/>
+  </g>
+  <text x="94" y="46" font-family="'Songti SC','Noto Serif SC','Source Han Serif SC',SimSun,Georgia,serif" font-size="33" font-weight="700" fill="#17130E">Skill<tspan dx="9">指北</tspan></text>
+  <text x="95" y="62" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',-apple-system,sans-serif" font-size="9.5" letter-spacing="2.1" fill="#8A8271">AGENT SKILLS LIBRARY</text>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 252 76" width="252" height="76" role="img" aria-label="Skill 指北 反白版">
+  <g transform="translate(0,6)">
+    <rect width="64" height="64" rx="15" fill="#F7F3EA"/>
+    <path d="M32 11 41 32 23 32Z" fill="#D9553A"/>
+    <path d="M32 53 41 32 23 32Z" fill="#D9553A" opacity=".4"/>
+    <circle cx="32" cy="32" r="2.6" fill="#F7F3EA"/>
+  </g>
+  <text x="94" y="46" font-family="'Songti SC','Noto Serif SC','Source Han Serif SC',SimSun,Georgia,serif" font-size="33" font-weight="700" fill="#F7F3EA">Skill<tspan dx="9">指北</tspan></text>
+  <text x="95" y="62" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei',-apple-system,sans-serif" font-size="9.5" letter-spacing="2.1" fill="#B9AF9B">AGENT SKILLS LIBRARY</text>
+</svg>

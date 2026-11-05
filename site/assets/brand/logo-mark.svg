@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Skill 指北 标志">
+  <defs>
+    <linearGradient id="sc-mark-g" x1="4" y1="2" x2="60" y2="62" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E4693F"/>
+      <stop offset="1" stop-color="#A83A22"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#sc-mark-g)"/>
+  <path d="M32 11 41 32 23 32Z" fill="#FFF9F0"/>
+  <path d="M32 53 41 32 23 32Z" fill="#FFF9F0" opacity=".45"/>
+  <circle cx="32" cy="32" r="2.6" fill="#8E2E19"/>
+</svg>
