@@ -1,0 +1,13 @@
+{
+  "name": "skill-compass",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Skill 指北 —— 开源 Agent Skills 精选库（静态页 + 零依赖上游数据代理）",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

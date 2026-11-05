@@ -1,0 +1,14 @@
+# 只发布站点本体，以下都是本地素材 / 工具残留，不进仓库
+_data/
+_shots/
+bookmarks_*.html
+online.png
+share-qr.png
+share-qr.svg
+.workbuddy/
+.wbapp_*.genie
+
+# 服务端运行期缓存，由 server.mjs 自己生成
+site/server/cache.json
+
+node_modules/

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill 指北 · 129 个开源 Agent Skills 精选库</title>
+<meta name="description" content="从收藏夹和 13 位创作者的仓库里筛出 129 个开源 Agent Skills，按你要做的事分类：做 PPT、画图表、做视频、写公众号、管知识。带真实效果图，一键跳 GitHub。">
+<meta property="og:title" content="Skill 指北 · 开源 Agent Skills 精选库">
+<meta property="og:description" content="129 个开源 Agent Skills，按产出物分类，带效果演示，点开就能用。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23D9553A'/%3E%3Ctext x='16' y='23' font-size='19' font-family='Georgia,serif' fill='%23fff' text-anchor='middle' font-weight='700'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        <div class="brand-name">Skill 指北</div>
+        <div class="brand-sub">Agent Skills Library</div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="搜 skill、场景，比如「PPT」「配图」「省 token」" autocomplete="off" spellcheck="false">
+      <span class="kbd-hint">/</span>
+    </div>
+    <div class="topbar-stat"><b id="stat-total">129</b> 个 skill · <b>11</b> 个分类</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-kicker">Curated · 2026.10</div>
+  <h1>别再从收藏夹里<em>翻链接</em>了。</h1>
+  <p class="hero-lead">
+    这里是我从收藏夹和几位创作者的仓库里挑出来的 <b>129 个开源 Agent Skills</b>，按「你想做出什么」分类，不按技术栈。
+    每个都写了它<b>到底能干什么、什么时候该用它</b>，能配效果演示的就放演示图。
+    想用哪个，点开看安装命令，或者直接跳 GitHub。
+    也可以按<b>知名创作者</b>筛——花叔、卡兹克、归藏这些人做了哪些，一次看全。
+    每张卡片底下写着这个仓库<b>最近一次提交是多久以前</b>，怕装了就吃灰的，直接点上面的<b>「近 30 天有更新」</b>。
+  </p>
+  <div class="stats">
+    <div>
+      <div class="stat-num" id="s1">129<span>个</span></div>
+      <div class="stat-label">收录 Skill 仓库</div>
+    </div>
+    <div>
+      <div class="stat-num" id="s2">72<span>个</span></div>
+      <div class="stat-label">带真实效果演示</div>
+    </div>
+    <div>
+      <div class="stat-num" id="s3">11<span>类</span></div>
+      <div class="stat-label">按产出物分类</div>
+    </div>
+    <div>
+      <div class="stat-num" id="s4">13<span>位</span></div>
+      <div class="stat-label">知名创作者</div>
+    </div>
+  </div>
+</section>
+
+<nav class="filterbar">
+  <div class="filterbar-inner">
+    <div class="chips" id="chips"></div>
+    <div class="author-row">
+      <span class="row-label" title="只收录多产且高星的发布人">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        创作者
+      </span>
+      <div class="chips chips-author" id="authors"></div>
+    </div>
+  </div>
+</nav>
+
+<main class="grid-wrap">
+  <div class="tip-bar">
+    <span class="tip-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg></span>
+    <div><b>Skill 是给 AI 装的一份说明书</b>：它告诉 Claude Code / Codex / Cursor 这类工具「这件事该怎么做」。装法基本就一句 <code>npx skills add 仓库名</code>，装完在那个工具里正常提需求就会自动用上。不确定安哪个？先点开卡片看效果图，再决定。</div>
+  </div>
+  <div class="result-line">
+    <span id="result-text">共 129 个</span>
+    <span id="result-hint"></span>
+    <span id="fresh-hint" class="fresh-hint"></span>
+    <div class="sortsel-wrap" id="sort-wrap">
+      <button type="button" class="sortsel" id="sort-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="排序方式">
+        <span id="sort-label">推荐排序</span>
+        <svg class="sort-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <ul class="sort-menu" id="sort-menu" role="listbox" aria-label="排序方式" hidden>
+        <li class="sort-head" aria-hidden="true">排序方式</li>
+        <li class="sort-opt" role="option" data-value="recommend">推荐排序</li>
+        <li class="sort-opt" role="option" data-value="updated">最近更新</li>
+        <li class="sort-opt" role="option" data-value="stars">按 Star 数</li>
+        <li class="sort-opt" role="option" data-value="name">按名称</li>
+      </ul>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<section class="ext">
+  <div class="ext-head">
+    <h3>延伸资源</h3>
+    <span>不是 skill 仓库，但逛 skill 时会用到</span>
+  </div>
+  <div class="ext-list" id="ext-list"></div>
+</section>
+
+<footer>
+  <div class="about">
+    <div class="about-mark" aria-hidden="true">D</div>
+    <div class="about-text">
+      <div class="about-kicker">本站作者 · 整理与维护</div>
+      <div class="about-title">
+        <b class="about-name">Dawson</b>
+        <span class="about-role">公众号「Dawson聊AI提效」主理人</span>
+      </div>
+      <p class="about-desc">专注帮传统行业职场人用 AI 干掉重复性工作。这个站点由我独立选题、整理、设计并长期维护。</p>
+    </div>
+    <a class="about-link" href="https://view.dawsondx.top/" target="_blank" rel="noopener me">
+      我的个人网站
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+    </a>
+  </div>
+
+  <div class="foot-src">
+    <span class="src-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h3.6l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/></svg>
+      数据来源
+    </span>
+    <p class="src-text">
+      <b>Dawson 的个人收藏夹「优质skills」</b>，共 129 个 skill；Star 数与仓库元信息抓取于 2026-10-29，新增条目补录于 2026-11-05。<br>
+      <span class="src-note">最近提交与语义化版本由 GitHub Actions 每天自动刷新，无需手动操作</span>
+    </p>
+  </div>
+
+  <div class="foot-fine">
+    <b>Skill 指北</b> · 效果图版权归各仓库作者所有，此处仅作导航展示 · 点击卡片进入原仓库查看完整说明
+  </div>
+</footer>
+
+<div class="sort-scrim" id="sort-scrim" hidden></div>
+<div class="overlay" id="overlay"></div>
+
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title">
+  <button class="drawer-close" id="drawer-close" aria-label="关闭">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div class="drawer-scroll" id="drawer-scroll"></div>
+</aside>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
