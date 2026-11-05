@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+  html,body { margin:0; padding:0; width:1200px; height:630px; overflow:hidden; }
+  body {
+    background:#F7F3EA; color:#17130E; position:relative;
+    font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',-apple-system,sans-serif;
+  }
+  .glow-a { position:absolute; left:-120px; top:-160px; width:700px; height:700px; border-radius:50%;
+    background:radial-gradient(circle, rgba(217,85,58,.10), transparent 62%); }
+  .glow-b { position:absolute; right:-160px; bottom:-220px; width:760px; height:760px; border-radius:50%;
+    background:radial-gradient(circle, rgba(15,95,88,.09), transparent 64%); }
+  .frame { position:absolute; inset:44px; border:1px solid #E4D9C6; border-radius:18px; }
+  .inner { position:absolute; inset:84px; display:flex; flex-direction:column; }
+  .lock { width:252px; height:76px; }
+  h1 { font-family:'Songti SC','Noto Serif SC',SimSun,Georgia,serif; font-weight:700;
+    font-size:62px; line-height:1.22; margin:52px 0 0; letter-spacing:.01em; }
+  h1 em { font-style:normal; color:#D9553A; }
+  .sub { margin-top:22px; font-size:22px; color:#57503F; letter-spacing:.01em; }
+  .foot { margin-top:auto; display:flex; align-items:center; gap:14px; font-size:15px; color:#8A8271; letter-spacing:.06em; }
+  .dot { width:6px; height:6px; border-radius:50%; background:#D9553A; }
+  .mark-big { position:absolute; right:96px; bottom:96px; width:236px; height:236px; }
+  .ring { position:absolute; right:56px; bottom:56px; width:316px; height:316px; border-radius:50%;
+    border:1px dashed #E0D3BC; }
+</style></head>
+<body>
+  <div class="glow-a"></div><div class="glow-b"></div>
+  <div class="frame"></div>
+  <div class="ring"></div>
+  <img class="mark-big" src="logo-mark.svg" alt="">
+  <div class="inner">
+    <img class="lock" src="logo-lockup.svg" alt="">
+    <h1>别再从收藏夹里<em>翻链接</em>了。</h1>
+    <div class="sub">129 个开源 Agent Skills · 按产出物分类 · 带真实效果图</div>
+    <div class="foot"><span class="dot"></span>skills.dawsondx.top</div>
+  </div>
+</body></html>
