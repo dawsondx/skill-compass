@@ -782,12 +782,12 @@
 
   function refreshUpstream() {
     if (!window.fetch || location.protocol === 'file:') return;
-    // GitHub Pages 是纯静态托管，没有 api 端点，直接跳过免得控制台刷 404
-    if (/(^|\.)github\.io$/.test(location.hostname)) return;
+    // 静态托管（GitHub Pages）没有 api 端点：请求失败就保留内置快照的日期，不清空
+    function keepSeed() { setFreshHint({ source: 'seed', fetchedAt: UPS_AT }); }
     fetch('api/upstream', { cache: 'no-store' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (p) {
-        if (!p) { setFreshHint(null); return; }
+        if (!p) { keepSeed(); return; }
         var wasUnknown = !UPS_TTL;              // 第一次拿到服务端参数
         if (p.ttlSeconds) UPS_TTL = p.ttlSeconds;
         var changed = applyUpstream(p);
@@ -803,7 +803,7 @@
           if (t) openDrawer(t);
         }
       })
-      .catch(function () { setFreshHint(null); });
+      .catch(keepSeed);
   }
 
   /* ---------- 启动 ---------- */
