@@ -53,7 +53,9 @@ jobs:
           path: site
 
   deploy:
-    needs: build
+    needs: [refresh, build]
+    # push 事件里 refresh 是 skipped，不加这个 if 的话 deploy 会跟着被跳过（GitHub 沿 needs 链传播 skipped）
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
