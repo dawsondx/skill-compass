@@ -68,10 +68,17 @@
   // 关页面时才落盘：这样同一天里刷新不会把角标刷掉，下次来才「清账」
   window.addEventListener('pagehide', saveSnap);
 
-  var state = { cat: 'all', q: '', sort: 'recommend', onlyImg: false, recentOnly: false, openId: null, author: 'all', fav: false };
+  var state = { cat: 'all', q: '', sort: 'recommend', onlyImg: false, recentOnly: false, openId: null, author: 'all', fav: false, view: 'grid' };
   var $grid = document.getElementById('grid');
   var $chips = document.getElementById('chips');
-  var $authors = document.getElementById('authors');
+  var $authorBtn = document.getElementById('author-btn');
+  var $authorMenu = document.getElementById('author-menu');
+  var $authorLabel = document.getElementById('author-label');
+  var $authorWrap = document.getElementById('author-wrap');
+  var $flagImg = document.getElementById('flag-img');
+  var $flagUpd = document.getElementById('flag-upd');
+  var $flagFav = document.getElementById('flag-fav');
+  var $viewSwitch = document.getElementById('view-switch');
   var $q = document.getElementById('q');
   var $sortBtn = document.getElementById('sort-btn');
   var $sortLabel = document.getElementById('sort-label');
@@ -102,12 +109,8 @@
   }
   function syncFavCount() {
     if ($favN) { $favN.textContent = favs.length; $favN.dataset.n = favs.length; }
-    var chip = $chips ? $chips.querySelector('[data-cat="__fav"]') : null;
-    if (chip) {
-      chip.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
-      var n = chip.querySelector('.n');
-      if (n) n.textContent = favs.length;
-    }
+    var nFav = document.getElementById('n-fav');
+    if (nFav) nFav.textContent = favs.length;
   }
   function toggleFav(id) {
     if (favMap[id]) {
@@ -119,9 +122,10 @@
     }
     saveFavs();
     // 卡片上的按钮就地翻转，不整屏重排；只有在「只看收藏」时才需要重排
-    Array.prototype.forEach.call(document.querySelectorAll('.card-fav[data-fav="' + id + '"]'), function (b) {
-      b.setAttribute('aria-pressed', isFav(id) ? 'true' : 'false');
-    });
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.card-fav[data-fav="' + id + '"], .rr-fav[data-fav="' + id + '"]'),
+      function (b) { b.setAttribute('aria-pressed', isFav(id) ? 'true' : 'false'); }
+    );
     syncFavCount();
     renderFavPop();
     syncDrawerFav();
@@ -403,39 +407,29 @@
   function recentCount() {
     return SKILLS.filter(function (s) { return s.days != null && s.days <= 30; }).length;
   }
-  function buildChips() {
-    var html = '<button class="chip" data-cat="all" aria-pressed="' + (state.cat === 'all' ? 'true' : 'false') + '">全部<span class="n">' + SKILLS.length + '</span></button>';
+  function buildCats() {
+    var html = '<button class="cat-tab" type="button" role="tab" data-cat="all" aria-selected="' +
+      (state.cat === 'all' ? 'true' : 'false') + '">全部场景<span class="n">' + SKILLS.length + '</span></button>';
     CATS.forEach(function (c) {
-      html += '<button class="chip" data-cat="' + c.key + '" aria-pressed="' + (state.cat === c.key ? 'true' : 'false') + '">' +
-        '<span class="dot" style="background:' + c.color + '"></span>' + c.name +
+      html += '<button class="cat-tab" type="button" role="tab" data-cat="' + c.key + '" aria-selected="' +
+        (state.cat === c.key ? 'true' : 'false') + '">' + c.name +
         '<span class="n">' + countOf(c.key) + '</span></button>';
     });
-    html += '<button class="chip chip-flag" data-cat="__upd" aria-pressed="' + (state.recentOnly ? 'true' : 'false') + '" title="最近 30 天内有提交的仓库">⟳ 近 30 天有更新<span class="n">' + recentCount() + '</span></button>';
-    html += '<button class="chip chip-flag" data-cat="__img" aria-pressed="' + (state.onlyImg ? 'true' : 'false') + '">▶ 有演示图<span class="n">' + withImg + '</span></button>';
-    html += '<button class="chip chip-flag" data-cat="__fav" aria-pressed="' + (state.fav ? 'true' : 'false') + '" title="只看我收藏过的">★ 我的收藏<span class="n">' + favs.length + '</span></button>';
     $chips.innerHTML = html;
 
     $chips.addEventListener('click', function (e) {
-      var btn = e.target.closest('.chip');
+      var btn = e.target.closest('.cat-tab');
       if (!btn) return;
-      var cat = btn.dataset.cat;
-      if (cat === '__img') {
-        state.onlyImg = !state.onlyImg;
-        btn.setAttribute('aria-pressed', state.onlyImg ? 'true' : 'false');
-      } else if (cat === '__upd') {
-        state.recentOnly = !state.recentOnly;
-        btn.setAttribute('aria-pressed', state.recentOnly ? 'true' : 'false');
-      } else if (cat === '__fav') {
-        state.fav = !state.fav;
-        btn.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
-      } else {
-        state.cat = cat;
-        Array.prototype.forEach.call($chips.children, function (c) {
-          if (c.dataset.cat === '__img' || c.dataset.cat === '__upd' || c.dataset.cat === '__fav') return;
-          c.setAttribute('aria-pressed', c === btn ? 'true' : 'false');
-        });
-      }
+      if (state.cat === btn.dataset.cat) return;
+      state.cat = btn.dataset.cat;
+      syncCats();
       render();
+    });
+  }
+  function syncCats() {
+    if (!$chips) return;
+    Array.prototype.forEach.call($chips.children, function (c) {
+      c.setAttribute('aria-selected', c.dataset.cat === state.cat ? 'true' : 'false');
     });
   }
 
@@ -468,41 +462,74 @@
     if (compact) return r + ' 仓库' + (k > r ? ' · ' + k + ' skill' : '');
     return r + ' 个仓库' + (k > r ? ' / ' + k + ' 个 skill' : '');
   }
-  function buildAuthors() {
+  function authorCountOf() {
+    return AUTHORS.filter(function (a) { return countByAuthor(a.owner) > 0; }).length;
+  }
+  function buildAuthorMenu() {
+    if (!$authorMenu) return;
     var own = AUTHORS.map(function (a) {
       return { a: a, n: countByAuthor(a.owner) };
     }).filter(function (x) { return x.n > 0; })
       .sort(function (x, y) { return y.n - x.n; })
       .map(function (x) { return x.a; });
 
-    var html = '<button class="chip chip-sm" data-author="all" aria-pressed="' + (state.author === 'all' ? 'true' : 'false') + '">全部</button>';
+    var html = '<li class="au-opt" role="option" data-author="all" aria-selected="' +
+      (state.author === 'all' ? 'true' : 'false') + '">' +
+      '<span class="avatar" style="background:var(--ink-3)">全</span>' +
+      '<span class="au-name">全部创作者</span>' +
+      '<span class="n">' + SKILLS.length + '</span></li>';
     own.forEach(function (a) {
       var pressed = state.author.toLowerCase() === a.owner.toLowerCase();
       var n = countByAuthor(a.owner);
-      html += '<button class="chip chip-sm" data-author="' + a.owner + '" aria-pressed="' + (pressed ? 'true' : 'false') + '" title="' + a.note + '｜' + authorMeta(a.owner) + '">' +
+      var meta = authorMeta(a.owner, true);
+      // 「15 仓库」和右边的 15 是同一个数时不重复写，只有合集展开过（仓库≠skill）才补一句
+      var sub = meta === n + ' 仓库' ? '' : meta;
+      html += '<li class="au-opt" role="option" data-author="' + a.owner + '" aria-selected="' + (pressed ? 'true' : 'false') +
+        '" title="' + a.note + '｜' + authorMeta(a.owner) + '">' +
         '<span class="avatar" style="background:' + a.color + '">' + a.name.slice(0, 1) + '</span>' +
-        a.name +
-        (n > 1 ? '<span class="n">' + n + '</span>' : '') +
-        '</button>';
+        '<span class="au-name">' + a.name + '</span>' +
+        (sub ? '<span class="au-sub">' + sub + '</span>' : '') +
+        '<span class="n">' + n + '</span>' +
+        '</li>';
     });
-    $authors.innerHTML = html;
+    $authorMenu.innerHTML = html;
 
-    $authors.addEventListener('click', function (e) {
-      var btn = e.target.closest('.chip');
-      if (!btn) return;
-      var next = btn.dataset.author;
-      setAuthor(state.author.toLowerCase() === next.toLowerCase() ? 'all' : next);
+    $authorMenu.addEventListener('click', function (e) {
+      var opt = e.target.closest('.au-opt');
+      if (!opt) return;
+      var next = opt.dataset.author;
+      setAuthor(state.author.toLowerCase() === String(next).toLowerCase() ? 'all' : next);
+      setAuthorOpen(false);
       render();
     });
+  }
+  function setAuthorOpen(open) {
+    if (!$authorMenu || !$authorBtn) return;
+    if (open) {
+      // 控件条贴着视口底部时向下弹会被裁掉，量一下剩余空间改成向上
+      var r = $authorBtn.getBoundingClientRect();
+      var need = Math.min($authorMenu.offsetHeight || 300, 380) + 16;
+      $authorMenu.classList.toggle('drop-up', window.innerHeight - r.bottom < need);
+    }
+    $authorMenu.hidden = !open;
+    $authorBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
   function setAuthor(owner) {
     state.author = owner || 'all';
-    if (!$authors) return;
-    Array.prototype.forEach.call($authors.children, function (c) {
-      var on = c.dataset.author.toLowerCase() === state.author.toLowerCase();
-      c.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
+    syncAuthorUI();
+  }
+  function syncAuthorUI() {
+    if ($authorLabel) {
+      var hit = state.author !== 'all' ? (AUTHOR_MAP[state.author.toLowerCase()] || null) : null;
+      $authorLabel.textContent = hit ? hit.name : '全部 ' + authorCountOf() + ' 位作者';
+    }
+    if ($authorMenu) {
+      Array.prototype.forEach.call($authorMenu.children, function (c) {
+        var on = String(c.dataset.author || '').toLowerCase() === state.author.toLowerCase();
+        c.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
   }
 
   function esc(s) {
@@ -513,17 +540,58 @@
 
   /* 把 state 回写到所有筛选控件（从结果栏摘掉某个条件后，整组要跟着同步） */
   function syncFilterUI() {
-    Array.prototype.forEach.call($chips.children, function (c) {
-      var k = c.dataset.cat, on;
-      if (k === '__img') on = state.onlyImg;
-      else if (k === '__upd') on = state.recentOnly;
-      else if (k === '__fav') on = state.fav;
-      else on = (k === state.cat);
-      c.setAttribute('aria-pressed', on ? 'true' : 'false');
-    });
-    setAuthor(state.author);
+    syncCats();
+    syncAuthorUI();
+    if ($flagImg) $flagImg.setAttribute('aria-pressed', state.onlyImg ? 'true' : 'false');
+    if ($flagUpd) $flagUpd.setAttribute('aria-pressed', state.recentOnly ? 'true' : 'false');
+    if ($flagFav) $flagFav.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
     if ($q && $q.value !== state.q) $q.value = state.q;
     if ($statImg) $statImg.classList.toggle('on', state.onlyImg);
+  }
+
+  /* ---------- 控件条的三个快捷开关 + 创作者下拉 ---------- */
+  function bindFlag(btn, key) {
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      if (key === 'img') state.onlyImg = !state.onlyImg;
+      else if (key === 'recent') state.recentOnly = !state.recentOnly;
+      else state.fav = !state.fav;
+      syncFilterUI();
+      render();
+    });
+  }
+  bindFlag($flagImg, 'img');
+  bindFlag($flagUpd, 'recent');
+  bindFlag($flagFav, 'fav');
+  // 开关上的计数（演示图 / 近 30 天 / 收藏）跟着数据走，不写死在 HTML 里
+  (function () {
+    var $nImg = document.getElementById('n-img');
+    var $nUpd = document.getElementById('n-upd');
+    if ($nImg) $nImg.textContent = withImg;
+    if ($nUpd) $nUpd.textContent = recentCount();
+  })();
+
+  if ($authorBtn) {
+    $authorBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setAuthorOpen($authorMenu.hidden);
+    });
+  }
+  if ($authorMenu) {
+    document.addEventListener('click', function (e) {
+      if ($authorMenu.hidden || (e.target.closest && e.target.closest('.author-wrap'))) return;
+      setAuthorOpen(false);
+    });
+  }
+
+  /* ---------- 画廊 / 榜单：同一批结果两种看法 ---------- */
+  if ($viewSwitch) {
+    $viewSwitch.addEventListener('click', function (e) {
+      var b = e.target.closest('.vs-btn');
+      if (!b || b.dataset.view === state.view) return;
+      state.view = b.dataset.view === 'list' ? 'list' : 'grid';
+      render();
+    });
   }
 
   /* 已选条件标签：分类 + 创作者 + 搜索 + 两个快捷开关叠加时，结果栏上一眼看清是谁在过滤 */
@@ -629,12 +697,58 @@
   }
 
   /* ---------- 渲染 ---------- */
+  function isFiltered() {
+    return state.cat !== 'all' || state.author !== 'all' || !!state.q ||
+      state.onlyImg || state.recentOnly || state.fav;
+  }
+
+  /* 榜单视图的一行：名次 / 缩略 / 名称 + 仓库 + 分类 / 一句话 / star + 更新时间 / 收藏 */
+  function rowHTML(s, i) {
+    var c = CAT_MAP[s.cat] || {};
+    var thumb = s.img
+      ? '<span class="rr-thumb"><img data-src="assets/img/' + s.img + '" alt=""></span>'
+      : '<span class="rr-thumb">' + esc(s.name.slice(0, 1)) + '</span>';
+    var n = i + 1;
+    return '<div class="rank-row" tabindex="0" role="button" data-id="' + s.id + '" aria-label="' + esc(s.name) + '，查看详情">' +
+      '<span class="rr-num">' + (n < 10 ? '0' + n : n) + '</span>' +
+      thumb +
+      '<div class="rr-main">' +
+        '<div class="rr-top">' +
+          '<span class="rr-name">' + esc(s.name) + '</span>' +
+          '<span class="rr-repo">' + esc(s.repo) + '</span>' +
+          '<span class="rr-cat">' + esc(c.name || s.cat) + '</span>' +
+        '</div>' +
+        '<p class="rr-desc">' + esc(s.desc) + '</p>' +
+      '</div>' +
+      '<div class="rr-meta">' +
+        '<span class="rr-star">★ ' + (s.stars ? fmtNum(s.stars) : '—') + '</span>' +
+        (s.days != null ? '<span title="最近提交 ' + s.upd + '">' + fmtAgo(s.days) + '</span>' : '') +
+      '</div>' +
+      '<button class="rr-fav" type="button" data-fav="' + s.id + '" aria-pressed="' + (isFav(s.id) ? 'true' : 'false') +
+        '" aria-label="收藏 ' + esc(s.name) + '" title="收藏 / 取消收藏">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
+      '</button>' +
+      '<span class="rr-go"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>' +
+      '</div>';
+  }
+
+  function syncViewUI() {
+    if (!$viewSwitch) return;
+    Array.prototype.forEach.call($viewSwitch.children, function (b) {
+      b.setAttribute('aria-selected', b.dataset.view === state.view ? 'true' : 'false');
+    });
+  }
+
   function render() {
     writeURL();
     var terms = state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
     var list = sortList(SKILLS.filter(function (s) { return matches(s, terms); }));
 
-    $resultText.innerHTML = '共 <b>' + list.length + '</b> 个 skill';
+    $grid.className = state.view === 'list' ? 'grid list' : 'grid';
+    syncViewUI();
+    // 结果数：样板页的写法是「展示 N 个（共收录 M 个）」，一眼能看出筛掉了多少
+    $resultText.innerHTML = (isFiltered() ? '筛选出 ' : '展示 ') + '<b>' + list.length + '</b> 个（共收录 <b>' +
+      SKILLS.length + '</b> 个）';
     if ($activeFilters) $activeFilters.innerHTML = activeFiltersHTML();
     $resultHint.textContent = '';
 
@@ -653,6 +767,17 @@
         '</div>';
       return;
     }
+
+    if (state.view === 'list') {
+      $grid.innerHTML = list.map(rowHTML).join('');
+      $grid.querySelectorAll('.rank-row').forEach(function (el, i) {
+        el.style.animationDelay = Math.min(i * 12, 200) + 'ms';
+      });
+      initIO();
+      $grid.querySelectorAll('img[data-src]').forEach(observeImg);
+      return;
+    }
+
     $grid.innerHTML = list.map(cardHTML).join('');
     $grid.querySelectorAll('.card').forEach(function (el, i) {
       el.style.animationDelay = Math.min(i * 18, 260) + 'ms';
@@ -894,19 +1019,19 @@
 
   $grid.addEventListener('click', function (e) {
     if (e.target.closest('[data-reset]')) { resetAll(); return; }
-    var favBtn = e.target.closest('.card-fav');
+    var favBtn = e.target.closest('.card-fav, .rr-fav');
     if (favBtn) {
       e.stopPropagation();
       toggleFav(favBtn.dataset.fav);
       return;
     }
-    var card = e.target.closest('.card');
+    var card = e.target.closest('.card, .rank-row');
     if (card) openDrawer(SKILLS.filter(function (s) { return s.id === card.dataset.id; })[0]);
   });
   $grid.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    if (e.target.closest('.card-fav')) return;
-    var card = e.target.closest('.card');
+    if (e.target.closest('.card-fav, .rr-fav')) return;
+    var card = e.target.closest('.card, .rank-row');
     if (!card) return;
     e.preventDefault();
     openDrawer(SKILLS.filter(function (s) { return s.id === card.dataset.id; })[0]);
@@ -958,6 +1083,7 @@
     if (e.key === 'Escape') {
       if ($modal && !$modal.hidden) { closeModal(); return; }
       if ($favPop && !$favPop.hidden) { setFavOpen(false); if ($favBtn) $favBtn.focus(); return; }
+      if ($authorMenu && !$authorMenu.hidden) { setAuthorOpen(false); if ($authorBtn) $authorBtn.focus(); return; }
       if ($sortMenu && !$sortMenu.hidden) { setSortOpen(false); if ($sortBtn) $sortBtn.focus(); return; }
       if ($drawer.classList.contains('on')) closeDrawer();
       return;
@@ -1067,24 +1193,6 @@
     });
   }
 
-  /* ---------- 顶部说明条：可收起，选择记在本地 ---------- */
-  var TIP_KEY = 'skill-compass-tip-off';
-  var $tipBar = document.getElementById('tip-bar');
-  var $tipClose = document.getElementById('tip-close');
-  var $tipReopen = document.getElementById('tip-reopen');
-  function setTipOff(off) {
-    if (!$tipBar || !$tipReopen) return;
-    $tipBar.hidden = off;
-    $tipReopen.hidden = !off;
-    try {
-      if (off) localStorage.setItem(TIP_KEY, '1');
-      else localStorage.removeItem(TIP_KEY);
-    } catch (e) {}
-  }
-  if ($tipClose) $tipClose.addEventListener('click', function () { setTipOff(true); });
-  if ($tipReopen) $tipReopen.addEventListener('click', function () { setTipOff(false); });
-  try { if (localStorage.getItem(TIP_KEY) === '1') setTipOff(true); } catch (e) {}
-
   /* ---------- 延伸资源 ---------- */
   document.getElementById('ext-list').innerHTML = (window.RESOURCES || []).map(function (r) {
     return '<a class="ext-item" href="' + r.url + '" target="_blank" rel="noopener"><b>' + r.name + '</b><i>' + r.desc + '</i></a>';
@@ -1100,6 +1208,7 @@
     if (p.get('img') === '1') state.onlyImg = true;
     if (p.get('recent') === '1') state.recentOnly = true;
     if (p.get('open')) state.openId = p.get('open');
+    if (p.get('view') === 'list') state.view = 'list';
     if (p.get('by')) {
       var by = p.get('by');
       if (AUTHOR_MAP[by.toLowerCase()] && countByAuthor(by) > 0) state.author = AUTHOR_MAP[by.toLowerCase()].owner;
@@ -1113,6 +1222,7 @@
     if (state.sort !== 'recommend') p.set('sort', state.sort);
     if (state.onlyImg) p.set('img', '1');
     if (state.recentOnly) p.set('recent', '1');
+    if (state.view !== 'grid') p.set('view', state.view);
     if (state.openId) p.set('open', state.openId);
     var qs = p.toString();
     try { history.replaceState(null, '', qs ? '?' + qs : location.pathname); } catch (err) {}
@@ -1198,10 +1308,11 @@
   window.addEventListener('load', syncTopH);
 
   readURL();
-  buildChips();
-  buildAuthors();
-  syncFilterUI();          // 把 URL 带进来的状态回写到 chips / 创作者行 / 搜索框 / 统计入口
+  buildCats();
+  buildAuthorMenu();
+  syncFilterUI();          // 把 URL 带进来的状态回写到场景 tabs / 创作者下拉 / 搜索框 / 统计入口
   syncSortUI();
+  syncViewUI();
 
   /* ---------- 接管构建期预渲染的首屏卡片 ----------
      _tools/prerender.mjs 已经把「推荐排序」前 24 张卡写进 #grid。默认状态首次访问时
@@ -1210,7 +1321,7 @@
      以下情况照常 render()：带筛选/深链接参数、有回访快照（要补「新增 / 有更新」角标）、
      静态数据不是这两天的（相对时间「X 天前」会偏）。 */
   function hydrateStatic() {
-    $resultText.innerHTML = '共 <b>' + SKILLS.length + '</b> 个 skill';
+    $resultText.innerHTML = '展示 <b>' + SKILLS.length + '</b> 个（共收录 <b>' + SKILLS.length + '</b> 个）';
     $resultHint.textContent = '';
     if ($activeFilters) $activeFilters.innerHTML = '';
     initIO();
@@ -1218,6 +1329,7 @@
   }
   function canHydrate() {
     if (prevSnap || !$grid.querySelector('.card')) return false;
+    if (state.view !== 'grid') return false;      // 榜单视图要自己铺行，别接管静态卡
     if (state.cat !== 'all' || state.author !== 'all' || state.q) return false;
     if (state.onlyImg || state.recentOnly || state.openId) return false;
     if (state.sort !== 'recommend') return false;
