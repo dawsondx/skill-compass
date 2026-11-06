@@ -68,7 +68,7 @@
   // 关页面时才落盘：这样同一天里刷新不会把角标刷掉，下次来才「清账」
   window.addEventListener('pagehide', saveSnap);
 
-  var state = { cat: 'all', q: '', sort: 'recommend', onlyImg: false, recentOnly: false, openId: null, author: 'all' };
+  var state = { cat: 'all', q: '', sort: 'recommend', onlyImg: false, recentOnly: false, openId: null, author: 'all', fav: false };
   var $grid = document.getElementById('grid');
   var $chips = document.getElementById('chips');
   var $authors = document.getElementById('authors');
@@ -82,6 +82,246 @@
   var $resultHint = document.getElementById('result-hint');
   var $activeFilters = document.getElementById('active-filters');
   var $statImg = document.querySelector('.stat[data-stat="img"]');
+  var $favBtn = document.getElementById('fav-btn');
+  var $favPop = document.getElementById('fav-pop');
+  var $favN = document.getElementById('fav-n');
+
+  /* ---------- 收藏夹：只存在这台机器上，没有账号、不上传 ---------- */
+  var FAV_KEY = 'skill-compass-favs-v1';
+  var favs = [];
+  try {
+    var savedFavs = JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
+    if (Array.isArray(savedFavs)) favs = savedFavs.filter(function (x) { return typeof x === 'string'; });
+  } catch (e) { favs = []; }
+  var favMap = {};
+  favs.forEach(function (id) { favMap[id] = 1; });
+
+  function isFav(id) { return !!favMap[id]; }
+  function saveFavs() {
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (e) {}
+  }
+  function syncFavCount() {
+    if ($favN) { $favN.textContent = favs.length; $favN.dataset.n = favs.length; }
+    var chip = $chips ? $chips.querySelector('[data-cat="__fav"]') : null;
+    if (chip) {
+      chip.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
+      var n = chip.querySelector('.n');
+      if (n) n.textContent = favs.length;
+    }
+  }
+  function toggleFav(id) {
+    if (favMap[id]) {
+      favs = favs.filter(function (x) { return x !== id; });
+      delete favMap[id];
+    } else {
+      favs.unshift(id);
+      favMap[id] = 1;
+    }
+    saveFavs();
+    // 卡片上的按钮就地翻转，不整屏重排；只有在「只看收藏」时才需要重排
+    Array.prototype.forEach.call(document.querySelectorAll('.card-fav[data-fav="' + id + '"]'), function (b) {
+      b.setAttribute('aria-pressed', isFav(id) ? 'true' : 'false');
+    });
+    syncFavCount();
+    renderFavPop();
+    syncDrawerFav();
+    if (state.fav) render();
+  }
+  function favList() {
+    return favs.map(function (id) {
+      return SKILLS.filter(function (s) { return s.id === id; })[0];
+    }).filter(Boolean);
+  }
+  function renderFavPop() {
+    if (!$favPop) return;
+    var list = favList();
+    if (!list.length) {
+      $favPop.innerHTML = '<div class="fav-empty"><b>还没有收藏</b>卡片右上角的星标点一下就收进来，存在本机浏览器里，不用登录。</div>';
+      return;
+    }
+    $favPop.innerHTML = '<div class="fav-head"><b>我的收藏</b>' + list.length + ' 个<button class="fav-clear" type="button" data-fav-clear="1">清空</button></div>' +
+      list.map(function (s) {
+        return '<div class="fav-item" data-fav-open="' + s.id + '">' +
+          '<div class="fi-main"><div class="fi-name">' + s.name + '</div><div class="fi-repo">' + s.repo + '</div></div>' +
+          '<button class="fi-x" type="button" data-fav-remove="' + s.id + '" aria-label="取消收藏 ' + s.name + '">×</button>' +
+          '</div>';
+      }).join('');
+  }
+  function setFavOpen(open) {
+    if (!$favPop || !$favBtn) return;
+    $favPop.hidden = !open;
+    $favBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) renderFavPop();
+  }
+
+  /* ---------- 日夜纸墨主题（按钮 / D 键 / 系统偏好） ---------- */
+  var THEME_KEY = 'skill-compass-theme';
+  var $themeBtn = document.getElementById('theme-btn');
+  var $metaTheme = document.querySelector('meta[name="theme-color"]');
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+  function applyTheme(mode) {
+    var dark = mode === 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    if ($themeBtn) $themeBtn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    if ($metaTheme) $metaTheme.setAttribute('content', dark ? '#15120E' : '#D9553A');
+  }
+  function toggleTheme() {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  }
+  if ($themeBtn) $themeBtn.addEventListener('click', toggleTheme);
+
+  /* ---------- 快速安装器：切宿主换命令 ---------- */
+  var HOSTS = {
+    npx: '',
+    claude: ' -a claude-code',
+    cursor: ' -a cursor',
+    codex: ' -a codex'
+  };
+  var installHost = 'npx';
+  // 安装器默认演示「推荐排序第一位」那个仓库：它既是首屏第一张卡，也是这个站最想推的东西
+  var spotlight = SKILLS[0];
+  function cmdFor(s, host) {
+    if (!s) return '';
+    return 'npx skills add ' + s.repo + (s.skill ? ' --skill ' + s.skill : '') + (HOSTS[host] || '');
+  }
+  function paintInstaller() {
+    var el = document.getElementById('inst-cmd-text');
+    if (el) el.textContent = cmdFor(spotlight, installHost);
+  }
+
+  /* ---------- 本周安装热度风向标 ---------- */
+  var PULSE = window.PULSE || null;
+  var $pulseList = document.getElementById('pulse-list');
+  var $pulseToggle = document.getElementById('pulse-toggle');
+  var $pulseFoot = document.getElementById('pulse-foot');
+  var pulseOpen = false;
+  var PULSE_COLLAPSED = 3;
+
+  // 榜单右侧那个数字：过万折成「12.6万」，万是单位不是数字，单独缩小一档
+  function fmtWan(n) {
+    if (n >= 10000) return (n / 10000).toFixed(1).replace(/\.0$/, '') + '<i>万</i>';
+    return String(n);
+  }
+  // 8 周安装量 → 一条小折线。只用真实序列，没有数据就不画
+  function sparkSVG(series) {
+    if (!series || series.length < 2) return '';
+    var w = 74, h = 22, pad = 2;
+    var max = Math.max.apply(null, series);
+    var min = Math.min.apply(null, series);
+    var span = max - min || 1;
+    var step = (w - pad * 2) / (series.length - 1);
+    var pts = series.map(function (v, i) {
+      var x = pad + i * step;
+      var y = pad + (1 - (v - min) / span) * (h - pad * 2);
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    var last = pts.split(' ').pop().split(',');
+    return '<svg class="pulse-spark" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true">' +
+      '<polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<circle cx="' + last[0] + '" cy="' + last[1] + '" r="1.9" fill="currentColor"/>' +
+      '</svg>';
+  }
+  function renderPulse() {
+    if (!$pulseList) return;
+    var items = (PULSE && PULSE.items) ? PULSE.items.filter(function (x) {
+      return SKILLS.some(function (s) { return s.id === x.id; });
+    }) : [];
+    if (!items.length) {
+      $pulseList.innerHTML = '<li class="pulse-empty">暂时没有可用的安装量数据，下次构建会补。</li>';
+      if ($pulseToggle) $pulseToggle.hidden = true;
+      return;
+    }
+    var shown = pulseOpen ? items : items.slice(0, PULSE_COLLAPSED);
+    $pulseList.innerHTML = shown.map(function (it, i) {
+      var dir = it.delta > 0 ? '较上周 +' + it.delta : (it.delta < 0 ? '较上周 ' + it.delta : '与上周持平');
+      var tip = '本周安装 ' + it.week + ' 次 · ' + dir + ' 次 · 累计 ' + it.installs + ' 次';
+      return '<li class="pulse-item" data-id="' + it.id + '" title="' + tip + '">' +
+        '<span class="pulse-rank">' + (i + 1) + '</span>' +
+        '<div class="pulse-main"><span class="pulse-name">' + it.name + '</span>' +
+        '<span class="pulse-repo">' + it.repo + '</span></div>' +
+        sparkSVG(it.weekly) +
+        '<span class="pulse-val">' + fmtWan(it.week) + '</span>' +
+        '</li>';
+    }).join('');
+    if ($pulseToggle) {
+      $pulseToggle.hidden = items.length <= PULSE_COLLAPSED;
+      $pulseToggle.setAttribute('aria-expanded', pulseOpen ? 'true' : 'false');
+      $pulseToggle.textContent = pulseOpen ? '收起榜单 ↑' : '切换完整榜单视图 →';
+    }
+    if ($pulseFoot && PULSE) {
+      $pulseFoot.innerHTML = '口径：<a href="https://www.skills.sh/" target="_blank" rel="noopener"><b>skills.sh</b></a> 公开安装量（<code>npx skills add</code> 的匿名遥测）· ' +
+        '按最近 7 天安装量排序，折线为近 8 周 · 站内 ' + SKILLS.length + ' 个仓库里 ' +
+        PULSE.total + ' 个查得到安装量，只排这些 · 更新于 ' + PULSE.at;
+    }
+  }
+  if ($pulseToggle) {
+    $pulseToggle.addEventListener('click', function () {
+      pulseOpen = !pulseOpen;
+      renderPulse();
+    });
+  }
+  if ($pulseList) {
+    $pulseList.addEventListener('click', function (e) {
+      var li = e.target.closest('.pulse-item');
+      if (!li) return;
+      var t = SKILLS.filter(function (s) { return s.id === li.dataset.id; })[0];
+      if (t) openDrawer(t);
+    });
+  }
+
+  /* ---------- 提交 Skill ---------- */
+  var ISSUE_BASE = 'https://github.com/dawsondx/skill-compass/issues/new';
+  var SUBMIT_TPL = [
+    '## 想推荐的 skill',
+    '- 仓库地址：',
+    '- 它产出什么（一句话）：',
+    '- 你实际用它做过什么：',
+    '- 有真实效果图吗（链接即可）：',
+    '',
+    '## 我确认',
+    '- [ ] 这是一个开源仓库，能直接 npx skills add 装',
+    '- [ ] 上面写的是我自己用过的感受，不是复制 README'
+  ].join('\n');
+  var $modal = document.getElementById('submit-modal');
+  function openModal() {
+    if (!$modal) return;
+    var issue = document.getElementById('submit-issue');
+    if (issue) {
+      issue.href = ISSUE_BASE + '?title=' + encodeURIComponent('[投稿] ') + '&body=' + encodeURIComponent(SUBMIT_TPL);
+    }
+    $modal.hidden = false;
+    document.body.classList.add('modal-open');
+    var close = $modal.querySelector('.modal-close');
+    if (close) close.focus();
+  }
+  function closeModal() {
+    if (!$modal || $modal.hidden) return;
+    $modal.hidden = true;
+    document.body.classList.remove('modal-open');
+    if ($submitBtn) $submitBtn.focus();
+  }
+  var $submitBtn = document.getElementById('submit-btn');
+  if ($submitBtn) $submitBtn.addEventListener('click', openModal);
+  if ($modal) {
+    $modal.addEventListener('click', function (e) {
+      if (e.target.closest('[data-close-modal]')) closeModal();
+    });
+    var $submitCopy = document.getElementById('submit-copy');
+    if ($submitCopy) {
+      $submitCopy.addEventListener('click', function () {
+        var done = function () {
+          $submitCopy.textContent = '已复制，去粘贴';
+          setTimeout(function () { $submitCopy.textContent = '复制投稿模板'; }, 1600);
+        };
+        if (navigator.clipboard) navigator.clipboard.writeText(SUBMIT_TPL).then(done, done);
+        else done();
+      });
+    }
+  }
 
   /* ---------- 工具 ---------- */
   var fmtNum = CT.fmtNum;
@@ -151,7 +391,10 @@
     }).length;
     s4.innerHTML = liveAuthors + '<span>位</span>';
   }
-  document.getElementById('stat-total').textContent = SKILLS.length;
+  // 顶栏「N 个 skill · M 个分类」那行已让位给 收藏夹 / 提交 / 主题 三件套，
+  // 总数由 hero 的 #hero-total 和统计栏 #s1 承担；这里只兜底，别让旧节点缺失把整个脚本打断
+  var $statTotal = document.getElementById('stat-total');
+  if ($statTotal) $statTotal.textContent = SKILLS.length;
 
   /* ---------- 分类 chips ---------- */
   function countOf(key) {
@@ -169,6 +412,7 @@
     });
     html += '<button class="chip chip-flag" data-cat="__upd" aria-pressed="' + (state.recentOnly ? 'true' : 'false') + '" title="最近 30 天内有提交的仓库">⟳ 近 30 天有更新<span class="n">' + recentCount() + '</span></button>';
     html += '<button class="chip chip-flag" data-cat="__img" aria-pressed="' + (state.onlyImg ? 'true' : 'false') + '">▶ 有演示图<span class="n">' + withImg + '</span></button>';
+    html += '<button class="chip chip-flag" data-cat="__fav" aria-pressed="' + (state.fav ? 'true' : 'false') + '" title="只看我收藏过的">★ 我的收藏<span class="n">' + favs.length + '</span></button>';
     $chips.innerHTML = html;
 
     $chips.addEventListener('click', function (e) {
@@ -181,10 +425,13 @@
       } else if (cat === '__upd') {
         state.recentOnly = !state.recentOnly;
         btn.setAttribute('aria-pressed', state.recentOnly ? 'true' : 'false');
+      } else if (cat === '__fav') {
+        state.fav = !state.fav;
+        btn.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
       } else {
         state.cat = cat;
         Array.prototype.forEach.call($chips.children, function (c) {
-          if (c.dataset.cat === '__img' || c.dataset.cat === '__upd') return;
+          if (c.dataset.cat === '__img' || c.dataset.cat === '__upd' || c.dataset.cat === '__fav') return;
           c.setAttribute('aria-pressed', c === btn ? 'true' : 'false');
         });
       }
@@ -270,6 +517,7 @@
       var k = c.dataset.cat, on;
       if (k === '__img') on = state.onlyImg;
       else if (k === '__upd') on = state.recentOnly;
+      else if (k === '__fav') on = state.fav;
       else on = (k === state.cat);
       c.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
@@ -286,6 +534,7 @@
     if (state.q) out.push({ k: 'q', t: '搜索：' + state.q });
     if (state.onlyImg) out.push({ k: 'img', t: '有演示图' });
     if (state.recentOnly) out.push({ k: 'recent', t: '近 30 天有更新' });
+    if (state.fav) out.push({ k: 'fav', t: '只看收藏' });
     if (!out.length) return '';
     return out.map(function (f) {
       var t = esc(f.t);
@@ -300,6 +549,7 @@
     else if (k === 'q') state.q = '';
     else if (k === 'img') state.onlyImg = false;
     else if (k === 'recent') state.recentOnly = false;
+    else if (k === 'fav') state.fav = false;
     syncFilterUI();
     render();
   }
@@ -309,6 +559,7 @@
     if (state.cat !== 'all' && s.cat !== state.cat) return false;
     if (state.onlyImg && !s.img) return false;
     if (state.recentOnly && !(s.days != null && s.days <= 30)) return false;
+    if (state.fav && !isFav(s.id)) return false;
     if (state.author !== 'all' && s.owner.toLowerCase() !== state.author.toLowerCase()) return false;
     if (!terms.length) return true;
     var hay = (s.name + ' ' + s.repo + ' ' + s.desc + ' ' + s.tags.join(' ') + ' ' + s.catName + ' ' + s.id
@@ -374,7 +625,7 @@
   }
 
   function cardHTML(s) {
-    return CT.cardHTML(s, { cat: CAT_MAP[s.cat], mark: markOf(s) });
+    return CT.cardHTML(s, { cat: CAT_MAP[s.cat], mark: markOf(s), fav: isFav(s.id) });
   }
 
   /* ---------- 渲染 ---------- */
@@ -389,7 +640,13 @@
 
     if (!list.length) {
       var noFilter = state.cat === 'all' && state.author === 'all' && !state.q &&
-        !state.onlyImg && !state.recentOnly;
+        !state.onlyImg && !state.recentOnly && !state.fav;
+      if (state.fav && !favs.length) {
+        $grid.innerHTML = '<div class="empty"><div class="big">收藏夹还是空的</div>' +
+          '<div>卡片右上角那颗星点一下就收进来，存在本机浏览器里，换设备不会同步。</div>' +
+          '<button class="empty-reset" type="button" data-reset="1">看全部 skill</button></div>';
+        return;
+      }
       $grid.innerHTML = '<div class="empty"><div class="big">没找到匹配的 skill</div>' +
         '<div>换个说法试试，比如「PPT」「配图」「架构图」「省 token」，或者点上面的分类</div>' +
         (noFilter ? '' : '<button class="empty-reset" type="button" data-reset="1">清空全部筛选</button>') +
@@ -552,6 +809,9 @@
       '<div class="drawer-actions">' +
       '<a class="btn btn-primary" href="' + repoUrl(s) + '" target="_blank" rel="noopener">打开 GitHub 仓库' +
       '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></a>' +
+      '<button class="btn btn-ghost" id="drawer-fav" type="button" data-drawer-fav="' + s.id + '" aria-pressed="' + (isFav(s.id) ? 'true' : 'false') + '">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
+      '<span>' + (isFav(s.id) ? '已收藏' : '收藏') + '</span></button>' +
       '</div>' +
       '<div class="sec-label">安装</div>' +
       '<div class="cmd"><code>' + installCmd(s) + '</code><button data-copy="' + installCmd(s) + '">复制</button></div>' +
@@ -579,10 +839,19 @@
     if (lastFocus) lastFocus.focus();
   }
 
+  function syncDrawerFav() {
+    var b = document.getElementById('drawer-fav');
+    if (!b) return;
+    var on = isFav(b.dataset.drawerFav);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    var sp = b.querySelector('span');
+    if (sp) sp.textContent = on ? '已收藏' : '收藏';
+  }
+
   /* ---------- 事件 ---------- */
   function resetAll() {
     state.cat = 'all'; state.author = 'all'; state.q = '';
-    state.sort = 'recommend'; state.onlyImg = false; state.recentOnly = false;
+    state.sort = 'recommend'; state.onlyImg = false; state.recentOnly = false; state.fav = false;
     syncFilterUI();
     syncSortUI();
     render();
@@ -625,11 +894,18 @@
 
   $grid.addEventListener('click', function (e) {
     if (e.target.closest('[data-reset]')) { resetAll(); return; }
+    var favBtn = e.target.closest('.card-fav');
+    if (favBtn) {
+      e.stopPropagation();
+      toggleFav(favBtn.dataset.fav);
+      return;
+    }
     var card = e.target.closest('.card');
     if (card) openDrawer(SKILLS.filter(function (s) { return s.id === card.dataset.id; })[0]);
   });
   $grid.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.target.closest('.card-fav')) return;
     var card = e.target.closest('.card');
     if (!card) return;
     e.preventDefault();
@@ -637,6 +913,12 @@
   });
 
   $dScroll.addEventListener('click', function (e) {
+    var drawerFav = e.target.closest('[data-drawer-fav]');
+    if (drawerFav) {
+      toggleFav(drawerFav.dataset.drawerFav);
+      syncDrawerFav();
+      return;
+    }
     var authorBtn = e.target.closest('[data-filter-author]');
     if (authorBtn) {
       setAuthor(authorBtn.dataset.filterAuthor);
@@ -674,8 +956,20 @@
   $overlay.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+      if ($modal && !$modal.hidden) { closeModal(); return; }
+      if ($favPop && !$favPop.hidden) { setFavOpen(false); if ($favBtn) $favBtn.focus(); return; }
       if ($sortMenu && !$sortMenu.hidden) { setSortOpen(false); if ($sortBtn) $sortBtn.focus(); return; }
       if ($drawer.classList.contains('on')) closeDrawer();
+      return;
+    }
+    // D 切换日夜纸墨；正在输入时让位给文字
+    if ((e.key === 'd' || e.key === 'D') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      var el = document.activeElement;
+      var typing = el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+      if (!typing && !document.body.classList.contains('modal-open')) {
+        e.preventDefault();
+        toggleTheme();
+      }
       return;
     }
     if (e.key === '/' && document.activeElement !== $q && !document.body.classList.contains('sort-open')) {
@@ -684,6 +978,66 @@
       $q.select();
     }
   });
+
+  /* ---------- 收藏夹浮层 / 安装器 ---------- */
+  if ($favBtn) {
+    $favBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setFavOpen($favPop.hidden);
+    });
+  }
+  if ($favPop) {
+    $favPop.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (e.target.closest('[data-fav-clear]')) {
+        favs = []; favMap = {};
+        saveFavs(); renderFavPop(); syncFavCount(); syncFilterUI(); render();
+        return;
+      }
+      var rm = e.target.closest('[data-fav-remove]');
+      if (rm) { toggleFav(rm.dataset.favRemove); return; }
+      var op = e.target.closest('[data-fav-open]');
+      if (op) {
+        setFavOpen(false);
+        var t = SKILLS.filter(function (s) { return s.id === op.dataset.favOpen; })[0];
+        if (t) openDrawer(t);
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if ($favPop.hidden || e.target.closest('.fav-wrap')) return;
+      setFavOpen(false);
+    });
+  }
+
+  var $instTabs = document.querySelector('.inst-tabs');
+  if ($instTabs) {
+    $instTabs.addEventListener('click', function (e) {
+      var b = e.target.closest('.inst-tab');
+      if (!b) return;
+      installHost = b.dataset.host;
+      Array.prototype.forEach.call($instTabs.children, function (x) {
+        x.setAttribute('aria-selected', x === b ? 'true' : 'false');
+      });
+      paintInstaller();
+    });
+  }
+  var $instCopy = document.getElementById('inst-copy');
+  if ($instCopy) {
+    $instCopy.addEventListener('click', function () {
+      var txt = cmdFor(spotlight, installHost);
+      var label = $instCopy.querySelector('span');
+      var done = function () {
+        $instCopy.classList.add('done');
+        if (label) label.textContent = '已复制';
+        setTimeout(function () {
+          $instCopy.classList.remove('done');
+          if (label) label.textContent = '复制命令';
+        }, 1600);
+      };
+      if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, done);
+      else done();
+    });
+  }
 
   var timer = null;
   $q.addEventListener('input', function () {
@@ -873,6 +1227,13 @@
 
   if (canHydrate()) hydrateStatic(); else render();
   syncTopH();
+
+  /* ---------- 首屏静态块的首次填充（不挂在交互上，否则要等用户点一下才出现） ---------- */
+  applyTheme(currentTheme());   // 内联脚本已定好 data-theme，这里只补按钮状态
+  syncFavCount();
+  renderFavPop();
+  paintInstaller();
+  renderPulse();
   if (state.openId) {
     var target = SKILLS.filter(function (s) { return s.id === state.openId; })[0];
     if (target) openDrawer(target);

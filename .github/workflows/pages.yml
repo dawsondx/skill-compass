@@ -54,6 +54,11 @@ jobs:
       # 保证快照数据（refresh 刚提交的 data.js）和 HTML 里的内容不会脱节
       - name: 预渲染首屏卡片与全量 SEO 数据
         run: node _tools/prerender.mjs
+      # 本周安装热度风向标：每天顺手抓一次 skills.sh 的公开安装量。
+      # 抓不到就沿用仓库里上次提交的 pulse.js，不让外部站点的抖动挡住部署
+      - name: 刷新本周安装热度风向标
+        continue-on-error: true
+        run: node _tools/fetch-pulse.mjs || echo '⚠ 风向标抓取失败，沿用上次快照'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

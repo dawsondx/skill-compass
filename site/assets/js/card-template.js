@@ -68,9 +68,16 @@
       thumb += '<img data-src="assets/img/' + s.img + '" alt="' + s.name + ' 效果演示">';
     }
     thumb += '<span class="badge-cat"><span class="dot" style="background:' + c.color + '"></span>' + c.name + '</span>';
+    // 右上角：角标 + 收藏。两个都挤在这一条里，收藏按钮才不会盖住「有更新」
+    var corner = '';
     if (mark) {
-      thumb += '<span class="badge-new ' + mark + '">' + (mark === 'new' ? '新增' : '有更新') + '</span>';
+      corner += '<span class="badge-new ' + mark + '">' + (mark === 'new' ? '新增' : '有更新') + '</span>';
     }
+    corner += '<button class="card-fav" type="button" data-fav="' + s.id + '" aria-pressed="' +
+      (opt.fav ? 'true' : 'false') + '" aria-label="收藏 ' + s.name + '" title="收藏 / 取消收藏">' +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
+      '</button>';
+    thumb += '<div class="thumb-tags">' + corner + '</div>';
     thumb += '</div>';
 
     var updHTML = s.days == null ? '' :
