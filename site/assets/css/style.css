@@ -752,7 +752,9 @@ kbd {
               box-shadow .28s cubic-bezier(.16,1,.3,1),
               border-color .2s ease;
   box-shadow: var(--shadow-1);
-  animation: rise .34s cubic-bezier(.2,.7,.3,1) both;
+  /* 注意：这里必须是 backwards 不是 both —— both 会把最后一帧的 transform:none 一直挂着，
+     hover 的 translateY(-3px) 就永远不生效 */
+  animation: rise .34s cubic-bezier(.2,.7,.3,1) backwards;
 }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); border-color: var(--line-hi); }
@@ -779,6 +781,222 @@ kbd {
 .thumb.fit { background: var(--paper-3); }
 .thumb.fit img { object-fit: contain; }
 .card:hover .thumb.fit img { transform: none; }
+
+/* ================= 无图封面：按分类画的「假界面画布」 =================
+   16:10 的封面里塞一张微型版式：顶条（类型/规格）+ 主体（该分类的产出物）+ 底条（标签/分类）。
+   主体统一做成「一张贴在纸上的截图」：白底 + 细边 + 圆角，颜色走 CSS 变量，深色自动反色。 */
+.cov {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: 8px 9px 7px;
+  background:
+    radial-gradient(circle at 84% 8%, color-mix(in srgb, var(--cc) 14%, transparent), transparent 58%),
+    linear-gradient(0deg, var(--cover-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cover-line) 1px, transparent 1px),
+    var(--paper-3);
+  background-size: 100% 100%, 16px 16px, 16px 16px, 100% 100%;
+  overflow: hidden;
+}
+.cv-top {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-right: 22px;   /* 右上角有收藏星标，别让规格标签钻到它下面 */
+  font-family: var(--mono); font-size: 8px; line-height: 1;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3);
+  flex-shrink: 0;
+}
+.cv-top .v { color: color-mix(in srgb, var(--cc) 78%, var(--ink-3)); }
+.cv-body {
+  flex: 1; min-height: 0; margin: 6px 0 5px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+/* 所有主体的骨架线统一用这个强度，太浅会看成空白 */
+.cv-slide u, .cv-doc u, .cv-cards u, .cv-feed b {
+  background: color-mix(in srgb, var(--ink) 16%, transparent) !important;
+}
+.cv-foot {
+  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+  font-family: var(--sans); font-size: 8.5px; color: var(--ink-3);
+}
+.cv-foot span {
+  padding: 1px 5px; border-radius: 4px;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  max-width: 86px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cv-foot i { margin-left: auto; font-style: normal; font-size: 8.5px; opacity: .85; }
+/* 带封面的卡片不再叠分类角标（封面底条已经写了分类，两个挤左上角会打架） */
+.thumb.cov-thumb .badge-cat { display: none; }
+
+/* 设计与前端：色板 + 字阶样张 */
+.cv-design .cv-body { justify-content: space-between; }
+.cv-sw { display: flex; gap: 5px; }
+.cv-sw i { width: 22px; height: 22px; border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1); }
+.cv-type { display: flex; align-items: baseline; gap: 7px; }
+.cv-type b { font-family: var(--serif); font-size: 32px; line-height: .85; color: var(--ink); font-weight: 700; }
+.cv-type span { font-family: var(--mono); font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.cv-bar { height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
+.cv-bar i { display: block; height: 100%; background: var(--cc); }
+
+/* 幻灯片：一张缩小的 slide，铺满主体 */
+.cv-slide {
+  position: relative; flex: 1; min-height: 0; border-radius: 7px;
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--cc) 26%, var(--line-2));
+  box-shadow: 0 1px 2px rgba(23, 19, 14, .05);
+  padding: 10px 11px; display: flex; flex-direction: column; gap: 6px;
+}
+.cv-slide b { font-family: var(--serif); font-size: 14px; color: var(--ink); line-height: 1.2; }
+.cv-slide u { display: block; height: 4px; border-radius: 2px; text-decoration: none; }
+.cv-slide u:first-of-type { background: color-mix(in srgb, var(--cc) 55%, transparent) !important; }
+.cv-slide s { position: absolute; right: 10px; bottom: 8px; font-family: var(--mono); font-size: 9px; color: var(--ink-3); text-decoration: none; }
+
+/* 图表：三节点两连线 */
+.cv-graph { position: relative; flex: 1; min-height: 0; }
+.cv-graph .n {
+  position: absolute; font-family: var(--mono); font-size: 9px; color: var(--ink);
+  padding: 4px 7px; border-radius: 5px;
+  background: var(--paper); border: 1px solid color-mix(in srgb, var(--cc) 38%, var(--line-2));
+  box-shadow: 0 1px 2px rgba(23, 19, 14, .05);
+}
+.cv-graph .n1 { left: 0; top: 50%; transform: translateY(-50%); }
+.cv-graph .n2 { left: 40%; top: 6%; }
+.cv-graph .n3 { left: 40%; bottom: 6%; }
+.cv-graph .l { position: absolute; left: 27%; width: 15%; height: 1.5px; background: color-mix(in srgb, var(--cc) 55%, transparent); }
+.cv-graph .l1 { top: 30%; transform: rotate(-16deg); }
+.cv-graph .l2 { bottom: 30%; transform: rotate(16deg); }
+
+/* 视频：播放器时间轴 */
+.cv-player {
+  position: relative; flex: 1; min-height: 0; border-radius: 7px; overflow: hidden;
+  background: #1B1916; color: #F0E9DA;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 9px 10px; gap: 7px;
+}
+:root[data-theme="dark"] .cv-player { background: #0D0B08; border: 1px solid var(--line); }
+.cv-player .rec {
+  position: absolute; left: 9px; top: 8px;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 8px; letter-spacing: .12em; color: #E4675A;
+}
+.cv-player .rec i { width: 4px; height: 4px; border-radius: 50%; background: #E4675A; }
+.cv-player .tc { position: absolute; right: 9px; top: 8px; font-family: var(--mono); font-size: 8px; opacity: .65; }
+.cv-player .play {
+  position: absolute; left: 50%; top: 44%; width: 24px; height: 24px; margin: -12px 0 0 -12px;
+  border-radius: 50%; background: rgba(255, 255, 255, .94);
+}
+.cv-player .play::after {
+  content: ''; position: absolute; left: 9px; top: 7px;
+  border-left: 8px solid #1B1916; border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+}
+.cv-player .track { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, .2); overflow: hidden; }
+.cv-player .track i { display: block; height: 100%; background: #E4675A; }
+.cv-player s { font-family: var(--mono); font-size: 8px; opacity: .55; text-decoration: none; }
+
+/* 插画与图像：四宫格 */
+.cv-tiles { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 5px; flex: 1; min-height: 0; }
+.cv-tiles i { border-radius: 5px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06); }
+
+/* 写作：文档页 */
+.cv-doc {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 7px;
+  padding: 10px 11px; border-radius: 7px;
+  background: var(--paper); border: 1px solid var(--line-2);
+  box-shadow: 0 1px 2px rgba(23, 19, 14, .04);
+}
+.cv-doc b { font-family: var(--serif); font-size: 13px; color: var(--ink); margin-bottom: 1px; }
+.cv-doc u { display: block; height: 4px; border-radius: 2px; text-decoration: none; }
+.cv-doc u:nth-of-type(1) { background: color-mix(in srgb, var(--cc) 50%, transparent) !important; }
+
+/* 知识：两张叠卡 + 一张正面卡 */
+.cv-cards { position: relative; flex: 1; min-height: 0; }
+.cv-cards i { position: absolute; left: 8%; right: 8%; height: 74%; border-radius: 7px; background: var(--paper); border: 1px solid var(--line-2); }
+.cv-cards .c1 { top: 0; transform: scale(.88); opacity: .55; }
+.cv-cards .c2 { top: 7%; transform: scale(.94); opacity: .8; }
+.cv-cards .c3 {
+  position: absolute; left: 12%; right: 12%; bottom: 0; top: 16%;
+  border-radius: 7px; background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--cc) 32%, var(--line-2));
+  box-shadow: 0 1px 3px rgba(23, 19, 14, .05);
+  padding: 8px 9px; display: flex; flex-direction: column; gap: 6px;
+}
+.cv-cards .c3 b { font-size: 10.5px; color: var(--ink); font-family: var(--sans); }
+.cv-cards .c3 u { height: 4px; border-radius: 2px; text-decoration: none; }
+
+/* 情报：信息流 */
+.cv-feed {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-evenly; gap: 6px;
+  padding: 10px 11px; border-radius: 7px;
+  background: var(--paper); border: 1px solid var(--line-2);
+}
+.cv-feed .row { display: flex; align-items: center; gap: 7px; }
+.cv-feed .row i { width: 5px; height: 5px; border-radius: 50%; background: color-mix(in srgb, var(--cc) 80%, var(--ink-3)); flex-shrink: 0; }
+.cv-feed .row b { height: 5px; border-radius: 2px; }
+.cv-feed .row s { margin-left: auto; font-family: var(--mono); font-size: 7.5px; color: var(--ink-3); text-decoration: none; }
+
+/* 元技能：终端 */
+.cv-term {
+  flex: 1; min-height: 0; border-radius: 7px; padding: 9px 10px;
+  background: var(--cmd-bg); color: var(--cmd-ink);
+  font-family: var(--mono); font-size: 9.5px; line-height: 1.6;
+  display: flex; flex-direction: column; justify-content: space-evenly; gap: 2px;
+}
+.cv-term .ln { display: flex; align-items: center; gap: 5px; }
+.cv-term .ln s { color: var(--accent); text-decoration: none; }
+.cv-term .ln u { text-decoration: none; opacity: .9; }
+.cv-term .out i { display: block; height: 4px; border-radius: 2px; background: currentColor; opacity: .22; }
+.cv-term .ok { color: var(--teal); opacity: .95; }
+
+/* 套装：文件树 */
+.cv-tree {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-evenly; gap: 4px;
+  padding: 10px 11px; border-radius: 7px;
+  background: var(--paper); border: 1px solid var(--line-2);
+  font-family: var(--mono); font-size: 9.5px; line-height: 1.5; color: var(--ink-2);
+}
+.cv-tree b { color: var(--ink); font-weight: 600; }
+.cv-tree .sz { margin-left: auto; font-size: 8px; opacity: .75; }
+.cv-tree span { color: var(--ink-3); }
+.cv-tree .last { color: color-mix(in srgb, var(--cc) 75%, var(--ink-3)); }
+
+/* 商业：KPI + 迷你柱状 */
+.cv-kpi {
+  flex: 1; min-height: 0; display: flex; align-items: center; gap: 14px;
+  padding: 10px 12px; border-radius: 7px;
+  background: var(--paper); border: 1px solid var(--line-2);
+}
+.cv-kpi .num { font-family: var(--mono); font-size: 30px; font-weight: 600; color: var(--ink); line-height: 1; }
+.cv-kpi .num s { font-size: 10px; margin-left: 3px; color: var(--cc); text-decoration: none; }
+.cv-kpi .bars { flex: 1; height: 62%; display: flex; align-items: flex-end; gap: 5px; }
+.cv-kpi .bars i { flex: 1; border-radius: 2px 2px 0 0; background: color-mix(in srgb, var(--cc) 60%, var(--line-2)); }
+
+/* —— 上面几套画布的补充零件 —— */
+.cv-bar.thin { height: 3px; opacity: .5; }
+.cv-tiles { grid-template-columns: repeat(3, 1fr); }
+.cv-slide-f { margin-top: auto; display: flex; align-items: center; gap: 6px; }
+.cv-slide-f .chip { width: 26px; height: 5px; border-radius: 3px; background: color-mix(in srgb, var(--cc) 65%, transparent); }
+.cv-slide-f s { position: static; margin-left: auto; }
+.cv-doc-f {
+  margin-top: auto; display: flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 8px; color: var(--ink-3);
+}
+.cv-cards .c3 .chips { display: flex; gap: 4px; margin-top: auto; }
+.cv-cards .c3 .chips span {
+  height: 6px; border-radius: 3px; flex: 1;
+  background: color-mix(in srgb, var(--cc) 30%, transparent);
+}
+.cv-cards .c3 .chips span:last-child { flex: .6; background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.cv-term .cur {
+  display: inline-block; width: 5px; height: 10px; margin-left: 2px;
+  background: currentColor; opacity: .7; animation: caret 1.1s steps(1) infinite;
+}
+@keyframes caret { 0%, 50% { opacity: .7; } 50.01%, 100% { opacity: 0; } }
+.cv-business .cv-body { justify-content: stretch; gap: 5px; }
+.cv-kpi-f {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 8px; color: var(--ink-3); flex-shrink: 0;
+}
+.cv-kpi-f span { padding: 1px 5px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.cv-kpi-f i { margin-left: auto; font-style: normal; color: var(--teal); }
+
 
 /* 封面右下角的一键复制：默认藏在下方 6px，悬停/聚焦时浮起（照样板那条曲线） */
 .quick-copy {
