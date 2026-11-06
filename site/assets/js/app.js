@@ -36,6 +36,11 @@
     s.catName = (CAT_MAP[s.cat] || {}).name || s.cat;
     s.owner = ownerOf(s);
     s.author = authorOf(s);
+    // 补图清单（_tools/fetch-demo-images.mjs 生成）里有的，就当作有图；data.js 自带的 img 优先
+    if (!s.img) {
+      var extra = window.DEMO_IMGS && window.DEMO_IMGS[s.id];
+      if (extra) s.img = extra;
+    }
     var u = UPS[s.repo] || [];
     s.upd = u[0] || '';       // 最近一次提交
     s.ver = u[1] || '';       // 能抽出语义化版本号才有
@@ -1027,8 +1032,30 @@
     });
   }
 
+  /* 卡片右下角的一键复制：就地变「已复制」，1.6s 还原，不打断浏览 */
+  function copyInstall(btn) {
+    var cmd = btn.dataset.cmd || '';
+    var label = btn.querySelector('.qc-t');
+    function done() {
+      btn.classList.add('done');
+      if (label) label.textContent = '✓ 已复制';
+      setTimeout(function () {
+        btn.classList.remove('done');
+        if (label) label.textContent = '$ 一键复制命令';
+      }, 1600);
+    }
+    if (navigator.clipboard && cmd) navigator.clipboard.writeText(cmd).then(done, done);
+    else done();
+  }
+
   $grid.addEventListener('click', function (e) {
     if (e.target.closest('[data-reset]')) { resetAll(); return; }
+    var qc = e.target.closest('.quick-copy');
+    if (qc) {
+      e.stopPropagation();
+      copyInstall(qc);
+      return;
+    }
     var favBtn = e.target.closest('.card-fav, .rr-fav');
     if (favBtn) {
       e.stopPropagation();
@@ -1040,7 +1067,7 @@
   });
   $grid.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    if (e.target.closest('.card-fav, .rr-fav')) return;
+    if (e.target.closest('.card-fav, .rr-fav, .quick-copy')) return;
     var card = e.target.closest('.card, .rank-row');
     if (!card) return;
     e.preventDefault();

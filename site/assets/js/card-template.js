@@ -52,6 +52,12 @@
     return n.slice(0, 1);
   }
 
+  /* 安装命令：合集里的子 skill 要带 --skill，否则会装整个仓库 */
+  function installCmd(s) {
+    if (!s) return '';
+    return 'npx skills add ' + s.repo + (s.skill ? ' --skill ' + s.skill : '');
+  }
+
   /* opt: { cat: {name,color}, mark: 'new' | 'upd' | '' } */
   function cardHTML(s, opt) {
     opt = opt || {};
@@ -78,6 +84,10 @@
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
       '</button>';
     thumb += '<div class="thumb-tags">' + corner + '</div>';
+    // 右下角的一键复制：默认藏着，鼠标上来才浮起（触屏设备常显）
+    var cmd = installCmd(s);
+    thumb += '<button class="quick-copy" type="button" data-cmd="' + cmd + '" aria-label="复制安装命令：' + cmd + '" title="' + cmd + '">' +
+      '<span class="qc-t">$ 一键复制命令</span></button>';
     thumb += '</div>';
 
     var updHTML = s.days == null ? '' :
@@ -133,6 +143,7 @@
     freshOf: freshOf,
     fmtNum: fmtNum,
     glyphOf: glyphOf,
+    installCmd: installCmd,
     cardHTML: cardHTML,
     recommendOrder: recommendOrder
   };

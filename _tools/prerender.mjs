@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const HTML_PATH = path.join(ROOT, 'site', 'index.html');
 const DATA_PATH = path.join(ROOT, 'site', 'assets', 'js', 'data.js');
+const DEMO_PATH = path.join(ROOT, 'site', 'assets', 'js', 'demo-images.js');
 const TPL_PATH = path.join(ROOT, 'site', 'assets', 'js', 'card-template.js');
 
 const TOP_COUNT = 24;
@@ -35,14 +36,15 @@ const NOS_MARK_B = '<!--PRERENDER:NOSCRIPT:END-->';
 
 /* ---------- 加载数据与模板（同一个沙箱，模拟浏览器 window） ---------- */
 function loadSandbox() {
-  for (const f of [DATA_PATH, TPL_PATH]) {
+  const files = [DATA_PATH, TPL_PATH];
+  if (fs.existsSync(DEMO_PATH)) files.splice(1, 0, DEMO_PATH);   // 补图清单，data.js 之后、模板之前
+  for (const f of files) {
     if (!fs.existsSync(f)) throw new Error('缺少文件：' + path.relative(ROOT, f));
   }
   const sandbox = {};
   vm.createContext(sandbox);
   Object.defineProperty(sandbox, 'window', { value: sandbox, writable: true, configurable: true });
-  vm.runInContext(fs.readFileSync(DATA_PATH, 'utf8'), sandbox, { filename: 'data.js' });
-  vm.runInContext(fs.readFileSync(TPL_PATH, 'utf8'), sandbox, { filename: 'card-template.js' });
+  files.forEach((f) => vm.runInContext(fs.readFileSync(f, 'utf8'), sandbox, { filename: path.basename(f) }));
   return sandbox;
 }
 
@@ -64,7 +66,9 @@ const AUTHOR_MAP = {};
 AUTHORS.forEach((a) => { AUTHOR_MAP[a.owner.toLowerCase()] = a; });
 
 const NOW = new Date();
+const DEMO_IMGS = sb.DEMO_IMGS || {};
 SKILLS.forEach((s) => {
+  if (!s.img && DEMO_IMGS[s.id]) s.img = DEMO_IMGS[s.id];   // 同 app.js：补图清单兜底
   s.owner = s.repo.split('/')[0];
   s.author = AUTHOR_MAP[s.owner.toLowerCase()] || null;
   s.catName = (CAT_MAP[s.cat] || {}).name || s.cat;
