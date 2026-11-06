@@ -174,6 +174,12 @@
       <button class="fb-ctl fb-flag" id="flag-upd" type="button" aria-pressed="false"><i class="dt dt-upd"></i>近 30 天更新<span class="n" id="n-upd">71</span></button>
       <button class="fb-ctl fb-flag" id="flag-fav" type="button" aria-pressed="false"><i class="dt dt-fav">★</i>我的收藏<span class="n" id="n-fav">0</span></button>
 
+      <!-- 筛选之后的重置：只在真的有筛选条件时出现，点一下回到全部 -->
+      <button class="af-reset" id="filter-reset" type="button" hidden title="清空全部筛选条件">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        <span class="r-long">重置全部筛选</span><span class="r-short">重置</span>
+      </button>
+
       <div class="fb-right">
         <span class="fb-count" id="result-text">展示 <b>294</b> 个（共收录 <b>294</b> 个）</span>
         <div class="sortsel-wrap" id="sort-wrap">
@@ -206,6 +212,11 @@
 
 <main class="grid-wrap">
   <div class="result-line">
+    <!-- 窄屏时控件条要横滑，重置放在那里会被滑出去看不见，改在这条常驻行上露一颗 -->
+    <button class="af-reset af-reset-line" id="filter-reset-2" type="button" hidden title="清空全部筛选条件">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      <span class="r-long">重置全部筛选</span><span class="r-short">重置</span>
+    </button>
     <span class="active-filters" id="active-filters"></span>
     <span id="result-hint"></span>
     <span id="fresh-hint" class="fresh-hint"></span>

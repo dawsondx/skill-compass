@@ -439,21 +439,18 @@ kbd {
 }
 
 /* 第一行：场景（分类）导航。选中是一颗实心墨丸，未选就是纯文字，计数当上标。
-   12 个场景一行放不下就横滑，右端用遮罩渐隐提示「还有」——样板页也是这么处理的 */
+   桌面上允许折行——12 个中文分类一行装不下，横向滚对鼠标用户太别扭；
+   折行后一屏能看全，窄屏（≤900）才退回横滑 + 右端渐隐 */
 .cats {
-  display: flex; align-items: center; flex-wrap: nowrap; gap: 1px 2px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 1px;
   margin-bottom: 9px;
-  overflow-x: auto; scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 30px), transparent 100%);
 }
-.cats::-webkit-scrollbar { display: none; }
 .cat-tab {
   flex-shrink: 0;
-  display: inline-flex; align-items: center; gap: 7px;
-  height: 30px; padding: 0 11px; border: 0; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 9px; border: 0; border-radius: 999px;
   background: transparent; color: var(--ink-2);
-  font-family: var(--sans); font-size: 13.5px; font-weight: 500; letter-spacing: -.005em;
+  font-family: var(--sans); font-size: 13px; font-weight: 500; letter-spacing: -.005em;
   cursor: pointer; white-space: nowrap;
   transition: background .15s, color .15s;
 }
@@ -470,7 +467,7 @@ kbd {
 
 /* 第二行：一张白纸控件条 —— 左三颗筛选，右侧结果数 / 排序 / 画廊·榜单 */
 .fb-bar {
-  display: flex; align-items: center; gap: 7px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 7px;
   padding: 6px 7px;
   background: var(--paper); border: 1px solid var(--line);
   border-radius: 12px; box-shadow: var(--shadow-1);
@@ -539,6 +536,12 @@ kbd {
 .fb-right { display: flex; align-items: center; gap: 7px; margin-left: auto; }
 .fb-count { font-size: 12px; color: var(--ink-3); white-space: nowrap; letter-spacing: .01em; }
 .fb-count b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+/* 「（共收录 294 个）」是补充信息，宽屏才留，窄屏让位给控件 */
+@media (max-width: 1240px) {
+  .fb-all { display: none; }
+  .fb-bar { gap: 5px; }
+  .fb-ctl { padding: 0 9px; }
+}
 .view-switch {
   flex-shrink: 0; display: inline-flex; gap: 2px; padding: 2px;
   background: var(--paper-2); border: 1px solid var(--line); border-radius: 9px;
@@ -635,14 +638,36 @@ kbd {
   cursor: pointer; transition: opacity .15s, background .15s;
 }
 .af-x:hover { opacity: 1; background: rgba(0, 0, 0, .07); }
-.af-clear {
-  height: 23px; padding: 0 4px; border: 0; background: transparent;
-  color: var(--ink-3); font-size: 11.5px; font-family: var(--sans);
-  cursor: pointer; letter-spacing: 0;
-  text-decoration: underline; text-underline-offset: 2px;
-  transition: color .15s;
+/* 重置：样板那颗「× 重置全部筛选」。跟着筛选控件待在同一条，只真有条件时露出，
+   比一行小字「清空」好找，也不用滚回筛选区 */
+.af-reset {
+  flex-shrink: 0;
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 31px; padding: 0 12px; margin-left: 2px;
+  border: 1px solid transparent; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600; letter-spacing: 0;
+  cursor: pointer; white-space: nowrap;
+  animation: resetIn .18s cubic-bezier(.2,.7,.3,1) both;
+  transition: background .15s, color .15s, border-color .15s;
 }
-.af-clear:hover { color: var(--ink); }
+.af-reset[hidden] { display: none; }
+.af-reset svg { flex-shrink: 0; }
+.af-reset .r-short { display: none; }
+/* 空间紧的时候缩成「× 重置」，语义不变但省 40px（这条必须排在 .r-short 的 display:none 之后） */
+@media (max-width: 1240px) {
+  .af-reset .r-long { display: none; }
+  .af-reset .r-short { display: inline; }
+}
+.af-reset:hover { background: var(--accent); color: #FFF6F0; border-color: var(--accent); }
+@keyframes resetIn { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
+
+/* 宽屏用控件条里那颗；窄屏控件条要横滑，改由结果行那颗顶上（互斥，避免两个同时出现） */
+.af-reset-line { display: none; }
+@media (max-width: 900px) {
+  .fb-bar .af-reset { display: none; }
+  .af-reset-line { display: inline-flex; height: 27px; font-size: 12px; padding: 0 10px; margin-left: 0; }
+}
 .grid {
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
@@ -1184,6 +1209,7 @@ footer b { color: var(--ink-2); font-weight: 550; }
   .cats {
     flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
     -webkit-overflow-scrolling: touch; padding-right: 16px; margin-bottom: 7px;
+    mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 28px), transparent 100%);
   }
   .cats::-webkit-scrollbar { display: none; }
   .cat-tab { height: 32px; padding: 0 10px; font-size: 13px; }

@@ -79,6 +79,8 @@
   var $flagUpd = document.getElementById('flag-upd');
   var $flagFav = document.getElementById('flag-fav');
   var $viewSwitch = document.getElementById('view-switch');
+  var $filterReset = document.getElementById('filter-reset');
+  var $filterReset2 = document.getElementById('filter-reset-2');
   var $q = document.getElementById('q');
   var $sortBtn = document.getElementById('sort-btn');
   var $sortLabel = document.getElementById('sort-label');
@@ -420,8 +422,10 @@
     $chips.addEventListener('click', function (e) {
       var btn = e.target.closest('.cat-tab');
       if (!btn) return;
-      if (state.cat === btn.dataset.cat) return;
-      state.cat = btn.dataset.cat;
+      // 再点一次当前分类 = 取消回全部，省得为退出一个分类去找重置按钮
+      var next = btn.dataset.cat === state.cat ? 'all' : btn.dataset.cat;
+      if (next === state.cat) return;
+      state.cat = next;
       syncCats();
       render();
     });
@@ -563,6 +567,8 @@
   bindFlag($flagImg, 'img');
   bindFlag($flagUpd, 'recent');
   bindFlag($flagFav, 'fav');
+  if ($filterReset) $filterReset.addEventListener('click', resetAll);
+  if ($filterReset2) $filterReset2.addEventListener('click', resetAll);
   // 开关上的计数（演示图 / 近 30 天 / 收藏）跟着数据走，不写死在 HTML 里
   (function () {
     var $nImg = document.getElementById('n-img');
@@ -608,7 +614,7 @@
       var t = esc(f.t);
       return '<span class="af-chip">' + t +
         '<button class="af-x" type="button" data-drop="' + f.k + '" aria-label="移除条件：' + t + '">×</button></span>';
-    }).join('') + '<button class="af-clear" type="button" data-reset="1">清空</button>';
+    }).join('');
   }
 
   function dropFilter(k) {
@@ -746,9 +752,13 @@
 
     $grid.className = state.view === 'list' ? 'grid list' : 'grid';
     syncViewUI();
-    // 结果数：样板页的写法是「展示 N 个（共收录 M 个）」，一眼能看出筛掉了多少
-    $resultText.innerHTML = (isFiltered() ? '筛选出 ' : '展示 ') + '<b>' + list.length + '</b> 个（共收录 <b>' +
-      SKILLS.length + '</b> 个）';
+    // 「重置全部筛选」只在有筛选条件时露出，跟筛选控件待在同一条里，不用滚回去找
+    if ($filterReset) $filterReset.hidden = !isFiltered();
+    if ($filterReset2) $filterReset2.hidden = !isFiltered();
+    // 结果数：样板页的写法是「展示 N 个（共收录 M 个）」，一眼能看出筛掉了多少；
+    // 窄屏把括号那截收掉，控件条才排得进一行
+    $resultText.innerHTML = (isFiltered() ? '筛选出 ' : '展示 ') + '<b>' + list.length + '</b> 个' +
+      '<span class="fb-all">（共收录 <b>' + SKILLS.length + '</b> 个）</span>';
     if ($activeFilters) $activeFilters.innerHTML = activeFiltersHTML();
     $resultHint.textContent = '';
 
@@ -1321,7 +1331,8 @@
      以下情况照常 render()：带筛选/深链接参数、有回访快照（要补「新增 / 有更新」角标）、
      静态数据不是这两天的（相对时间「X 天前」会偏）。 */
   function hydrateStatic() {
-    $resultText.innerHTML = '展示 <b>' + SKILLS.length + '</b> 个（共收录 <b>' + SKILLS.length + '</b> 个）';
+    $resultText.innerHTML = '展示 <b>' + SKILLS.length + '</b> 个' +
+      '<span class="fb-all">（共收录 <b>' + SKILLS.length + '</b> 个）</span>';
     $resultHint.textContent = '';
     if ($activeFilters) $activeFilters.innerHTML = '';
     initIO();
