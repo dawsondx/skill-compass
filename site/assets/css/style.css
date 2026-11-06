@@ -675,62 +675,94 @@ kbd {
   grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
 }
 
-/* ---------- 榜单视图：同一批结果的另一种看法，一张纸、一行一个仓库 ---------- */
+/* ---------- 榜单视图：宽屏当表格用（列对齐、可点表头排序），窄屏塌成卡片行 ----------
+   用 div+grid 不用 <table>：行内要放收藏星标、一键复制、整行点击，表格语义会打架，
+   而且 grid 只改一个模板就能在窄屏变成两行布局。 */
 .grid.list {
   display: block;
   background: var(--paper); border: 1px solid var(--line);
   border-radius: var(--radius); overflow: hidden;
   box-shadow: var(--shadow-1);
 }
+.rank-head,
 .rank-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 14px; border-top: 1px solid var(--line-2);
+  display: grid;
+  grid-template-columns: 34px 40px minmax(150px, 1.05fr) minmax(0, 1.5fr) 92px 74px 72px 26px 14px;
+  align-items: center; gap: 10px;
+  padding: 0 14px;
+}
+.rank-head {
+  height: 33px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.rank-head > * { display: flex; align-items: center; min-width: 0; }
+.rank-head button {
+  padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: inherit; gap: 4px; transition: color .15s;
+}
+.rank-head button:hover { color: var(--ink); }
+.rank-head button[aria-sort] { color: var(--accent); font-weight: 600; }
+.rank-head button[aria-sort]::after {
+  content: '▲'; font-size: 7px; transform: translateY(-1px);
+}
+.rank-head button[aria-sort="descending"]::after { content: '▼'; }
+.rh-star, .rh-upd { justify-content: flex-end; }
+
+.rank-row {
+  padding-top: 7px; padding-bottom: 7px;
+  border-top: 1px solid var(--line-2);
   cursor: pointer; text-align: left;
   animation: rise .28s cubic-bezier(.2,.7,.3,1) both;
   transition: background .12s;
 }
-.rank-row:first-child { border-top: 0; }
+.rank-head + .rank-row { border-top: 0; }
 .rank-row:hover { background: var(--paper-2); }
 .rank-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .rr-num {
-  flex-shrink: 0; width: 24px; text-align: right;
   font-family: var(--mono); font-size: 11.5px; color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums; justify-content: flex-end;
 }
-.rank-row:nth-child(-n+3) .rr-num { color: var(--accent); font-weight: 700; }
+.rank-row:nth-child(-n+4) .rr-num { color: var(--accent); font-weight: 700; }
 .rr-thumb {
-  flex-shrink: 0; width: 48px; height: 36px;
-  border-radius: 6px; overflow: hidden;
+  width: 40px; height: 26px; border-radius: 4px; overflow: hidden;
   background: var(--paper-2); border: 1px solid var(--line-2);
   display: grid; place-items: center;
-  font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--ink-3);
+  font-family: var(--serif); font-size: 13px; font-weight: 700; color: var(--ink-3);
 }
 .rr-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.rr-main { flex: 1; min-width: 0; }
-.rr-top { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.rr-name-c { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .rr-name {
-  font-size: 13.5px; font-weight: 600; color: var(--ink);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; max-width: 45%;
+  font-size: 13.5px; font-weight: 600; color: var(--ink); letter-spacing: -.005em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .15s;
 }
+.rank-row:hover .rr-name { color: var(--accent); }
 .rr-repo {
-  font-family: var(--mono); font-size: 10.5px; color: var(--ink-3);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
-}
-.rr-cat {
-  flex-shrink: 0; font-size: 10px; color: var(--ink-3);
-  border: 1px solid var(--line-2); border-radius: 3px; padding: 0 4px;
-}
-.rr-desc {
-  margin: 2px 0 0; font-size: 12px; line-height: 1.5; color: var(--ink-2);
+  font-family: var(--mono); font-size: 10px; color: var(--ink-3);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.rr-meta {
-  flex-shrink: 0; display: flex; align-items: center; gap: 10px;
-  font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums;
+.rr-desc {
+  margin: 0; font-size: 12px; line-height: 1.5; color: var(--ink-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.rr-star { display: inline-flex; align-items: center; gap: 3px; }
+.rr-cat {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--ink-2); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.rr-cat i { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.rr-star, .rr-upd {
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
+  font-variant-numeric: tabular-nums; justify-content: flex-end;
+  white-space: nowrap;
+}
+.rr-star { color: var(--ink); font-weight: 500; }
+.rr-upd { color: var(--ink-3); }
 .rr-fav {
-  flex-shrink: 0; width: 26px; height: 26px; padding: 0;
+  width: 26px; height: 26px; padding: 0;
   display: grid; place-items: center;
   border: 1px solid transparent; border-radius: 6px;
   background: transparent; color: var(--ink-3);
@@ -739,7 +771,27 @@ kbd {
 .rank-row:hover .rr-fav, .rr-fav[aria-pressed="true"] { opacity: 1; }
 .rr-fav:hover { background: var(--paper-3); color: var(--accent); }
 .rr-fav[aria-pressed="true"] { color: var(--accent); }
-.rr-go { flex-shrink: 0; color: var(--ink-3); display: grid; place-items: center; }
+.rr-go { color: var(--ink-3); display: grid; place-items: center; opacity: .55; }
+.rank-row:hover .rr-go { opacity: 1; color: var(--accent); }
+
+/* ≤1240：先砍「一句话」，留住数字列 */
+@media (max-width: 1240px) {
+  .rank-head, .rank-row {
+    grid-template-columns: 30px 38px minmax(140px, 1.2fr) 86px 70px 68px 26px 14px;
+  }
+  .rank-head .rh-desc, .rank-row .rr-desc { display: none; }
+}
+/* ≤900：表格塌成卡片行（名次 + 缩略 + 名称/仓库 + ★ + 收藏） */
+@media (max-width: 900px) {
+  .rank-head { display: none; }
+  .rank-row {
+    grid-template-columns: 24px 38px minmax(0, 1fr) auto 26px;
+    padding: 9px 12px;
+  }
+  .rank-row .rr-cat, .rank-row .rr-upd, .rank-row .rr-go { display: none; }
+  .rank-row .rr-fav { opacity: 1; }
+  .rank-row:nth-child(1) .rr-num { color: var(--accent); }
+}
 
 /* ---------- 卡片 ---------- */
 /* 动效口径照样板：.28s / cubic-bezier(.16,1,.3,1)，抬 3px + 阴影加深 */
@@ -1493,11 +1545,8 @@ footer b { color: var(--ink-2); font-weight: 550; }
   .sortsel { margin-left: auto; }
 
   /* 榜单行在窄屏只留「名次 + 缩略 + 名称 + 收藏」，描述和分类让位 */
-  .rank-row { gap: 9px; padding: 9px 11px; }
-  .rr-thumb { width: 40px; height: 30px; }
-  .rr-desc, .rr-cat, .rr-meta .rr-star { display: none; }
-  .rr-name { max-width: 100%; }
-  .rr-meta { font-size: 11px; }
+  .rank-row { gap: 8px; padding: 8px 11px; }
+  .rr-thumb { width: 38px; height: 28px; }
 
   footer { padding: 22px 16px 28px; font-size: 11.5px; }
   .foot-fine { text-align: left; }

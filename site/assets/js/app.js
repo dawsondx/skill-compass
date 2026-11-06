@@ -368,6 +368,14 @@
   }
   function syncSortUI() {
     if ($sortLabel) $sortLabel.textContent = sortText(state.sort);
+    // 榜单表头的 ▲ 跟着走，跟下拉是同一个 state
+    Array.prototype.forEach.call(document.querySelectorAll('.rank-head [data-sort]'), function (b) {
+      if (b.dataset.sort === state.sort) {
+        b.setAttribute('aria-sort', b.dataset.sort === 'name' ? 'ascending' : 'descending');
+      } else {
+        b.removeAttribute('aria-sort');
+      }
+    });
     if (!$sortMenu) return;
     Array.prototype.forEach.call($sortMenu.children, function (li) {
       if (!li.dataset || !li.dataset.value) return;
@@ -713,7 +721,8 @@
       state.onlyImg || state.recentOnly || state.fav;
   }
 
-  /* 榜单视图的一行：名次 / 缩略 / 名称 + 仓库 + 分类 / 一句话 / star + 更新时间 / 收藏 */
+  /* 榜单视图的一行：宽屏按表格对齐（名次/缩略/名称/一句话/分类/★/更新/收藏/箭头），
+     窄屏靠 CSS 塌成卡片行。列顺序改这里的同时也要改 headHTML 与 .rank-* 的 grid 模板 */
   function rowHTML(s, i) {
     var c = CAT_MAP[s.cat] || {};
     var thumb = s.img
@@ -723,23 +732,32 @@
     return '<div class="rank-row" tabindex="0" role="button" data-id="' + s.id + '" aria-label="' + esc(s.name) + '，查看详情">' +
       '<span class="rr-num">' + (n < 10 ? '0' + n : n) + '</span>' +
       thumb +
-      '<div class="rr-main">' +
-        '<div class="rr-top">' +
-          '<span class="rr-name">' + esc(s.name) + '</span>' +
-          '<span class="rr-repo">' + esc(s.repo) + '</span>' +
-          '<span class="rr-cat">' + esc(c.name || s.cat) + '</span>' +
-        '</div>' +
-        '<p class="rr-desc">' + esc(s.desc) + '</p>' +
-      '</div>' +
-      '<div class="rr-meta">' +
-        '<span class="rr-star">★ ' + (s.stars ? fmtNum(s.stars) : '—') + '</span>' +
-        (s.days != null ? '<span title="最近提交 ' + s.upd + '">' + fmtAgo(s.days) + '</span>' : '') +
-      '</div>' +
+      '<span class="rr-name-c">' +
+        '<span class="rr-name">' + esc(s.name) + '</span>' +
+        '<span class="rr-repo">' + esc(s.repo) + '</span>' +
+      '</span>' +
+      '<span class="rr-desc">' + esc(s.desc) + '</span>' +
+      '<span class="rr-cat"><i style="background:' + (c.color || '#888') + '"></i>' + esc(c.name || s.cat) + '</span>' +
+      '<span class="rr-star">★ ' + (s.stars ? fmtNum(s.stars) : '—') + '</span>' +
+      '<span class="rr-upd" title="最近提交 ' + (s.upd || '—') + '">' + (s.days != null ? fmtAgo(s.days) : '—') + '</span>' +
       '<button class="rr-fav" type="button" data-fav="' + s.id + '" aria-pressed="' + (isFav(s.id) ? 'true' : 'false') +
         '" aria-label="收藏 ' + esc(s.name) + '" title="收藏 / 取消收藏">' +
         '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
       '</button>' +
       '<span class="rr-go"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>' +
+      '</div>';
+  }
+
+  /* 表头：只有「名称 / ★ / 更新」可点，点一下按它排，再点回推荐排序 */
+  function headHTML() {
+    return '<div class="rank-head">' +
+      '<span class="rh-num">#</span><span class="rh-thumb"></span>' +
+      '<button class="rh-name" type="button" data-sort="name">名称 / 仓库</button>' +
+      '<span class="rh-desc">一句话</span>' +
+      '<span class="rh-cat">分类</span>' +
+      '<button class="rh-star" type="button" data-sort="stars">★ Star</button>' +
+      '<button class="rh-upd" type="button" data-sort="updated">更新</button>' +
+      '<span></span><span></span>' +
       '</div>';
   }
 
@@ -784,10 +802,11 @@
     }
 
     if (state.view === 'list') {
-      $grid.innerHTML = list.map(rowHTML).join('');
+      $grid.innerHTML = headHTML() + list.map(rowHTML).join('');
       $grid.querySelectorAll('.rank-row').forEach(function (el, i) {
         el.style.animationDelay = Math.min(i * 12, 200) + 'ms';
       });
+      syncSortUI();                      // 表头的 ▲ 要等表头插进 DOM 后再标
       initIO();
       $grid.querySelectorAll('img[data-src]').forEach(observeImg);
       return;
@@ -1050,6 +1069,16 @@
 
   $grid.addEventListener('click', function (e) {
     if (e.target.closest('[data-reset]')) { resetAll(); return; }
+    // 表头排序：点一下按这列排，再点同一列回推荐排序
+    var headBtn = e.target.closest('.rank-head [data-sort]');
+    if (headBtn) {
+      e.stopPropagation();
+      var next = headBtn.dataset.sort;
+      state.sort = state.sort === next ? 'recommend' : next;
+      syncSortUI();
+      render();
+      return;
+    }
     var qc = e.target.closest('.quick-copy');
     if (qc) {
       e.stopPropagation();
