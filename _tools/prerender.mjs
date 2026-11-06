@@ -205,6 +205,11 @@ html = setNum(html, 's4', nAuthors);
 html = setNum(html, 'hero-total', nSkills);
 html = html.replace(/(<title>Skill 指北 · )\d+( 个开源 Agent Skills 精选库)/, `$1${nSkills}$2`);
 html = html.replace(/(筛出 )\d+( 个开源 Agent Skills)/, `$1${nSkills}$2`);
+// 分享卡 / 搜索结果 / 页脚这些散落的数字也一起跟上，别留旧值
+html = html.replace(/(content=")\d+( 个开源 Agent Skills)/g, `$1${nSkills}$2`);
+html = html.replace(/(content="Skill 指北 · )\d+( 个开源 Agent Skills 精选库")/g, `$1${nSkills}$2`);
+html = html.replace(/(id="result-text">共 )\d+( 个)/, `$1${nSkills}$2`);
+html = html.replace(/(，共 )\d+( 个 skill；)/, `$1${nSkills}$2`);
 
 if (html === before) {
   console.log('· 内容无变化，index.html 未改动');
