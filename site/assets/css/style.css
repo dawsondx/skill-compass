@@ -98,6 +98,21 @@ body {
 }
 .hero-lead b { color: var(--ink); font-weight: 600; }
 .stats { display: flex; gap: 40px; flex-wrap: wrap; }
+/* 统计数字直接当筛快捷入口用：点「72 个演示」等于勾「有演示图」，不用先读文案再去找按钮 */
+.stat {
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 0; margin: 0; border: 0; background: none;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.stat .stat-label {
+  border-bottom: 1px dashed transparent;
+  transition: color .15s, border-color .15s;
+}
+.stat:hover .stat-num { color: var(--accent); }
+.stat:hover .stat-label { color: var(--ink-2); border-bottom-color: var(--line); }
+.stat:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3px; border-radius: 5px; }
+.stat.on .stat-num { color: var(--accent); }
+.stat.on .stat-label { color: var(--accent-ink); border-bottom-color: var(--accent-soft); }
 .stat-num {
   font-family: var(--serif); font-size: 30px; font-weight: 700; line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -229,6 +244,32 @@ body {
   font-size: 12.5px; color: var(--ink-3); letter-spacing: .02em;
 }
 .result-line b { color: var(--ink); font-weight: 600; }
+
+/* 已选条件标签：叠加多个条件时在结果栏直接可见、可单独摘掉 */
+.active-filters { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.result-line > :empty { display: none; }   /* 空占位不参与 flex gap，免得白多一段间距 */
+.af-chip {
+  display: inline-flex; align-items: center; gap: 2px;
+  height: 23px; padding: 0 3px 0 8px; border-radius: 6px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  font-size: 11.5px; font-weight: 500; letter-spacing: 0; white-space: nowrap;
+}
+.af-x {
+  width: 16px; height: 16px; padding: 0; border: 0; border-radius: 4px;
+  display: grid; place-items: center;
+  background: transparent; color: inherit; opacity: .5;
+  font-size: 12px; line-height: 1; font-family: var(--sans);
+  cursor: pointer; transition: opacity .15s, background .15s;
+}
+.af-x:hover { opacity: 1; background: rgba(0, 0, 0, .07); }
+.af-clear {
+  height: 23px; padding: 0 4px; border: 0; background: transparent;
+  color: var(--ink-3); font-size: 11.5px; font-family: var(--sans);
+  cursor: pointer; letter-spacing: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+  transition: color .15s;
+}
+.af-clear:hover { color: var(--ink); }
 .grid {
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
@@ -362,6 +403,46 @@ body {
   grid-column: 1 / -1; padding: 70px 20px; text-align: center; color: var(--ink-3);
 }
 .empty .big { font-family: var(--serif); font-size: 20px; color: var(--ink-2); margin-bottom: 8px; }
+.empty-reset {
+  margin-top: 16px; height: 32px; padding: 0 14px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper); color: var(--ink-2);
+  font-size: 12.5px; font-family: var(--sans); cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.empty-reset:hover { border-color: #D3C5AC; background: var(--paper-2); color: var(--ink); }
+
+/* ---------- 说明条：收起按钮 + 收起后的唤起入口 ---------- */
+.tip-bar { position: relative; padding-right: 38px; }
+.tip-bar[hidden], .tip-reopen[hidden] { display: none; }
+.tip-close {
+  position: absolute; top: 7px; right: 7px;
+  width: 22px; height: 22px; padding: 0; border: 0; border-radius: 6px;
+  display: grid; place-items: center;
+  background: transparent; color: var(--ink-3);
+  font-size: 17px; line-height: 1; font-family: var(--sans);
+  cursor: pointer; transition: background .15s, color .15s;
+}
+.tip-close:hover { background: var(--paper-2); color: var(--ink); }
+.tip-reopen {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 27px; padding: 0 11px; margin-bottom: 18px;
+  border: 1px dashed var(--line); border-radius: 14px;
+  background: transparent; color: var(--ink-3);
+  font-size: 12.5px; font-family: var(--sans); cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.tip-reopen:hover { color: var(--ink); border-color: #D3C5AC; background: var(--paper); }
+
+/* ---------- noscript 全量目录：只在 JS 关闭时出现，给搜索引擎兜底 ---------- */
+.seo-index { padding: 26px 0 0; border-top: 1px solid var(--line); }
+.seo-index h2 { font-family: var(--serif); font-size: 20px; margin: 0 0 6px; }
+.seo-index-note { font-size: 12.5px; color: var(--ink-3); margin: 0 0 16px; }
+.seo-index ul { margin: 0; padding-left: 18px; }
+.seo-index li { font-size: 13px; line-height: 1.85; color: var(--ink-2); }
+.seo-index li a { color: var(--accent-ink); text-decoration: none; }
+.seo-index li a:hover { text-decoration: underline; }
+.seo-meta { color: var(--ink-3); }
 
 /* ---------- 抽屉 ---------- */
 .overlay {
@@ -728,7 +809,23 @@ footer b { color: var(--ink-2); font-weight: 550; }
 @media (max-width: 640px) {
   body.sort-open { overflow: hidden; }
 
+  /* 统计四项压成一行四列：原来 wrap 成两行，把首屏推得看不见卡片 */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat-num { font-size: 21px; }
+  .stat-num span { font-size: 11px; margin-left: 1px; }
+  .stat-label { font-size: 10.5px; letter-spacing: 0; margin-top: 5px; line-height: 1.35; }
+
   .sortsel { height: 36px; padding: 0 13px; font-size: 13.5px; gap: 8px; }
+
+  /* 窄屏：结果数 + 排序占第一行，已选条件单独一行横滑，不把行高撑到三四行 */
+  .result-line { flex-wrap: wrap; row-gap: 7px; }
+  .active-filters {
+    order: 2; flex-basis: 100%;
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .active-filters::-webkit-scrollbar { display: none; }
+  .fresh-hint { order: 3; flex-basis: 100%; margin-left: 0; }
 
   .sort-scrim {
     display: block; position: fixed; inset: 0; z-index: 88;

@@ -18,35 +18,15 @@
   var UPS_AT = window.UPS_FETCHED || '';
   var UPS_TTL = 0;                             // 服务端刷新间隔（秒），由 /api/upstream 告知
 
-  function pad2(n) { return (n < 10 ? '0' : '') + n; }
-  function dayNum(str) {                       // 'YYYY-MM-DD' → 可比较的整数
-    if (!str) return 0;
-    var p = String(str).slice(0, 10).split('-');
-    return (+p[0]) * 10000 + (+p[1]) * 100 + (+p[2]);
-  }
-  function daysSince(str) {                    // 距今多少天（按本地日历日算，不看时分）
-    if (!str) return null;
-    var p = String(str).slice(0, 10).split('-');
-    var d = new Date(+p[0], (+p[1]) - 1, +p[2]);
-    var t = new Date();
-    var today = new Date(t.getFullYear(), t.getMonth(), t.getDate());
-    return Math.round((today - d) / 86400000);
-  }
-  function fmtAgo(n) {
-    if (n == null) return '';
-    if (n <= 0) return '今天';
-    if (n === 1) return '昨天';
-    if (n < 30) return n + ' 天前';
-    if (n < 60) return '1 个月前';
-    if (n < 365) return Math.round(n / 30) + ' 个月前';
-    return Math.round(n / 365) + ' 年前';
-  }
-  function freshOf(s) {                        // hot:30 天内 / warm:90 天内 / cold:更久
-    if (s.days == null) return '';
-    if (s.days <= 30) return 'hot';
-    if (s.days <= 90) return 'warm';
-    return 'cold';
-  }
+  // 卡片模板与日期格式化放在 card-template.js：构建期预渲染（_tools/prerender.mjs）
+  // 加载的是同一份实现，静态卡片与 JS 渲染的 DOM 才不会跑偏
+  var CT = window.CardTemplate;
+  var pad2 = CT.pad2;
+  var dayNum = CT.dayNum;
+  var daysSince = CT.daysSince;
+  var fmtAgo = CT.fmtAgo;
+  var freshOf = CT.freshOf;
+
   function todayStr() {
     var t = new Date();
     return t.getFullYear() + '-' + pad2(t.getMonth() + 1) + '-' + pad2(t.getDate());
@@ -100,25 +80,18 @@
   var $sortScrim = document.getElementById('sort-scrim');
   var $resultText = document.getElementById('result-text');
   var $resultHint = document.getElementById('result-hint');
+  var $activeFilters = document.getElementById('active-filters');
+  var $statImg = document.querySelector('.stat[data-stat="img"]');
 
   /* ---------- 工具 ---------- */
-  function fmtNum(n) {
-    if (n == null) return '—';
-    if (n >= 10000) return (n / 1000).toFixed(n >= 100000 ? 0 : 1).replace('.0', '') + 'k';
-    if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'k';
-    return String(n);
-  }
+  var fmtNum = CT.fmtNum;
   function hex2rgba(hex, a) {
     var h = hex.replace('#', '');
     if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
     var r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
     return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
   }
-  function glyphOf(s) {
-    var n = s.name.replace(/[（(\[].*?[）)\]]/g, '').trim();
-    if (/^[A-Za-z]/.test(n)) return n.slice(0, 1).toUpperCase();
-    return n.slice(0, 1);
-  }
+  var glyphOf = CT.glyphOf;
   function repoUrl(s) {
     return 'https://github.com/' + s.repo + (s.path ? '/' + s.path : '');
   }
@@ -285,6 +258,52 @@
     });
   }
 
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  /* 把 state 回写到所有筛选控件（从结果栏摘掉某个条件后，整组要跟着同步） */
+  function syncFilterUI() {
+    Array.prototype.forEach.call($chips.children, function (c) {
+      var k = c.dataset.cat, on;
+      if (k === '__img') on = state.onlyImg;
+      else if (k === '__upd') on = state.recentOnly;
+      else on = (k === state.cat);
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    setAuthor(state.author);
+    if ($q && $q.value !== state.q) $q.value = state.q;
+    if ($statImg) $statImg.classList.toggle('on', state.onlyImg);
+  }
+
+  /* 已选条件标签：分类 + 创作者 + 搜索 + 两个快捷开关叠加时，结果栏上一眼看清是谁在过滤 */
+  function activeFiltersHTML() {
+    var out = [];
+    if (state.cat !== 'all') out.push({ k: 'cat', t: '分类：' + ((CAT_MAP[state.cat] || {}).name || state.cat) });
+    if (state.author !== 'all') out.push({ k: 'author', t: '创作者：' + ((AUTHOR_MAP[state.author.toLowerCase()] || {}).name || state.author) });
+    if (state.q) out.push({ k: 'q', t: '搜索：' + state.q });
+    if (state.onlyImg) out.push({ k: 'img', t: '有演示图' });
+    if (state.recentOnly) out.push({ k: 'recent', t: '近 30 天有更新' });
+    if (!out.length) return '';
+    return out.map(function (f) {
+      var t = esc(f.t);
+      return '<span class="af-chip">' + t +
+        '<button class="af-x" type="button" data-drop="' + f.k + '" aria-label="移除条件：' + t + '">×</button></span>';
+    }).join('') + '<button class="af-clear" type="button" data-reset="1">清空</button>';
+  }
+
+  function dropFilter(k) {
+    if (k === 'cat') state.cat = 'all';
+    else if (k === 'author') state.author = 'all';
+    else if (k === 'q') state.q = '';
+    else if (k === 'img') state.onlyImg = false;
+    else if (k === 'recent') state.recentOnly = false;
+    syncFilterUI();
+    render();
+  }
+
   /* ---------- 过滤 + 排序 ---------- */
   function matches(s, terms) {
     if (state.cat !== 'all' && s.cat !== state.cat) return false;
@@ -318,21 +337,8 @@
       return list.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'zh-Hans-CN'); });
     }
     // 推荐：分类轮转，让第一屏覆盖不同分类，而不是被几个巨型仓库霸榜
-    var byCat = {};
-    list.slice().sort(function (a, b) { return (b.stars || 0) - (a.stars || 0); }).forEach(function (s) {
-      (byCat[s.cat] = byCat[s.cat] || []).push(s);
-    });
-    var order = CATS.map(function (c) { return c.key; }).filter(function (k) { return byCat[k]; });
-    var out = [], i = 0, added = true;
-    while (added) {
-      added = false;
-      for (var j = 0; j < order.length; j++) {
-        var arr = byCat[order[j]];
-        if (arr[i]) { out.push(arr[i]); added = true; }
-      }
-      i++;
-    }
-    return out;
+    // 与构建期预渲染首屏卡片共用同一份排序，保证静态/动态顺序一致
+    return CT.recommendOrder(list, CATS.map(function (c) { return c.key; }));
   }
 
   /* ---------- 卡片 ---------- */
@@ -368,47 +374,7 @@
   }
 
   function cardHTML(s) {
-    var c = CAT_MAP[s.cat] || { color: '#888', name: s.cat };
-    var fb = '<div class="thumb-fallback" style="--c:' + c.color + (s.img ? ';display:none' : '') + '">' +
-      '<div class="fb-inner">' +
-      '<div class="fb-mark">' + glyphOf(s) + '</div>' +
-      '<div class="fb-name">' + s.name + '</div>' +
-      '<div class="fb-cat">' + c.name + '</div>' +
-      '</div></div>';
-    var thumb = '<div class="thumb' + (s.fit === 'contain' ? ' fit' : '') + '">' + fb;
-    if (s.img) {
-      thumb += '<img data-src="assets/img/' + s.img + '" alt="' + s.name + ' 效果演示">';
-    }
-    thumb += '<span class="badge-cat"><span class="dot" style="background:' + c.color + '"></span>' + c.name + '</span>';
-    var mark = markOf(s);
-    if (mark) {
-      thumb += '<span class="badge-new ' + mark + '">' + (mark === 'new' ? '新增' : '有更新') + '</span>';
-    }
-    thumb += '</div>';
-
-    var updHTML = s.days == null ? '' :
-      '<span class="upd ' + freshOf(s) + '" title="最近提交 ' + s.upd +
-      (s.ver ? ' · 最新版本 ' + s.ver : '') + '">' +
-      '<i class="upd-dot"></i>' + fmtAgo(s.days) +
-      (s.ver ? '<span class="upd-v">' + s.ver + '</span>' : '') +
-      '</span>';
-
-    return '<div class="card" tabindex="0" role="button" data-id="' + s.id + '" aria-label="' + s.name + '，查看详情">' +
-      thumb +
-      '<div class="card-body">' +
-      '<h3 class="card-title">' + s.name + '</h3>' +
-      '<div class="card-repo">' +
-      (s.author ? '<span class="by" style="color:' + s.author.color + '">' + s.author.name + '</span>' : '') +
-      s.repo + (s.skill ? ' / ' + s.skill : '') + '</div>' +
-      '<p class="card-desc">' + s.desc + '</p>' +
-      '<div class="card-tags">' + s.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div>' +
-      '<div class="card-foot">' +
-      '<span class="star"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>' + fmtNum(s.stars) + '</span>' +
-      (s.subs ? '<span class="pack-n">' + s.subs.length + ' 个 skill</span>' : '') +
-      (s.from ? '<span class="from-tag">合集内</span>' : '') +
-      updHTML +
-      '<span class="goto">GitHub <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>' +
-      '</div></div></div>';
+    return CT.cardHTML(s, { cat: CAT_MAP[s.cat], mark: markOf(s) });
   }
 
   /* ---------- 渲染 ---------- */
@@ -417,16 +383,17 @@
     var terms = state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
     var list = sortList(SKILLS.filter(function (s) { return matches(s, terms); }));
 
-    $resultText.innerHTML = '共 <b>' + list.length + '</b> 个 skill' +
-      (state.author !== 'all' ? ' · ' + ((AUTHOR_MAP[state.author.toLowerCase()] || {}).name || state.author) : '') +
-      (state.cat !== 'all' ? ' · ' + (CAT_MAP[state.cat] || {}).name : '') +
-      (state.onlyImg ? ' · 仅看有演示图' : '') +
-      (state.recentOnly ? ' · 近 30 天有更新' : '');
-    $resultHint.textContent = terms.length ? '关键词：' + terms.join(' + ') : '';
+    $resultText.innerHTML = '共 <b>' + list.length + '</b> 个 skill';
+    if ($activeFilters) $activeFilters.innerHTML = activeFiltersHTML();
+    $resultHint.textContent = '';
 
     if (!list.length) {
+      var noFilter = state.cat === 'all' && state.author === 'all' && !state.q &&
+        !state.onlyImg && !state.recentOnly;
       $grid.innerHTML = '<div class="empty"><div class="big">没找到匹配的 skill</div>' +
-        '<div>换个说法试试，比如「PPT」「配图」「架构图」「省 token」，或者点上面的分类</div></div>';
+        '<div>换个说法试试，比如「PPT」「配图」「架构图」「省 token」，或者点上面的分类</div>' +
+        (noFilter ? '' : '<button class="empty-reset" type="button" data-reset="1">清空全部筛选</button>') +
+        '</div>';
       return;
     }
     $grid.innerHTML = list.map(cardHTML).join('');
@@ -613,7 +580,51 @@
   }
 
   /* ---------- 事件 ---------- */
+  function resetAll() {
+    state.cat = 'all'; state.author = 'all'; state.q = '';
+    state.sort = 'recommend'; state.onlyImg = false; state.recentOnly = false;
+    syncFilterUI();
+    syncSortUI();
+    render();
+  }
+
+  if ($activeFilters) {
+    $activeFilters.addEventListener('click', function (e) {
+      if (e.target.closest('[data-reset]')) { resetAll(); return; }
+      var x = e.target.closest('[data-drop]');
+      if (x) dropFilter(x.dataset.drop);
+    });
+  }
+
+  /* 统计数字直接当入口：129 → 清空回全部、72 → 切「有演示图」、11/14 → 跳到对应筛选行。
+     hero 里因此不用再写「怎么筛」的使用说明 */
+  var $stats = document.querySelector('.stats');
+  function scrollToFilterbar() {
+    var bar = document.querySelector('.filterbar');
+    if (!bar) return;
+    window.scrollTo({ top: bar.offsetTop - 70, behavior: 'smooth' });
+  }
+  if ($stats) {
+    $stats.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-stat]');
+      if (!btn) return;
+      var k = btn.dataset.stat;
+      if (k === 'img') {
+        state.onlyImg = !state.onlyImg;
+        syncFilterUI();
+        render();
+        scrollToFilterbar();
+      } else if (k === 'all') {
+        resetAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        scrollToFilterbar();
+      }
+    });
+  }
+
   $grid.addEventListener('click', function (e) {
+    if (e.target.closest('[data-reset]')) { resetAll(); return; }
     var card = e.target.closest('.card');
     if (card) openDrawer(SKILLS.filter(function (s) { return s.id === card.dataset.id; })[0]);
   });
@@ -701,6 +712,24 @@
       setSortOpen(false);
     });
   }
+
+  /* ---------- 顶部说明条：可收起，选择记在本地 ---------- */
+  var TIP_KEY = 'skill-compass-tip-off';
+  var $tipBar = document.getElementById('tip-bar');
+  var $tipClose = document.getElementById('tip-close');
+  var $tipReopen = document.getElementById('tip-reopen');
+  function setTipOff(off) {
+    if (!$tipBar || !$tipReopen) return;
+    $tipBar.hidden = off;
+    $tipReopen.hidden = !off;
+    try {
+      if (off) localStorage.setItem(TIP_KEY, '1');
+      else localStorage.removeItem(TIP_KEY);
+    } catch (e) {}
+  }
+  if ($tipClose) $tipClose.addEventListener('click', function () { setTipOff(true); });
+  if ($tipReopen) $tipReopen.addEventListener('click', function () { setTipOff(false); });
+  try { if (localStorage.getItem(TIP_KEY) === '1') setTipOff(true); } catch (e) {}
 
   /* ---------- 延伸资源 ---------- */
   document.getElementById('ext-list').innerHTML = (window.RESOURCES || []).map(function (r) {
@@ -817,10 +846,32 @@
   readURL();
   buildChips();
   buildAuthors();
-  setAuthor(state.author);
-  $q.value = state.q;
+  syncFilterUI();          // 把 URL 带进来的状态回写到 chips / 创作者行 / 搜索框 / 统计入口
   syncSortUI();
-  render();
+
+  /* ---------- 接管构建期预渲染的首屏卡片 ----------
+     _tools/prerender.mjs 已经把「推荐排序」前 24 张卡写进 #grid。默认状态首次访问时
+     直接复用这批 DOM（点击已由 #grid 上的事件委托兜住），不再整屏 innerHTML 重建，
+     省掉一次重排 —— 这正是 CLS 的来源。
+     以下情况照常 render()：带筛选/深链接参数、有回访快照（要补「新增 / 有更新」角标）、
+     静态数据不是这两天的（相对时间「X 天前」会偏）。 */
+  function hydrateStatic() {
+    $resultText.innerHTML = '共 <b>' + SKILLS.length + '</b> 个 skill';
+    $resultHint.textContent = '';
+    if ($activeFilters) $activeFilters.innerHTML = '';
+    initIO();
+    $grid.querySelectorAll('img[data-src]').forEach(observeImg);
+  }
+  function canHydrate() {
+    if (prevSnap || !$grid.querySelector('.card')) return false;
+    if (state.cat !== 'all' || state.author !== 'all' || state.q) return false;
+    if (state.onlyImg || state.recentOnly || state.openId) return false;
+    if (state.sort !== 'recommend') return false;
+    var age = UPS_AT ? CT.daysSince(UPS_AT) : null;   // 数据抓取日距今
+    return age != null && age >= 0 && age <= 2;
+  }
+
+  if (canHydrate()) hydrateStatic(); else render();
   syncTopH();
   if (state.openId) {
     var target = SKILLS.filter(function (s) { return s.id === state.openId; })[0];

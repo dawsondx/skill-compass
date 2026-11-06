@@ -47,6 +47,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'push' && github.sha || 'main' }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # 每次部署前重新生成首屏静态卡片、全量 JSON-LD 与 noscript 目录，
+      # 保证快照数据（refresh 刚提交的 data.js）和 HTML 里的内容不会脱节
+      - name: 预渲染首屏卡片与全量 SEO 数据
+        run: node _tools/prerender.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
