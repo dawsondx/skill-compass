@@ -1221,6 +1221,27 @@
     render();
   }
 
+  /* ---------- 点 logo / 站名 = 回首页 https://skills.dawsondx.top/ ----------
+     href 写的是绝对地址，所以从别处点进来、中键新开、右键复制链接都正常。
+     已经在本站时拦下来做「软导航」：清空所有筛选与深链、关掉抽屉、回顶部，
+     结果 URL 同样变成干净的站点根，但不用整页刷新。 */
+  var $brandHome = document.getElementById('brand-home');
+  if ($brandHome) {
+    $brandHome.addEventListener('click', function (e) {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      var onSite = location.protocol === 'file:' ||
+        /(^|\.)skills\.dawsondx\.top$/.test(location.hostname) ||
+        /github\.io$/.test(location.hostname);
+      if (!onSite) return;
+      e.preventDefault();
+      if ($drawer.classList.contains('on')) closeDrawer();
+      state.openId = null;                 // 兜底：不带任何 ?open= 残留
+      state.view = 'grid';
+      resetAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
   if ($activeFilters) {
     $activeFilters.addEventListener('click', function (e) {
       if (e.target.closest('[data-reset]')) { resetAll(); return; }
