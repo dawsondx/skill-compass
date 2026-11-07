@@ -1869,6 +1869,12 @@ window.SKILLS = [
     cat: 'business', stars: 17, img: '',
     desc: '从六个维度逼你把产品说清楚：给谁、解决什么、为什么是你。写官网首屏、BP 摘要素材时，先用它把话讲明白。',
     tags: ['产品描述', '定位', 'BP']
+  },
+  {
+    id: 'bigdata-dashboard', name: '数据大屏生成器', repo: 'AragornZJF/bigdata-dashboard-skill',
+    cat: 'diagram', stars: 20, img: 'AragornZJF~bigdata-dashboard-skill.webp', fit: 'contain',
+    desc: 'Excel 或 JSON 直接渲染成数据大屏：15 套行业模板（药企、电厂、智慧城市、新能源……），ECharts 九类组件，产物是单个 HTML 文件，双击就能投屏，断网也能放。',
+    tags: ['数据大屏', 'ECharts', '单文件 HTML']
   }
 ];
 
@@ -1894,6 +1900,7 @@ window.UPS = {
   'adrianpunk/punk-posters': ['2026-11-04', 'v2.0.0', '2026-09-10'],
   'affaan-m/ecc': ['2026-11-06', 'v2.2.3', '2026-10-01'],
   'Agents365-ai/drawio-skill': ['2026-11-06', 'v3.4.4', '2026-11-06'],
+  'AragornZJF/bigdata-dashboard-skill': ['2026-10-30', '', ''],
   'aiolosking/english-textbook-reader': ['2026-09-13', '', ''],
   'aiolosking/podcast-reflection-publisher': ['2026-09-13', '', ''],
   'alchaincyf/darwin-skill': ['2026-09-18', '', ''],
