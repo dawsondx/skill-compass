@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import { polishReadme } from './readme-clean.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DATA_PATH = path.join(ROOT, 'site', 'assets', 'js', 'data.js');
@@ -128,11 +129,8 @@ function cleanReadme(txt) {
   }
 
   if (out.length < 2) return '';                             // 全是图，交给前端走空态
-  let t = out.join('\n');
-  if (Buffer.byteLength(t, 'utf8') > MAX_BYTES) {
-    t = Buffer.from(t, 'utf8').subarray(0, MAX_BYTES).toString('utf8').replace(/\n[^\n]*$/, '');
-  }
-  return t.trimEnd() + '\n';
+  // 二次抛光：提示块 / HTML 实体 / 语言栏 / 表格竖线 / 漏网井号，规则集中在 readme-clean.mjs
+  return polishReadme(out.join('\n'));
 }
 
 function candidates(s) {
