@@ -24,6 +24,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const HTML_PATH = path.join(ROOT, 'site', 'index.html');
 const DATA_PATH = path.join(ROOT, 'site', 'assets', 'js', 'data.js');
 const DEMO_PATH = path.join(ROOT, 'site', 'assets', 'js', 'demo-images.js');
+const ART_PATH = path.join(ROOT, 'site', 'assets', 'js', 'cover-art.js');
 const TPL_PATH = path.join(ROOT, 'site', 'assets', 'js', 'card-template.js');
 
 const TOP_COUNT = 24;
@@ -38,6 +39,7 @@ const NOS_MARK_B = '<!--PRERENDER:NOSCRIPT:END-->';
 function loadSandbox() {
   const files = [DATA_PATH, TPL_PATH];
   if (fs.existsSync(DEMO_PATH)) files.splice(1, 0, DEMO_PATH);   // 补图清单，data.js 之后、模板之前
+  if (fs.existsSync(ART_PATH)) files.splice(files.length - 1, 0, ART_PATH);  // 逐仓插画设计稿
   for (const f of files) {
     if (!fs.existsSync(f)) throw new Error('缺少文件：' + path.relative(ROOT, f));
   }
