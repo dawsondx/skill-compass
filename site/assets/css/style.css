@@ -735,7 +735,8 @@ kbd {
   font-family: var(--mono); font-size: 11.5px; color: var(--ink-3);
   font-variant-numeric: tabular-nums; justify-content: flex-end;
 }
-.rank-row:nth-child(-n+4) .rr-num { color: var(--accent); font-weight: 700; }
+/* 前 3 名标主色：只在第 1 页生效，否则每翻一页都会把该页前 3 行当冠军 */
+.grid.page-first .rank-row:nth-child(-n+4) .rr-num { color: var(--accent); font-weight: 700; }
 .rr-thumb {
   width: 40px; height: 26px; border-radius: 4px; overflow: hidden;
   background: var(--paper-2); border: 1px solid var(--line-2);
@@ -2560,6 +2561,45 @@ body.modal-open { overflow: hidden; }
 .x-ans .dim s { height: auto; padding-left: 6px; border-left: 1px solid var(--line-hi);
   background: none; font-size: 7.5px; line-height: 1.5; color: var(--ink-3); }
 .x-ans .big { font-size: 13.5px; }
+
+/* ---------- 结果分页 ----------
+   294 张一次铺完，底部「延伸资源 / 页脚」根本翻不到。桌面每页 24（4 列 × 6 行，
+   正好对齐预渲染的 24 张静态首屏），≤900px 每页 12（列数变少，24 张会拖成 12～24 行）。 */
+.pager {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 22px 0 8px; padding: 12px 14px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow-1);
+}
+.pager[hidden] { display: none; }
+.pg-info { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.pg-info b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pg-nums { display: flex; align-items: center; gap: 4px; }
+.pg-num, .pg-btn {
+  min-width: 30px; height: 30px; padding: 0 8px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper-2); color: var(--ink-2);
+  font-family: var(--mono); font-size: 11.5px; font-weight: 600;
+  cursor: pointer; transition: border-color .16s, color .16s, background .16s;
+}
+.pg-num:hover, .pg-btn:hover:not(:disabled) {
+  border-color: var(--accent); color: var(--accent-ink); background: var(--accent-soft);
+}
+.pg-num.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pg-gap { padding: 0 3px; color: var(--ink-3); font-family: var(--mono); font-size: 11px; }
+.pg-nav { display: flex; gap: 6px; }
+.pg-btn { min-width: auto; padding: 0 12px; font-family: var(--sans); font-size: 12px; }
+.pg-btn:disabled { opacity: .38; cursor: not-allowed; }
+.pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 900px) {
+  .pager { flex-wrap: wrap; }
+  .pg-nums { display: none; }              /* 窄屏只留页数 + 上一页/下一页 */
+}
+@media (max-width: 560px) {
+  .pager { padding: 10px; gap: 8px; }
+  .pg-range { display: none; }
+  .pg-btn { padding: 0 9px; font-size: 11.5px; }
+}
 
 /* ================= 抽屉 P1–P4：三段式骨架（对照 docs/drawer-spec.md） =================
    头 63px / 正文 24px 内边距且只有它滚 / 尾 65px；间距只用 24·16·12·10·8·6。 */

@@ -73,8 +73,21 @@
   // 关页面时才落盘：这样同一天里刷新不会把角标刷掉，下次来才「清账」
   window.addEventListener('pagehide', saveSnap);
 
-  var state = { cat: 'all', q: '', sort: 'recommend', onlyImg: false, recentOnly: false, openId: null, author: 'all', fav: false, view: 'grid' };
+  var state = { cat: 'all', q: '', sort: 'recommend', onlyImg: false, recentOnly: false, openId: null, author: 'all', fav: false, view: 'grid', page: 1 };
   var $grid = document.getElementById('grid');
+  var $pager = document.getElementById('pager');
+  /* 每页数量：桌面 24 / 窄屏 12。
+     实测 1440px 是 4 列 × 6 行 = 24 张，网格 2556px、文档 4307px；
+     同样 24 张在 390px 变成 1 列 × 24 行 = 10679px、文档 12964px，底部照样翻不到。
+     所以窄屏减半到 12（12 行 ≈ 5400px，文档约 7300px），保持「一页 6～12 行」的节奏。
+     24 同时等于 _tools/prerender.mjs 的 TOP_COUNT，桌面首屏可直接接管静态卡片不抖动。
+     URL 里的 ?per= 可以覆盖设备默认值，保证带页码的分享链接跨设备指向同一批卡片。 */
+  var PER_OVERRIDE = null;
+  var PER_DEFAULT = 24;
+  function pageSize() {
+    if (PER_OVERRIDE) return PER_OVERRIDE;
+    return window.matchMedia('(max-width: 900px)').matches ? 12 : PER_DEFAULT;
+  }
   var $chips = document.getElementById('chips');
   var $authorBtn = document.getElementById('author-btn');
   var $authorMenu = document.getElementById('author-menu');
@@ -785,12 +798,72 @@
     });
   }
 
+  /* ---------- 分页 ----------
+     294 张全铺一次会把「延伸资源 / 页脚」推到根本翻不到的地方，所以按页切。
+     页码写进 URL（第 1 页不写，保持分享链接干净），筛选变化时自动回第 1 页。 */
+  var lastFingerprint = null;
+
+  function pageNums(cur, pages) {
+    var set = {};
+    set[1] = 1; set[pages] = 1;
+    for (var i = cur - 2; i <= cur + 2; i++) if (i >= 1 && i <= pages) set[i] = 1;
+    if (cur <= 3) for (var j = 1; j <= 5 && j <= pages; j++) set[j] = 1;
+    if (cur >= pages - 2) for (var k = Math.max(1, pages - 4); k <= pages; k++) set[k] = 1;
+    var arr = Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
+    var out = [], prev = 0;
+    arr.forEach(function (n) { if (prev && n - prev > 1) out.push('…'); out.push(n); prev = n; });
+    return out;
+  }
+
+  function renderPager(total) {
+    if (!$pager) return;
+    var per = pageSize();
+    var pages = Math.max(1, Math.ceil(total / per));
+    if (pages <= 1) { $pager.hidden = true; $pager.innerHTML = ''; return; }
+    $pager.hidden = false;
+    var cur = state.page;
+    var from = (cur - 1) * per + 1;
+    var to = Math.min(cur * per, total);
+    var nums = pageNums(cur, pages).map(function (n) {
+      if (n === '…') return '<span class="pg-gap">…</span>';
+      return '<button class="pg-num' + (n === cur ? ' on' : '') + '" type="button" data-page="' + n +
+        '"' + (n === cur ? ' aria-current="page"' : '') + ' aria-label="第 ' + n + ' 页">' + n + '</button>';
+    }).join('');
+    $pager.innerHTML =
+      '<div class="pg-info">第 <b>' + cur + '</b> / <b>' + pages + '</b> 页' +
+        '<span class="pg-range"> · 本页 ' + from + '–' + to + ' 个</span></div>' +
+      '<div class="pg-nums">' + nums + '</div>' +
+      '<div class="pg-nav">' +
+        '<button class="pg-btn" type="button" data-page="prev"' + (cur <= 1 ? ' disabled' : '') + '>← 上一页</button>' +
+        '<button class="pg-btn" type="button" data-page="next"' + (cur >= pages ? ' disabled' : '') + '>下一页 →</button>' +
+      '</div>';
+  }
+
+  function scrollToGrid() {
+    var topH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--top-h'), 10) || 90;
+    var top = $grid.getBoundingClientRect().top + window.scrollY - topH - 14;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+
   function render() {
-    writeURL();
+    // 筛选指纹：筛选 / 排序 / 搜索 / 视图一变就自动回第 1 页，
+    // 不用在十几个交互入口里逐个记得 reset；翻页不改指纹，所以不会被打回。
+    var fp = [state.cat, state.author, state.q, state.sort, state.onlyImg, state.recentOnly, state.fav, state.view].join('|');
+    if (lastFingerprint !== null && fp !== lastFingerprint) state.page = 1;
+    lastFingerprint = fp;
+
     var terms = state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
     var list = sortList(SKILLS.filter(function (s) { return matches(s, terms); }));
+    var per = pageSize();
+    var pages = Math.max(1, Math.ceil(list.length / per));
+    if (state.page > pages) state.page = pages;          // 筛完结果变少时夹回最后一页
+    if (state.page < 1) state.page = 1;
+    var start = (state.page - 1) * per;
+    var pageList = list.slice(start, start + per);
+    writeURL();
+    renderPager(list.length);
 
-    $grid.className = state.view === 'list' ? 'grid list' : 'grid';
+    $grid.className = (state.view === 'list' ? 'grid list' : 'grid') + (state.page === 1 ? ' page-first' : '');
     syncViewUI();
     // 「重置全部筛选」只在有筛选条件时露出，跟筛选控件待在同一条里，不用滚回去找
     if ($filterReset) $filterReset.hidden = !isFiltered();
@@ -819,7 +892,8 @@
     }
 
     if (state.view === 'list') {
-      $grid.innerHTML = headHTML() + list.map(rowHTML).join('');
+      // 排名要接着上一页算，不能直接从 1 开始
+      $grid.innerHTML = headHTML() + pageList.map(function (s, i) { return rowHTML(s, start + i); }).join('');
       $grid.querySelectorAll('.rank-row').forEach(function (el, i) {
         el.style.animationDelay = Math.min(i * 12, 200) + 'ms';
       });
@@ -829,7 +903,7 @@
       return;
     }
 
-    $grid.innerHTML = list.map(cardHTML).join('');
+    $grid.innerHTML = pageList.map(cardHTML).join('');
     $grid.querySelectorAll('.card').forEach(function (el, i) {
       el.style.animationDelay = Math.min(i * 18, 260) + 'ms';
     });
@@ -1216,6 +1290,7 @@
   function resetAll() {
     state.cat = 'all'; state.author = 'all'; state.q = '';
     state.sort = 'recommend'; state.onlyImg = false; state.recentOnly = false; state.fav = false;
+    state.page = 1;
     syncFilterUI();
     syncSortUI();
     render();
@@ -1237,8 +1312,24 @@
       if ($drawer.classList.contains('on')) closeDrawer();
       state.openId = null;                 // 兜底：不带任何 ?open= 残留
       state.view = 'grid';
+      state.page = 1;
+      PER_OVERRIDE = null;                 // 回首页也恢复设备默认的每页数量
       resetAll();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  /* 分页条：事件委托，翻完把网格顶部滚回视口（别让用户还停在上一页的底部） */
+  if ($pager) {
+    $pager.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-page]');
+      if (!b || b.disabled || b.getAttribute('aria-current') === 'page') return;
+      var v = b.getAttribute('data-page');
+      var target = v === 'prev' ? state.page - 1 : (v === 'next' ? state.page + 1 : parseInt(v, 10));
+      if (!target || target < 1) return;
+      state.page = target;
+      render();
+      scrollToGrid();
     });
   }
 
@@ -1524,6 +1615,10 @@
     if (p.get('sort') && isSort(p.get('sort'))) state.sort = p.get('sort');
     if (p.get('img') === '1') state.onlyImg = true;
     if (p.get('recent') === '1') state.recentOnly = true;
+    var per = parseInt(p.get('per'), 10);
+    if (per >= 6 && per <= 48) PER_OVERRIDE = per;      // 分享链接里的每页数，跨设备一致
+    var pg = parseInt(p.get('page'), 10);
+    if (pg > 1) state.page = pg;                 // 越界页码由 render() 夹回最后一页
     if (p.get('open')) state.openId = p.get('open');
     if (p.get('view') === 'list') state.view = 'list';
     if (p.get('by')) {
@@ -1540,6 +1635,11 @@
     if (state.onlyImg) p.set('img', '1');
     if (state.recentOnly) p.set('recent', '1');
     if (state.view !== 'grid') p.set('view', state.view);
+    if (state.page > 1) {
+      p.set('page', state.page);
+      var per = pageSize();
+      if (per !== PER_DEFAULT) p.set('per', per);      // 只在窄屏/覆盖时写，桌面链接保持干净
+    }
     if (state.openId) p.set('open', state.openId);
     var qs = p.toString();
     try { history.replaceState(null, '', qs ? '?' + qs : location.pathname); } catch (err) {}
@@ -1624,6 +1724,21 @@
   window.addEventListener('resize', syncTopH);
   window.addEventListener('load', syncTopH);
 
+  /* 窗口跨过 900px 断点时每页数量会变（24 ↔ 12），页码含义跟着变：
+     防抖后回第 1 页重渲染，别让用户停在一个对不上的切片上 */
+  var lastPer = pageSize();
+  var perTimer = null;
+  window.addEventListener('resize', function () {
+    if (perTimer) clearTimeout(perTimer);
+    perTimer = setTimeout(function () {
+      var now = pageSize();
+      if (now === lastPer) return;
+      lastPer = now;
+      state.page = 1;
+      render();
+    }, 180);
+  });
+
   readURL();
   buildCats();
   buildAuthorMenu();
@@ -1642,12 +1757,15 @@
       '<span class="fb-all">（共收录 <b>' + SKILLS.length + '</b> 个）</span>';
     $resultHint.textContent = '';
     if ($activeFilters) $activeFilters.innerHTML = '';
+    $grid.className = 'grid page-first';
+    renderPager(SKILLS.length);                 // 静态首屏正好是第 1 页，分页条照常要出现
     initIO();
     $grid.querySelectorAll('img[data-src]').forEach(observeImg);
   }
   function canHydrate() {
     if (prevSnap || !$grid.querySelector('.card')) return false;
-    if (state.view !== 'grid') return false;      // 榜单视图要自己铺行，别接管静态卡
+    if (state.view !== 'grid' || state.page !== 1) return false;   // 静态卡只有第 1 页
+    if (pageSize() !== PER_DEFAULT) return false;                  // 窄屏每页 12，静态 24 张对不上
     if (state.cat !== 'all' || state.author !== 'all' || state.q) return false;
     if (state.onlyImg || state.recentOnly || state.openId) return false;
     if (state.sort !== 'recommend') return false;
