@@ -139,10 +139,10 @@ kbd {
 .brand-mark svg { display: block; width: 100%; height: 100%; }
 .brand-line { display: flex; align-items: baseline; gap: 7px; }
 .brand-name { font-family: var(--serif); font-weight: 700; font-size: 17px; letter-spacing: .02em; }
-/* 版本号：跟刊号一样的窄体小字，压在站名右侧 */
+/* 版本号：跟刊号一样的窄体小字，压在站名右侧（内容是数据快照日期，见 index.html 的 #brand-vol） */
 .brand-vol {
   font-family: var(--mono); font-size: 9.5px; line-height: 1;
-  letter-spacing: .08em; color: var(--ink-3);
+  letter-spacing: .03em; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums;
   padding: 2px 4px; border: 1px solid var(--line); border-radius: 3px;
   transform: translateY(-1px);
 }
@@ -1866,7 +1866,8 @@ body.modal-open { overflow: hidden; }
   .brand-mark { width: 23px; height: 23px; }
   .brand-name { font-size: 15px; }
   .brand-sub { display: none; }
-  .brand-vol { font-size: 9px; padding: 1px 3px; }
+  /* 快照号是 10 位日期，比原来的 VOL.26 长，收一档字号和内边距才塞得进同一行 */
+  .brand-vol { font-size: 8.5px; padding: 1px 2px; letter-spacing: -.01em; }
   .topbar-tools { gap: 5px; }
   .tool-btn { height: 30px; padding: 0 8px; }
   .icon-btn { width: 30px; height: 30px; }
@@ -1890,6 +1891,19 @@ body.modal-open { overflow: hidden; }
   .inst-copy { width: 32px; padding: 0; justify-content: center; }
   .fav-pop { width: min(320px, calc(100vw - 32px)); right: -6px; }
   .modal-act { flex-direction: column; }
+}
+
+/* 375 / 360 这种窄屏再收一档：日期徽章宽 3px 就是「工具组掉不掉到第二行」的分界线 */
+@media (max-width: 380px) {
+  .brand { gap: 5px; }
+  /* 到 375 就差这 6px：去掉徽章的边和内边距，退化成一行窄体小字 */
+  .brand-vol { font-size: 8px; letter-spacing: -.02em; padding: 1px 0; border-color: transparent; }
+  .topbar-tools { gap: 4px; }
+}
+@media (max-width: 366px) {
+  /* 360 这类老机型余量为负：日期徽章让位，保住「站名 + 工具组」一行。
+     完整数据日期在「上游动态」面板里，没有丢信息。 */
+  .brand-vol { display: none; }
 }
 
 /* ================= 逐仓插画母题（第二批） =================

@@ -415,6 +415,23 @@
   var $statTotal = document.getElementById('stat-total');
   if ($statTotal) $statTotal.textContent = SKILLS.length;
 
+  /* ---------- 顶栏快照号 ----------
+     原来这里是抄样板的「VOL.26」，没有任何数据来源。改成跟数据日期走：
+     显示 2026.11.06，鼠标悬停给出中文全称。拿不到日期就把徽章藏起来，不挂假号。 */
+  var $brandVol = document.getElementById('brand-vol');
+  function syncBrandVol(at) {
+    if (!$brandVol) return;
+    var snap = String(at || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(snap)) { $brandVol.hidden = true; return; }
+    var y = snap.slice(0, 4);
+    var m = +snap.slice(5, 7);
+    var d = +snap.slice(8, 10);
+    $brandVol.hidden = false;
+    $brandVol.textContent = y + '.' + snap.slice(5, 7) + '.' + snap.slice(8, 10);
+    $brandVol.title = '数据快照 · ' + y + ' 年 ' + m + ' 月 ' + d + ' 日';
+  }
+  syncBrandVol(UPS_AT);
+
   /* ---------- 分类 chips ---------- */
   function countOf(key) {
     return SKILLS.filter(function (s) { return key === 'all' || s.cat === key; }).length;
@@ -1335,7 +1352,7 @@
         s.days = daysSince(s.upd);
       }
     });
-    if (p.fetchedAt) UPS_AT = p.fetchedAt;
+    if (p.fetchedAt) { UPS_AT = p.fetchedAt; syncBrandVol(UPS_AT); }
     return changed;
   }
 

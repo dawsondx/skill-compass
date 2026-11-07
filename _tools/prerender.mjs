@@ -217,6 +217,14 @@ html = html.replace(/(content="Skill 指北 · )\d+( 个开源 Agent Skills 精�
 html = html.replace(/(id="result-text">共 )\d+( 个)/, `$1${nSkills}$2`);
 html = html.replace(/(，共 )\d+( 个 skill；)/, `$1${nSkills}$2`);
 
+/* 3.5 顶栏快照号：跟着 UPS_FETCHED 走，别留手写的旧值（原来写死过 VOL.26） */
+if (/^\d{4}-\d{2}-\d{2}$/.test(UPS_AT)) {
+  const [y, m, d] = UPS_AT.split('-');
+  html = html
+    .replace(/(<span class="brand-vol"[^>]*>)[^<]*(<\/span>)/, `$1${y}.${m}.${d}$2`)
+    .replace(/(<span class="brand-vol"[^>]*title=")[^"]*(")/, `$1数据快照 · ${y} 年 ${+m} 月 ${+d} 日$2`);
+}
+
 if (html === before) {
   console.log('· 内容无变化，index.html 未改动');
 } else if (CHECK_ONLY) {
