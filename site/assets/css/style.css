@@ -282,9 +282,16 @@ kbd {
 .hero-lead b { color: var(--ink); font-weight: 600; white-space: nowrap; }
 /* ---------- 快速安装器（复刻样板页：三点 + 宿主切换 + 一行命令） ---------- */
 .installer {
-  margin: 0 0 16px;
+  margin: 0;
+  display: flex; flex-direction: column; justify-content: center;
   background: var(--paper); border: 1px solid var(--line);
   border-radius: 13px; box-shadow: var(--shadow-1); overflow: hidden;
+}
+/* 左安装器 + 右风向标的 2:1 分区；列高不齐时安装器内容垂直居中，别留一截空卡 */
+.dash {
+  display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 12px; align-items: stretch;
+  margin: 0 0 26px; max-width: 100%;
 }
 .inst-head {
   display: flex; align-items: center; gap: 10px;
@@ -331,44 +338,40 @@ kbd {
 .inst-copy:hover { border-color: var(--accent); color: var(--accent-ink); background: var(--paper); }
 .inst-copy.done { border-color: var(--teal); color: var(--teal); }
 
-/* ========== 统计卡 + 风向标（样板页那张「一张纸片包住数字和榜单」） ========== */
-.dash {
-  margin: 0 0 26px; max-width: 100%;
-  background: var(--paper); border: 1px solid var(--line);
-  border-radius: 13px; box-shadow: var(--shadow-1); overflow: hidden;
+/* ========== 统计条（一行小字）+ 双卡分区（安装器 2 : 风向标 1） ========== */
+.stats {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: 4px 26px; margin: 0 0 14px;
 }
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); }
-/* 统计数字直接当筛快捷入口用：点「72 个演示」等于勾「有演示图」，不用先读文案再去找按钮 */
+/* 统计数字直接当筛快捷入口用：点「159 个演示」等于勾「有演示图」，不用先读文案再去找按钮 */
 .stat {
   position: relative;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 15px 10px 13px; margin: 0; border: 0; background: none;
-  font: inherit; color: inherit; text-align: center; cursor: pointer;
-  transition: background .15s;
+  display: flex; align-items: baseline; gap: 7px;
+  padding: 2px 0; margin: 0; border: 0; background: none;
+  font: inherit; color: inherit; cursor: pointer;
 }
-.stat + .stat::before {
-  content: ''; position: absolute; left: 0; top: 14px; bottom: 14px;
-  width: 1px; background: var(--line-2);
-}
-.stat:hover { background: var(--paper-2); }
 .stat .stat-label {
   border-bottom: 1px dashed transparent;
   transition: color .15s, border-color .15s;
 }
 .stat:hover .stat-num { color: var(--accent); }
 .stat:hover .stat-label { color: var(--ink-2); border-bottom-color: var(--line); }
-.stat:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: -3px; border-radius: 5px; }
+.stat:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 3px; border-radius: 5px; }
 .stat.on .stat-num { color: var(--accent); }
 .stat.on .stat-label { color: var(--accent-ink); border-bottom-color: var(--accent-soft); }
 .stat-num {
-  font-family: var(--serif); font-size: 31px; font-weight: 700; line-height: 1;
+  font-family: var(--serif); font-size: 20px; font-weight: 700; line-height: 1;
   font-variant-numeric: tabular-nums; letter-spacing: -.01em;
 }
-.stat-num span { font-size: 13px; color: var(--ink-3); font-family: var(--sans); font-weight: 500; margin-left: 3px; }
-.stat-label { font-size: 11.5px; color: var(--ink-3); margin-top: 8px; letter-spacing: .04em; }
+.stat-num span { font-size: 11px; color: var(--ink-3); font-family: var(--sans); font-weight: 500; margin-left: 2px; }
+.stat-label { font-size: 11.5px; color: var(--ink-3); letter-spacing: .04em; }
 
-/* ---------- 本周安装热度风向标 ---------- */
-.pulse-sec { border-top: 1px solid var(--line-2); padding: 9px 14px 11px; }
+/* ---------- 本周安装热度风向标（右栏迷你卡：收起时单行榜，展开后露仓库全名） ---------- */
+.pulse-sec {
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: 13px; box-shadow: var(--shadow-1);
+  padding: 9px 14px 10px;
+}
 .pulse-head { display: flex; align-items: center; gap: 7px; padding: 3px 2px 5px; }
 .pulse-title {
   display: inline-flex; align-items: center; gap: 6px;
@@ -417,10 +420,12 @@ kbd {
   font-family: var(--mono); font-size: 10px; line-height: 1.4; color: var(--ink-3);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.pulse-spark {
-  flex-shrink: 0; width: 86px; height: 20px; display: block;
-  color: var(--teal); opacity: .85;
-}
+/* 收起态是迷你榜：单行「名次 + 名称 + 周装机量」，仓库全名和折线展开后再说 */
+.pulse-list:not(.is-open) .pulse-repo { display: none; }
+.pulse-list:not(.is-open) .pulse-item { padding: 7px 4px; }
+/* 展开态限高滚动：21 条全铺会把左边的安装器卡拉成一张空面板 */
+.pulse-list.is-open { max-height: 224px; overflow-y: auto; scrollbar-width: thin; }
+.pulse-spark { display: none; }
 .pulse-val {
   flex-shrink: 0; min-width: 62px; text-align: right;
   font-family: var(--mono); font-size: 12.5px; font-weight: 600; color: var(--ink);
@@ -1686,7 +1691,7 @@ footer b { color: var(--ink-2); font-weight: 550; }
   .topbar-stat { display: none; }
   .hero { padding: 26px 16px 18px; }
   .hero-lead { font-size: 14.5px; line-height: 1.7; margin-bottom: 20px; }
-  .stats { gap: 20px 26px; }
+  .stats { gap: 4px 20px; }
   .filterbar { top: var(--top-h, 106px); }
   .filterbar-inner { padding: 7px 0 8px 16px; position: relative; }
   .filterbar-inner::after {
@@ -1719,7 +1724,6 @@ footer b { color: var(--ink-2); font-weight: 550; }
 }
 @media (max-width: 560px) {
   .grid { grid-template-columns: 1fr; }
-  .stat-num { font-size: 25px; }
   .hero-lead { font-size: 14.5px; }
   .result-line { flex-wrap: wrap; row-gap: 6px; }
   .fresh-hint { order: 3; flex-basis: 100%; margin-left: 0; }
@@ -1749,11 +1753,11 @@ footer b { color: var(--ink-2); font-weight: 550; }
 @media (max-width: 640px) {
   body.sort-open { overflow: hidden; }
 
-  /* 统计四项压成 2×2：原来直接 wrap 会把首屏推得看不见卡片 */
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .stat-num { font-size: 22px; }
-  .stat-num span { font-size: 11px; margin-left: 1px; }
-  .stat-label { font-size: 10.5px; letter-spacing: 0; margin-top: 5px; line-height: 1.35; }
+  /* 统计条收间距即可：本身就是一行小字，wrap 后也不会占多少 */
+  .stats { gap: 3px 20px; }
+  .stat-num { font-size: 18px; }
+  .stat-num span { font-size: 10.5px; margin-left: 1px; }
+  .stat-label { font-size: 10.5px; letter-spacing: 0; line-height: 1.35; }
 
   .sortsel { height: 36px; padding: 0 13px; font-size: 13.5px; gap: 8px; }
 
@@ -1865,12 +1869,13 @@ body.modal-open { overflow: hidden; }
   .tool-btn { height: 32px; padding: 0 9px; font-size: 12px; }
   .tool-btn .t-label { display: none; }
   .icon-btn { width: 32px; height: 32px; }
+  /* 窄屏双卡上下堆叠 */
+  .dash { grid-template-columns: 1fr; }
   .inst-head { flex-wrap: wrap; row-gap: 7px; }
   .inst-tabs { margin-left: 0; width: 100%; overflow-x: auto; }
   .inst-tab { flex: 1; }
   .inst-body { padding: 11px 12px; gap: 9px; }
   .inst-cmd { font-size: 11.5px; }
-  .pulse-spark { width: 58px; }
 }
 @media (max-width: 560px) {
   /* 手机上没键盘，快捷键说明纯占地方；版本条整条收起来，把首屏还给内容 */
@@ -1891,13 +1896,8 @@ body.modal-open { overflow: hidden; }
   #fav-btn .t-label { display: inline; }
   #fav-btn .tool-n { display: none; }
   #submit-btn svg { display: none; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-  .stat { padding: 13px 8px 11px; }
-  .stat:nth-child(3) { border-top: 1px solid var(--line-2); }
-  .stat:nth-child(4) { border-top: 1px solid var(--line-2); }
-  .stat:nth-child(3)::before { display: none; }
+  .stats { gap: 3px 16px; }
   .pulse-sec { padding: 8px 11px 10px; }
-  .pulse-spark { display: none; }
   .pulse-name { font-size: 12.5px; }
   .pulse-val { min-width: 54px; }
   .pulse-foot { font-size: 10px; }

@@ -102,29 +102,8 @@
     Skill 是给 AI Agent（Claude Code、Cursor、Codex、Gemini CLI）准备的<b>「专家作业说明书」</b>。
     我们人工实测并装裱了 <b><span id="hero-total">294</span> 个高质量开源仓库</b>，按最终交付物分类，附带真实效果预览与一行命令即插即用体验。
   </p>
-  <!-- 快速安装器：默认拿推荐排序第一位的仓库演示，切换宿主即换命令 -->
-  <div class="installer">
-    <div class="inst-head">
-      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="inst-label">快速安装器 · 选择你的宿主 <b>Agent</b>：</span>
-      <div class="inst-tabs" role="tablist" aria-label="选择宿主 Agent">
-        <button class="inst-tab" type="button" role="tab" data-host="npx" aria-selected="true">npx 通用</button>
-        <button class="inst-tab" type="button" role="tab" data-host="claude" aria-selected="false">Claude Code</button>
-        <button class="inst-tab" type="button" role="tab" data-host="cursor" aria-selected="false">Cursor</button>
-        <button class="inst-tab" type="button" role="tab" data-host="codex" aria-selected="false">Codex</button>
-      </div>
-    </div>
-    <div class="inst-body">
-      <code class="inst-cmd" id="inst-cmd"><span class="p">$</span><span id="inst-cmd-text">npx skills add nextlevelbuilder/ui-ux-pro-max-skill</span></code>
-      <button class="inst-copy" id="inst-copy" type="button">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h8"/></svg>
-        <span>复制命令</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="dash">
-    <div class="stats">
+  <!-- 统计数字：从大数字卡降级为一行小字快捷入口，点数字 = 快捷筛选 -->
+  <div class="stats">
     <button class="stat" type="button" data-stat="all" title="清空筛选，看全部">
       <span class="stat-num" id="s1">294<span>个</span></span>
       <span class="stat-label">收录 Skill 仓库</span>
@@ -141,6 +120,29 @@
       <span class="stat-num" id="s4">14<span>位</span></span>
       <span class="stat-label">知名创作者</span>
     </button>
+  </div>
+
+  <!-- 安装器(2) + 风向标(1) 左右分区，压缩首屏高度 -->
+  <div class="dash">
+    <!-- 快速安装器：默认拿推荐排序第一位的仓库演示，切换宿主即换命令 -->
+    <div class="installer">
+      <div class="inst-head">
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="inst-label">快速安装器 · 选择你的宿主 <b>Agent</b>：</span>
+        <div class="inst-tabs" role="tablist" aria-label="选择宿主 Agent">
+          <button class="inst-tab" type="button" role="tab" data-host="npx" aria-selected="true">npx 通用</button>
+          <button class="inst-tab" type="button" role="tab" data-host="claude" aria-selected="false">Claude Code</button>
+          <button class="inst-tab" type="button" role="tab" data-host="cursor" aria-selected="false">Cursor</button>
+          <button class="inst-tab" type="button" role="tab" data-host="codex" aria-selected="false">Codex</button>
+        </div>
+      </div>
+      <div class="inst-body">
+        <code class="inst-cmd" id="inst-cmd"><span class="p">$</span><span id="inst-cmd-text">npx skills add nextlevelbuilder/ui-ux-pro-max-skill</span></code>
+        <button class="inst-copy" id="inst-copy" type="button">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h8"/></svg>
+          <span>复制命令</span>
+        </button>
+      </div>
     </div>
 
     <div class="pulse-sec">

@@ -251,6 +251,8 @@
   }
   function renderPulse() {
     if (!$pulseList) return;
+    // 收起态是迷你榜（单行、短口径），展开态才露仓库全名和完整口径，CSS 跟着这个类走
+    $pulseList.classList.toggle('is-open', pulseOpen);
     var items = (PULSE && PULSE.items) ? PULSE.items.filter(function (x) {
       return SKILLS.some(function (s) { return s.id === x.id; });
     }) : [];
@@ -274,12 +276,15 @@
     if ($pulseToggle) {
       $pulseToggle.hidden = items.length <= PULSE_COLLAPSED;
       $pulseToggle.setAttribute('aria-expanded', pulseOpen ? 'true' : 'false');
-      $pulseToggle.textContent = pulseOpen ? '收起榜单 ↑' : '切换完整榜单视图 →';
+      $pulseToggle.textContent = pulseOpen ? '收起榜单 ↑' : '完整榜单 →';
     }
     if ($pulseFoot && PULSE) {
-      $pulseFoot.innerHTML = '口径：<a href="https://www.skills.sh/" target="_blank" rel="noopener"><b>skills.sh</b></a> 公开安装量（<code>npx skills add</code> 的匿名遥测）· ' +
-        '按最近 7 天安装量排序，折线为近 8 周 · 站内 ' + SKILLS.length + ' 个仓库里 ' +
-        PULSE.total + ' 个查得到安装量，只排这些 · 更新于 ' + PULSE.at;
+      // 右栏空间有限：收起时只留一行短口径，展开后才给完整说明
+      $pulseFoot.innerHTML = pulseOpen
+        ? '口径：<a href="https://www.skills.sh/" target="_blank" rel="noopener"><b>skills.sh</b></a> 公开安装量（<code>npx skills add</code> 的匿名遥测）· ' +
+          '按最近 7 天安装量排序，折线为近 8 周 · 站内 ' + SKILLS.length + ' 个仓库里 ' +
+          PULSE.total + ' 个查得到安装量，只排这些 · 更新于 ' + PULSE.at
+        : '口径：<a href="https://www.skills.sh/" target="_blank" rel="noopener"><b>skills.sh</b></a> 公开周安装量 · 更新于 ' + PULSE.at;
     }
   }
   if ($pulseToggle) {
