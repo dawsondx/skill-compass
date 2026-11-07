@@ -1758,6 +1758,10 @@ footer b { color: var(--ink-2); font-weight: 550; }
   .stat-num { font-size: 18px; }
   .stat-num span { font-size: 10.5px; margin-left: 1px; }
   .stat-label { font-size: 10.5px; letter-spacing: 0; line-height: 1.35; }
+  /* 右栏 <230px 时让 8W Pulse 徽章让位，标题和榜单名才不会被挤断 */
+  .pulse-tag { display: none; }
+  .pulse-name { font-size: 12px; }
+  .pulse-foot { font-size: 10px; }
 
   .sortsel { height: 36px; padding: 0 13px; font-size: 13.5px; gap: 8px; }
 
@@ -1869,8 +1873,8 @@ body.modal-open { overflow: hidden; }
   .tool-btn { height: 32px; padding: 0 9px; font-size: 12px; }
   .tool-btn .t-label { display: none; }
   .icon-btn { width: 32px; height: 32px; }
-  /* 窄屏双卡上下堆叠 */
-  .dash { grid-template-columns: 1fr; }
+  /* 中宽度保留左右分区，只是比例收窄；真正堆叠只发生在手机（见下方 560px 断点） */
+  .dash { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; }
   .inst-head { flex-wrap: wrap; row-gap: 7px; }
   .inst-tabs { margin-left: 0; width: 100%; overflow-x: auto; }
   .inst-tab { flex: 1; }
@@ -1880,6 +1884,7 @@ body.modal-open { overflow: hidden; }
 @media (max-width: 560px) {
   /* 手机上没键盘，快捷键说明纯占地方；版本条整条收起来，把首屏还给内容 */
   .topbar-strip { display: none; }
+  .dash { grid-template-columns: 1fr; }
   /* 一行装下「站名 + 收藏夹 + 提交 + 主题」：先舍副标题，别让工具组掉到第二行 */
   .brand { gap: 7px; }
   .brand-mark { width: 23px; height: 23px; }
