@@ -1538,7 +1538,8 @@
 
   /* 宿主切换：安装器 tab、抽屉里的兼容矩阵、抽屉里的安装命令三处一起更新 */
   function setInstallHost(host) {
-    if (!HOSTS[host]) return;
+    // npx 的后缀是空字符串，不能用 !HOSTS[host] 判空，否则切回 npx 会被挡掉
+    if (!Object.prototype.hasOwnProperty.call(HOSTS, host)) return;
     installHost = host;
     if ($instTabs) {
       Array.prototype.forEach.call($instTabs.children, function (x) {
