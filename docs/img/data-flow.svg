@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 330" width="1200" height="330" role="img" aria-label="Skill 指北数据流：四类上游数据汇入 JS 快照，再经构建期预渲染与浏览器渲染，最终发布到 GitHub Pages">
+  <rect x="1" y="1" width="1198" height="328" rx="16" fill="#FFFCF6" stroke="#E4D9C6" stroke-width="2"/>
+  <text x="28" y="32" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="14" font-weight="700" fill="#17130E">数据是怎么进站点的</text>
+  <text x="28" y="52" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="10" letter-spacing="1.5" fill="#8A8271">BUILD-TIME SNAPSHOT → STATIC HTML → BROWSER</text>
+
+  <!-- 第一列：四类上游 -->
+  <g font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="12" fill="#17130E">
+    <rect x="28" y="76" width="220" height="44" rx="9" fill="#FBF6EC" stroke="#E4D9C6"/>
+    <text x="44" y="103">上游仓库元数据</text>
+    <rect x="28" y="128" width="220" height="44" rx="9" fill="#FBF6EC" stroke="#E4D9C6"/>
+    <text x="44" y="155">README 演示图</text>
+    <rect x="28" y="180" width="220" height="44" rx="9" fill="#FBF6EC" stroke="#E4D9C6"/>
+    <text x="44" y="207">skills.sh 安装热度</text>
+    <rect x="28" y="232" width="220" height="44" rx="9" fill="#FBF6EC" stroke="#E4D9C6"/>
+    <text x="44" y="259">逐仓插画 / SKILL.md</text>
+  </g>
+
+  <!-- 箭头 1 -->
+  <path d="M252 178 H292" stroke="#D3C5AC" stroke-width="2" fill="none"/>
+  <path d="M292 178 l-7 -4 v8 z" fill="#D3C5AC"/>
+
+  <!-- 第二列：JS 快照 -->
+  <rect x="300" y="76" width="238" height="200" rx="12" fill="#F7F3EA" stroke="#D3C5AC" stroke-width="2"/>
+  <text x="318" y="104" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="14" font-weight="700" fill="#17130E">site/assets/js/*.js</text>
+  <text x="318" y="124" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#8A8271">唯一数据源 · 全部提交进仓库</text>
+  <g font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="11" fill="#57503F">
+    <text x="318" y="152">data.js</text><text x="318" y="174">demo-images.js</text>
+    <text x="318" y="196">cover-art.js</text><text x="318" y="218">skillmd*.js</text>
+    <text x="318" y="240">pulse.js</text><text x="318" y="262">card-template.js</text>
+  </g>
+
+  <!-- 箭头 2 -->
+  <path d="M542 178 H582" stroke="#D3C5AC" stroke-width="2" fill="none"/>
+  <path d="M582 178 l-7 -4 v8 z" fill="#D3C5AC"/>
+
+  <!-- 第三列：两条消费路径 -->
+  <rect x="590" y="76" width="248" height="88" rx="12" fill="#FBF6EC" stroke="#D9553A" stroke-width="2"/>
+  <text x="608" y="102" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="13" font-weight="700" fill="#B23C24">构建期 · prerender.mjs</text>
+  <text x="608" y="124" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="11" fill="#57503F">首屏 24 张卡片 + 全量 JSON-LD</text>
+  <text x="608" y="144" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="11" fill="#57503F">+ noscript 目录（给爬虫兜底）</text>
+
+  <rect x="590" y="188" width="248" height="88" rx="12" fill="#FBF6EC" stroke="#0F5F58" stroke-width="2"/>
+  <text x="608" y="214" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="13" font-weight="700" fill="#0F5F58">运行期 · app.js</text>
+  <text x="608" y="236" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="11" fill="#57503F">筛选 / 搜索 / 排序 / 双视图</text>
+  <text x="608" y="256" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="11" fill="#57503F">抽屉 / 收藏 / 主题 / 快捷键</text>
+
+  <!-- 箭头 3 -->
+  <path d="M842 140 H882" stroke="#D3C5AC" stroke-width="2" fill="none"/>
+  <path d="M882 140 l-7 -4 v8 z" fill="#D3C5AC"/>
+  <path d="M842 232 H882" stroke="#D3C5AC" stroke-width="2" fill="none"/>
+  <path d="M882 232 l-7 -4 v8 z" fill="#D3C5AC"/>
+
+  <!-- 第四列：产物 -->
+  <rect x="890" y="76" width="282" height="88" rx="12" fill="#17130E" stroke="#17130E"/>
+  <text x="910" y="104" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="13" font-weight="700" fill="#FBF7EE">index.html</text>
+  <text x="910" y="126" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#C0B5A2">静态 HTML · 不依赖 JS 也有首屏</text>
+  <text x="910" y="146" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#C0B5A2">GitHub Pages 直接托管 site/</text>
+
+  <rect x="890" y="188" width="282" height="88" rx="12" fill="#FFF" stroke="#D9553A" stroke-width="2"/>
+  <text x="910" y="216" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="13" font-weight="700" fill="#B23C24">skills.dawsondx.top</text>
+  <text x="910" y="238" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="10" fill="#57503F">push → Actions refresh → build → deploy</text>
+  <text x="910" y="258" font-family="-apple-system, 'PingFang SC', sans-serif" font-size="11" fill="#57503F">同一份 card-template.js，两端渲染不跑偏</text>
+
+  <text x="28" y="308" font-family="-apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="11" fill="#8A8271">所有抓取脚本零依赖（Node 内置模块），快照提交进仓库，外部站点抖动不会挡住部署。</text>
+</svg>

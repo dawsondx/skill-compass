@@ -2,7 +2,7 @@
  * Skill 指北 · 服务端
  *
  * 为什么需要一个服务端：GitHub 的 commits.atom 不返回 CORS 头，浏览器直连会被拦死；
- * api.github.com 虽然允许跨域，但匿名限流 60 次/小时/IP，121 个仓库一次就爆。
+ * api.github.com 虽然允许跨域，但匿名限流 60 次/小时/IP，294 个仓库一次就爆。
  * 所以把「抓取」放到服务端，浏览器只问自己的 /api/upstream。
  *
  * 刷新策略是 stale-while-revalidate：
