@@ -5,8 +5,9 @@
  * 抽屉里第二个 tab「SKILL.md 源码透视」用。仓库未必有，所以：
  *   · 先试根目录 SKILL.md / skill.md / SKILL.MD
  *   · 带 path 的子条目，再试 {path}/SKILL.md
- *   · 全都没命中就留空，前端显示「该仓库未提供 SKILL.md」并给 README 跳转
- * 只截前 60 行 / 8KB，避免把整本手册塞进页面。
+ *   · 全都没命中就退一步抓 README，洗成可读的纯文本摘要（丢掉 <img> / 徽章 /
+ *     代码块 / 链接语法），前端用正文排版展示，不再把 HTML 源码当「节选」给用户看
+ * SKILL.md 截前 24 行 / 2KB；README 扫全篇取前 18 句有意义正文 / 2KB。
  *
  * 用法：
  *   node _tools/fetch-skillmd.mjs                 # 全量
@@ -36,7 +37,7 @@ const ONLY = (val('--ids', '') || '').split(',').filter(Boolean);
 const CONCURRENCY = 8;
 const MAX_LINES = 24;
 const MAX_BYTES = 2 * 1024;
-const README_LINES = 24;
+const README_KEEP = 18;
 const UA = 'Mozilla/5.0 (compatible; skill-compass-skillmd/1.0; +https://skills.dawsondx.top/)';
 
 function loadSkills() {
@@ -76,16 +77,60 @@ function clip(txt) {
   return t.trimEnd() + '\n';
 }
 
-function clipReadme(txt) {
+/* README 不能直接截前 N 行：很多仓库开头是一整屏 <img> / <p align="center"> / 徽章，
+   截出来就是一堆 HTML 源码，看着像代码、读不出信息。这里把它洗成「可读的纯文本摘要」。
+   顺序很关键：**先剥标记、再判噪声**，否则 `<a>🇨🇳 简体中文</a> |` 这种语言栏
+   会因为行首是 `<` 而躲过所有过滤规则。 */
+function cleanReadme(txt) {
   const lines = txt.replace(/\r\n/g, '\n').split('\n');
-  // README 开头常常是一堆徽章 / logo / 空行，从第一处正文或标题开始截
-  let start = lines.findIndex((l, i) =>
-    i > 2 && (l.trim().length > 60 || /^#{1,3}\s+\S/.test(l)) && !/^\s*\[?!\[/.test(l)
-  );
-  if (start < 0) start = 0;
-  let t = lines.slice(start, start + README_LINES).join('\n');
+  const out = [];
+  let inCode = false;
+
+  for (const raw of lines) {
+    let l = raw.trim();
+    if (!l) continue;
+    if (/^(```|~~~)/.test(l)) { inCode = !inCode; continue; }
+    if (inCode) continue;
+
+    // ── 第一步：先把所有标记剥干净，拿到「人眼看到的文字」 ──
+    l = l.replace(/<[^>]*>/g, '');                            // HTML 标签（含 <img> <p align>）
+    l = l.replace(/!\[[^\]]*\]\([^)]*\)/g, '');              // Markdown 图片 / 徽章
+    l = l.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1');           // 链接只留锚文本（空锚文本会变成空串）
+    l = l.replace(/\[([^\]]+)\]\[[^\]]*\]/g, '$1');           // 引用式链接
+    l = l.replace(/\[([^\]]+)\]/g, '$1');                     // 残留方括号
+    l = l.replace(/\]\([^)]*\)/g, '');                        // 跨行链接留下的孤立 ](url)
+    l = l.replace(/\*\*|__|~~|`/g, '');                       // 强调 / 行内代码符号
+    l = l.replace(/^#{1,6}\s+/, '');                          // 标题井号
+    l = l.replace(/^\s*>\s*/, '');                            // 引用符号
+    l = l.replace(/^\s*[-*+]\s+/, '· ');                      // 列表符号
+    l = l.replace(/\s{2,}/g, ' ').trim();
+
+    // ── 第二步：再按纯文本判噪声 ──
+    if (!l || l.length < 8) continue;
+    if (!/[\u4e00-\u9fa5a-zA-Z]/.test(l)) continue;           // 没有实际文字
+    if (/^[.\-{}\[\]();:<>/\\|·～~_\s]+$/.test(l)) continue;   // 纯符号 / 分隔符
+    if (/^https?:\/\/\S+$/.test(l)) continue;                 // 纯 URL
+    if (/^[-=*_~]{3,}$/.test(l)) continue;                    // 分隔线
+    if (/^\|?[\s:|-]+\|?$/.test(l)) continue;                 // 表格分隔行
+    if (/shields\.io|badge\.fury|travis-ci|coveralls|codecov/i.test(l)) continue;
+    if (/^\s*(\$\s|npm |npx |yarn |pnpm |pip |git |curl |brew )/.test(l)) continue; // 命令行
+    // 语言切换栏 / 站点导航 / 分隔式链接列表
+    if (/^[\u{1F1E6}-\u{1F1FF}\p{Extended_Pictographic}]/u.test(l)) continue;
+    if (/^.{0,80}$/.test(l) && (l.match(/\|/g) || []).length >= 2) continue;
+    if (/^\S+\s+·\s+\S+\s+·/.test(l)) continue;               // English · 简体中文 · 日本語
+    if (/^(other projects|links|sponsors|contributors|table of contents|contents|navigation)$/i.test(l)) continue;
+    if (/^(website|docs|demo|homepage|link|repository)\s*:\s*https?:/i.test(l)) continue;
+    if (/^(if you find this useful|consider supporting|star this repo|follow me)/i.test(l)) continue;
+    if (out.length && out[out.length - 1] === l) continue;    // 相邻重复
+
+    out.push(l);
+    if (out.length >= README_KEEP) break;
+  }
+
+  if (out.length < 2) return '';                             // 全是图，交给前端走空态
+  let t = out.join('\n');
   if (Buffer.byteLength(t, 'utf8') > MAX_BYTES) {
-    t = Buffer.from(t, 'utf8').subarray(0, MAX_BYTES).toString('utf8').replace(/\n[^\n]*$/, '') + '\n…';
+    t = Buffer.from(t, 'utf8').subarray(0, MAX_BYTES).toString('utf8').replace(/\n[^\n]*$/, '');
   }
   return t.trimEnd() + '\n';
 }
@@ -108,7 +153,7 @@ async function work(s) {
     if (!txt) continue;
     return {
       id: s.id,
-      text: c.isReadme ? clipReadme(txt) : clip(txt),
+      text: c.isReadme ? cleanReadme(txt) : clip(txt),
       from: c.file.replace(/^https:\/\/raw\.githubusercontent\.com\//, '')
     };
   }
@@ -147,7 +192,7 @@ async function main() {
   const keys = Object.keys(found).sort();
   const body = keys.map((k) => '  ' + JSON.stringify(k) + ': ' + JSON.stringify(found[k])).join(',\n');
   const js = `/* SKILL.md 源码快照 —— 由 _tools/fetch-skillmd.mjs 生成，别手改\n` +
-    `   命中 ${keys.length} 个仓库；只截前 ${MAX_LINES} 行。缺的就是仓库里没有。 */\n` +
+    `   命中 ${keys.length} 个仓库；SKILL.md 截前 ${MAX_LINES} 行，README 已洗成纯文本摘要。 */\n` +
     `window.SKILLMD = {\n${body}\n};\n` +
     `window.SKILLMD_FROM = ${JSON.stringify(meta, null, 0)};\n`;
   fs.mkdirSync(path.dirname(OUT_JS), { recursive: true });

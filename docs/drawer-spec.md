@@ -415,5 +415,20 @@ function close(){
 - 宿主矩阵**回落全局默认 4 个**，没有为 294 个仓库逐个编造 `hosts: []` —— 没有可靠数据源，不造数据。
 - `skillmd.js` 是单文件按需注入（441 KB），没有拆成 291 个小文件：这样 `file://` 本地预览也能用，不必起服务器。
 
+### 后续修复：README 摘要不该长成代码（2026-11-07）
+
+**现象**：第二 tab 显示 `<img src=...>` / `<p align="center">` / 徽章链接等原始 HTML，读起来像一坨代码，183 个 README 型仓库里 87 个中招。
+
+**根因**：`fetch-skillmd.mjs` 最初只是「跳过后取前 24 行」，而很多仓库的 README 开头就是一整屏图片块；另外过滤规则跑在剥标签**之前**，像 `<a>🇨🇳 简体中文</a> |` 这种语言栏因行首是 `<` 躲过了所有规则。
+
+**修法（两侧一起改）**
+- 生成侧：`cleanReadme()` 改成 **先剥标记、再判噪声**。先去掉 HTML 标签 / Markdown 图片 / 链接只留锚文本 / 强调符 / 标题井号 / 列表符，再按纯文本丢掉纯 URL、分隔线、表格、命令行、语言切换栏、导航词、徽章域名、代码块；扫全篇取前 18 句有意义正文，而不是只盯开头。
+- 展示侧：`kind === 'readme'` 时 tab 改名「仓库说明」，内容从 `<pre>` 等宽代码块换成 `.dw-prose` 无衬线段落排版，并加一行出处说明「摘自仓库 README · 已去除图片、徽章与代码块」。真 `SKILL.md` 仍用 mono 代码块（那本来就是源码）。
+- 空态：清洗后不足 2 句就显示「这份 README 主要是图片和徽章」+ GitHub 原文链接。
+
+**质检（全量 183 条 README）**：HTML 标签 0、Markdown 图片 0、残留链接语法 0、空摘要 0，平均 1.1KB/条。第一版 960KB → 现在 464KB 且仍按需加载。
+
+---
+
 *测量脚本：`ego/sample-cards/probe.mjs`（样式）、`probe2.mjs`（响应式/暗色/交互时序）、`probe3.mjs`（动效采样/边界）、`parse-data.mjs`（12 条数据字段分布）、`probe-all.mjs`（12 仓逐一打开核对）、`probe-linkage.mjs`（宿主联动）。原始截图：`ego/drawer-shots/`。*
-*实施后的验证脚本：`_data/verify-drawer*.mjs`（`_data/` 已 gitignore，仅本地用）。*
+*实施后的验证脚本：`_data/verify-drawer*.mjs`、`_data/verify-readme.mjs`（`_data/` 已 gitignore，仅本地用）。*

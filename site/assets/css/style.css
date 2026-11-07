@@ -2643,10 +2643,17 @@ body.modal-open { overflow: hidden; }
 .dw-tags { margin-bottom: 22px; }
 .dw-sec { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
   color: var(--ink-3); margin: 0 0 10px; }
+.dw-src-head { margin: 0 0 10px; font-family: var(--mono); font-size: 10px;
+  letter-spacing: .04em; color: var(--ink-3); }
 .dw-src { padding: 16px; border-radius: 12px; border: 1px solid var(--line);
   background: var(--paper-2); overflow-x: auto; }
 .dw-src pre { margin: 0; font-family: var(--mono); font-size: 12px; line-height: 1.75;
   color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+/* README 摘要是给人读的正文，不是源码：换回无衬线、按段落排版 */
+.dw-prose { font-family: var(--sans); font-size: 13px; line-height: 1.8; color: var(--ink-2); }
+.dw-prose p { margin: 0 0 11px; }
+.dw-prose p:last-child { margin-bottom: 0; }
+.dw-prose a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
 .dw-empty { padding: 18px; border-radius: 12px; border: 1px dashed var(--line-hi);
   background: var(--paper-2); font-size: 12.5px; line-height: 1.7; color: var(--ink-2); }
 .dw-empty a { color: var(--accent-ink); }

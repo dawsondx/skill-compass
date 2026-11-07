@@ -897,7 +897,7 @@
   var paneScroll = { overview: 0, source: 0 };
 
   function mdKind(id) { return MD_META[id] || ''; }        // 'md' | 'readme' | ''
-  function mdLabel(k) { return k === 'md' ? 'SKILL.md 源码透视' : (k === 'readme' ? 'README 节选' : '源码透视'); }
+  function mdLabel(k) { return k === 'md' ? 'SKILL.md 源码透视' : (k === 'readme' ? '仓库说明' : '源码透视'); }
   function currentDrawerSkill() {
     return SKILLS.filter(function (x) { return x.id === state.openId; })[0] || null;
   }
@@ -930,27 +930,38 @@
     });
   }
 
+  /* SKILL.md 是源码，用等宽代码块；README 已经洗成纯文本摘要，用正文段落排版，
+     别再套 <pre> mono，否则「读起来像一坨代码」。 */
+  function fillSource(el, s, fallback) {
+    if (!el) return;
+    if (!MD_TEXT) { el.textContent = fallback || '正在载入…'; return; }
+    var kind = mdKind(s.id);
+    var text = MD_TEXT[s.id] || '';
+    if (kind === 'readme') {
+      var parts = text.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+      el.innerHTML = parts.length
+        ? parts.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('')
+        : '<p>这份 README 主要是图片和徽章，没有可提取的正文。' +
+          '<a href="' + repoUrl(s) + '/blob/HEAD/README.md" target="_blank" rel="noopener">到 GitHub 看原文 ↗</a></p>';
+    } else {
+      el.textContent = text || '（源码快照缺失，可到仓库查看完整文件）';
+    }
+  }
+
   function loadSkillMd() {
     var s = currentDrawerSkill();
-    if (!s || !mdKind(s.id) || MD_TEXT) {
-      if (MD_TEXT && s) {
-        var pre0 = document.getElementById('d-src');
-        if (pre0) pre0.textContent = MD_TEXT[s.id] || '（源码快照缺失）';
-      }
-      return;
-    }
+    if (!s || !mdKind(s.id)) return;
+    if (MD_TEXT) { fillSource(document.getElementById('d-src'), s); return; }
     if (mdLoading) return;
     mdLoading = true;
-    var pre = document.getElementById('d-src');
-    if (pre) pre.textContent = '正在载入源码快照…';
+    fillSource(document.getElementById('d-src'), s, '正在载入仓库说明…');
     var sc = document.createElement('script');
     sc.src = 'assets/js/skillmd.js';
     sc.onload = function () {
       MD_TEXT = window.SKILLMD || {};
       mdLoading = false;
       var cur = currentDrawerSkill();
-      var target = document.getElementById('d-src');
-      if (target && cur) target.textContent = MD_TEXT[cur.id] || '（源码快照缺失）';
+      if (cur) fillSource(document.getElementById('d-src'), cur);
     };
     sc.onerror = function () {
       mdLoading = false;
@@ -1069,10 +1080,12 @@
     }).sort(function (a, b) { return (b.stars || 0) - (a.stars || 0); }) : [];
     var byAuthorHTML = sameAuthor.map(simCardHTML).join('');
 
-    var sourceInner = kind
+    var sourceInner = kind === 'md'
       ? '<pre id="d-src"></pre>'
-      : '<div class="dw-empty">该仓库没有可用的 SKILL.md / README 源码快照。<br>' +
-        '<a href="' + repoUrl(s) + '/blob/HEAD/README.md" target="_blank" rel="noopener">到 GitHub 查看完整说明 ↗</a></div>';
+      : (kind === 'readme'
+        ? '<div class="dw-prose" id="d-src"></div>'
+        : '<div class="dw-empty">该仓库没有可用的 SKILL.md / README 源码快照。<br>' +
+          '<a href="' + repoUrl(s) + '/blob/HEAD/README.md" target="_blank" rel="noopener">到 GitHub 查看完整说明 ↗</a></div>');
 
     $dScroll.innerHTML =
       '<div class="dw-body">' +
@@ -1093,7 +1106,7 @@
 
         '<div class="dtabs" role="tablist">' +
           '<button type="button" class="dtab" data-dtab="overview" role="tab" aria-selected="true">功能说明书与安装</button>' +
-          '<button type="button" class="dtab mono" data-dtab="source" role="tab" aria-selected="false"' +
+          '<button type="button" class="dtab' + (kind === 'md' ? ' mono' : '') + '" data-dtab="source" role="tab" aria-selected="false"' +
             (kind ? '' : ' aria-disabled="true"') + '>' + mdLabel(kind) + '</button>' +
         '</div>' +
 
@@ -1142,6 +1155,9 @@
         '</section>' +
 
         '<section class="dpane" id="dpane-source" role="tabpanel" hidden>' +
+          (kind === 'readme'
+            ? '<div class="dw-src-head">摘自仓库 README · 已去除图片、徽章与代码块</div>'
+            : (kind === 'md' ? '<div class="dw-src-head">SKILL.md 前 24 行 · 完整文件见仓库</div>' : '')) +
           '<div class="dw-src">' + sourceInner + '</div>' +
         '</section>' +
       '</div>';
