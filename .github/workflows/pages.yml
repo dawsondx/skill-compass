@@ -27,11 +27,16 @@ jobs:
           node-version: 20
       - name: 抓取上游快照
         run: node _tools/fetch-upstream.mjs --write
+      # 抽屉第二个 tab 的源码透视。跟着上游快照一起刷新即可，push 部署不用重抓。
+      # 脚本只在全部跑完后一次性写盘，中途失败不会留下半份数据
+      - name: 刷新 SKILL.md 源码快照
+        continue-on-error: true
+        run: node _tools/fetch-skillmd.mjs || echo '⚠ 源码快照抓取失败，沿用上次'
       - name: 提交快照
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add site/assets/js/data.js site/server/seed.json
+          git add site/assets/js/data.js site/server/seed.json site/assets/js/skillmd.js site/assets/js/skillmd-index.js
           if git diff --staged --quiet; then
             echo '数据无变化，跳过提交'
           else

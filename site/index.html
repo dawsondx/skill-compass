@@ -598,11 +598,30 @@
 <div class="sort-scrim" id="sort-scrim" hidden></div>
 <div class="overlay" id="overlay"></div>
 
-<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title">
-  <button class="drawer-close" id="drawer-close" aria-label="关闭">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-  </button>
-  <div class="drawer-scroll" id="drawer-scroll"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="d-title">
+  <!-- 头：分类 / 版本 / 更新时间 + 分享 / 关闭。常驻，不随正文滚 -->
+  <header class="dw-head">
+    <div class="dw-meta">
+      <span class="dw-cat" id="d-cat"></span>
+      <span class="dw-ver" id="d-ver"></span>
+      <span class="dw-upd" id="d-upd"></span>
+    </div>
+    <div class="dw-tools">
+      <button class="dw-share" id="d-share" type="button" title="复制这个 skill 的分享链接">复制分享链接</button>
+      <button class="drawer-close" id="drawer-close" type="button" aria-label="关闭详情抽屉">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </header>
+  <!-- 正文：唯一滚动区 -->
+  <div class="drawer-scroll dw-scroll" id="drawer-scroll"></div>
+  <!-- 尾：创作者 + 主 CTA。常驻 -->
+  <footer class="dw-foot">
+    <div class="dw-creator">创作者：<b id="d-creator">—</b></div>
+    <a class="dw-gh" id="d-gh" href="#" target="_blank" rel="noopener noreferrer">
+      <span>访问 GitHub 仓库</span><span>↗</span>
+    </a>
+  </footer>
 </aside>
 
 <div class="modal" id="submit-modal" hidden role="dialog" aria-modal="true" aria-labelledby="submit-title">
@@ -631,6 +650,7 @@
 <script src="assets/js/pulse.js"></script>
 <script src="assets/js/cover-art.js"></script>
 <script src="assets/js/card-template.js"></script>
+<script src="assets/js/skillmd-index.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

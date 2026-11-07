@@ -4,6 +4,7 @@
   --paper: #FFFCF6;
   --paper-2: #FBF6EC;
   --paper-3: #FBF7EE;          /* 封面 / 内衬纸色 */
+  --cover-bg: #FBF7EE;         /* 封面画布底：暗色下要单独压深，卡片才浮得起来 */
   --ink: #17130E;
   --ink-2: #57503F;
   --ink-3: #8A8271;
@@ -44,6 +45,7 @@
   --paper: #1E1A14;
   --paper-2: #241F18;
   --paper-3: #201B15;
+  --cover-bg: #15120E;
   --ink: #F2EADC;
   --ink-2: #C0B5A2;
   --ink-3: #8B8375;
@@ -845,7 +847,7 @@ kbd {
     radial-gradient(circle at 84% 8%, color-mix(in srgb, var(--cc) 14%, transparent), transparent 58%),
     linear-gradient(0deg, var(--cover-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--cover-line) 1px, transparent 1px),
-    var(--paper-3);
+    var(--cover-bg);
   background-size: 100% 100%, 16px 16px, 16px 16px, 100% 100%;
   overflow: hidden;
 }
@@ -857,6 +859,7 @@ kbd {
   flex-shrink: 0;
 }
 .cv-top .v { color: color-mix(in srgb, var(--cc) 78%, var(--ink-3)); }
+:root[data-theme="dark"] .cv-top .v { color: color-mix(in srgb, var(--cc) 52%, #fff); }
 .cv-body {
   flex: 1; min-height: 0; margin: 6px 0 5px;
   display: flex; flex-direction: column; justify-content: center;
@@ -1364,22 +1367,24 @@ kbd {
 /* ---------- 抽屉 ---------- */
 .overlay {
   position: fixed; inset: 0; z-index: 90;
-  background: rgba(31, 25, 17, .32);
+  background: rgba(31, 25, 17, .40);
   backdrop-filter: blur(2px);
-  opacity: 0; pointer-events: none; transition: opacity .25s;
+  opacity: 0; pointer-events: none; transition: opacity .2s ease-out;
 }
 .overlay.on { opacity: 1; pointer-events: auto; }
 
 .drawer {
   position: fixed; z-index: 100; top: 0; right: 0; bottom: 0;
-  width: min(520px, 94vw);
-  background: var(--bg); border-left: 1px solid var(--line);
-  box-shadow: -18px 0 60px rgba(23, 19, 14, .16);
-  transform: translateX(102%); transition: transform .32s cubic-bezier(.32,.72,.24,1);
+  width: min(576px, 100vw);
+  background: var(--paper); border-left: 1px solid var(--line-hi);
+  box-shadow: -18px 0 60px rgba(23, 19, 14, .18);
+  /* 样板的 ease-out：前段快、尾段慢；遮罩 200ms 比它早 100ms 落定 */
+  transform: translateX(102%); transition: transform .3s cubic-bezier(0, 0, .2, 1);
   display: flex; flex-direction: column;
 }
 .drawer.on { transform: none; }
-.drawer-scroll { overflow-y: auto; flex: 1; overscroll-behavior: contain; }
+/* min-height:0 不能少，否则 flex:1 的滚动容器不会收缩 */
+.drawer-scroll { overflow-y: auto; flex: 1; min-height: 0; overscroll-behavior: contain; }
 .drawer-hero { position: relative; aspect-ratio: 16 / 9; background: var(--paper-2); border-bottom: 1px solid var(--line); }
 .drawer-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .drawer-hero.fit { background: var(--paper-3); }
@@ -1914,14 +1919,14 @@ body.modal-open { overflow: hidden; }
 .cv-art.shl1 {
   background:
     radial-gradient(circle at 84% 8%, color-mix(in srgb, var(--cc) 20%, transparent), transparent 58%),
-    color-mix(in srgb, var(--cc) 6%, var(--paper-3));
+    color-mix(in srgb, var(--cc) 6%, var(--cover-bg));
 }
 .cv-art.shl2 {
   background:
     radial-gradient(circle at 14% 92%, color-mix(in srgb, var(--cc) 15%, transparent), transparent 62%),
     linear-gradient(0deg, var(--cover-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--cover-line) 1px, transparent 1px),
-    color-mix(in srgb, var(--ink) 3%, var(--paper-3));
+    color-mix(in srgb, var(--ink) 3%, var(--cover-bg));
   background-size: 100% 100%, 9px 9px, 9px 9px, 100% 100%;
 }
 
@@ -2547,6 +2552,162 @@ body.modal-open { overflow: hidden; }
 .x-ans .dim s { height: auto; padding-left: 6px; border-left: 1px solid var(--line-hi);
   background: none; font-size: 7.5px; line-height: 1.5; color: var(--ink-3); }
 .x-ans .big { font-size: 13.5px; }
+
+/* ================= 抽屉 P1–P4：三段式骨架（对照 docs/drawer-spec.md） =================
+   头 63px / 正文 24px 内边距且只有它滚 / 尾 65px；间距只用 24·16·12·10·8·6。 */
+
+.dw-head {
+  flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 24px; border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 60%, var(--paper));
+}
+.dw-meta { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: nowrap; overflow: hidden; }
+.dw-cat {
+  flex: none; padding: 2px 10px; border-radius: 999px; white-space: nowrap;
+  font-size: 12px; font-weight: 600; color: var(--accent-ink);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.dw-ver { flex: none; font-family: var(--mono); font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+.dw-upd { flex: none; font-family: var(--mono); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.dw-tools { flex: none; display: flex; align-items: center; gap: 8px; }
+.dw-share, .drawer-close {
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); background: var(--paper); color: var(--ink-3);
+  cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+}
+.dw-share { padding: 4px 10px; border-radius: 8px; font-family: var(--mono); font-size: 11px; white-space: nowrap; }
+.dw-share:hover { color: var(--ink); border-color: var(--line-hi); }
+.dw-share.done { color: var(--accent-ink); border-color: var(--accent); }
+/* 旧的关闭键是浮在 hero 上的深色胶囊；现在挪进头部，改成描边方形 */
+.drawer-close {
+  position: static; transform: none; backdrop-filter: none;
+  width: 30px; height: 30px; padding: 0; border-radius: 8px;
+}
+.drawer-close:hover { color: var(--ink); border-color: var(--line-hi); background: var(--paper-2); }
+
+.dw-scroll { padding: 24px; }
+.dw-body { padding: 0; }
+
+/* 标题行：24px 大标题 + 右侧星标胶囊；仓库行紧随其后 */
+.dw-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.dw-title-wrap { min-width: 0; }
+.dw-body h2#d-title {
+  margin: 0; font-family: var(--sans); font-size: 24px; font-weight: 700;
+  line-height: 1.33; letter-spacing: -.025em; color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.dw-repo { margin-top: 4px; font-family: var(--mono); font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
+.dw-stars {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px;
+  border-radius: 8px; border: 1px solid color-mix(in srgb, #D89B2B 28%, transparent);
+  background: color-mix(in srgb, #D89B2B 10%, transparent);
+  font-family: var(--mono); font-size: 12px; color: #A9721B;
+}
+:root[data-theme="dark"] .dw-stars { color: #E9B45A; }
+
+/* 效果图框：哑光外框 → 白卡 → 说明条 → 16:10 画布 */
+.shot { margin: 0 0 20px; padding: 12px; border-radius: 16px;
+  background: var(--paper-2); border: 1px solid var(--line);
+  box-shadow: inset 0 1px 3px rgba(23, 19, 14, .05); }
+.shot-in { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--paper); }
+.shot-cap {
+  display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px;
+  border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10px;
+  line-height: 1.4; color: var(--ink-3);
+}
+.shot-cap span:last-child { flex: none; white-space: nowrap; }
+.shot-canvas { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--paper-2); }
+/* 逐仓插画原本按 ~286×139 设计，这里把 16:10 的逻辑画布按 1.55 倍放大填满。
+   用 transform 而不是重新写一套字号：所有母题的字 / 线 / 圆角等比变大且不糊。 */
+.shot-cov-wrap {
+  position: absolute; left: 0; top: 0; width: 64.5%; height: 64.5%;
+  transform: scale(1.55); transform-origin: 0 0;
+}
+.shot-img { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--paper-2); }
+
+/* 子标签页 */
+.dtabs { display: flex; gap: 24px; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+.dtab {
+  padding: 0 0 10px; background: none; border: 0; border-bottom: 2px solid transparent;
+  font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--ink-2);
+  cursor: pointer; white-space: nowrap; transition: color .15s, border-color .15s;
+}
+.dtab:hover { color: var(--ink); }
+.dtab[aria-selected="true"] { color: var(--accent-ink); border-bottom-color: var(--accent); font-weight: 600; }
+.dtab[aria-disabled="true"] { color: var(--ink-3); cursor: not-allowed; opacity: .6; }
+.dtab.mono { font-family: var(--mono); }
+.dtab[aria-selected="true"].mono { font-family: var(--mono); }
+
+/* 正文区块 */
+.dw-desc { margin: 0 0 18px; font-size: 14px; line-height: 1.75; color: var(--ink-2); }
+.dw-tags { margin-bottom: 22px; }
+.dw-sec { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-3); margin: 0 0 10px; }
+.dw-src { padding: 16px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--paper-2); overflow-x: auto; }
+.dw-src pre { margin: 0; font-family: var(--mono); font-size: 12px; line-height: 1.75;
+  color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+.dw-empty { padding: 18px; border-radius: 12px; border: 1px dashed var(--line-hi);
+  background: var(--paper-2); font-size: 12.5px; line-height: 1.7; color: var(--ink-2); }
+.dw-empty a { color: var(--accent-ink); }
+
+/* 安装块：与全局宿主选择联动；「已通过校验」只在真有 SKILL.md 时出现 */
+.dw-install { margin-bottom: 24px; padding: 16px; border-radius: 12px;
+  border: 1px solid var(--line-hi); background: var(--bg); }
+.di-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+.di-head > span:first-child { font-family: var(--mono); font-weight: 600; color: var(--ink-2); }
+.di-ok { font-family: var(--mono); font-size: 11px; color: var(--teal); white-space: nowrap; }
+.di-cmd { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px;
+  border: 1px solid var(--line); background: var(--paper); overflow-x: auto; }
+.di-cmd code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 12px; color: var(--ink);
+  white-space: nowrap; }
+.di-cmd button { flex: none; padding: 4px 10px; border-radius: 4px; border: 0;
+  background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background .15s; }
+.di-cmd button:hover { background: var(--accent-ink); }
+
+/* 宿主兼容矩阵 */
+.dw-hosts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 26px; }
+.dw-host { display: flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 50%, var(--paper));
+  font-family: var(--mono); font-size: 11px; color: var(--ink-2); white-space: nowrap;
+  cursor: pointer; text-align: left; transition: border-color .15s, background .15s; }
+.dw-host i { width: 7px; height: 7px; border-radius: 50%; background: #3FA46A; flex: none; }
+.dw-host.on { border-color: var(--accent); color: var(--ink); background: color-mix(in srgb, var(--accent) 8%, var(--paper)); }
+
+/* 尾部固定 CTA */
+.dw-foot { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 24px; border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 80%, var(--paper)); }
+.dw-creator { min-width: 0; font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dw-creator b { color: var(--ink); }
+.dw-gh { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+  border-radius: 10px; background: var(--solid); color: var(--solid-ink);
+  font-size: 12px; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+.dw-gh:hover { opacity: .88; }
+
+/* 收藏按钮留在正文里，GitHub 主 CTA 已在尾部 */
+.drawer-actions { margin-bottom: 24px; }
+.dw-hint { font-size: 12px; line-height: 1.7; color: var(--ink-3); margin: 0; }
+
+/* 390 及以下：正文留白收一档，头部分享键让位，说明条只留左段 */
+@media (max-width: 640px) {
+  .dw-head { padding: 12px 16px; gap: 10px; }
+  .dw-scroll { padding: 18px; }
+  .dw-foot { padding: 12px 16px; }
+  .dw-share { display: none; }
+  .shot-cap span:last-child { display: none; }
+  .shot { padding: 10px; }
+  .dw-hosts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dtabs { gap: 16px; }
+  .dw-body h2#d-title { font-size: 21px; }
+  .di-ok { display: none; }
+}
+@media (max-width: 380px) {
+  .dw-upd { display: none; }
+  .dw-cat { font-size: 11px; padding: 2px 8px; }
+  .dw-gh { padding: 8px 10px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .01ms !important; transition-duration: .01ms !important; }

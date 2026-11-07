@@ -887,19 +887,133 @@
       '</div></div>';
   }
 
-  function openDrawer(s) {
-    var c = CAT_MAP[s.cat] || { color: '#888', name: s.cat };
-    var heroHTML;
-    if (s.img) {
-      heroHTML = '<div class="drawer-hero' + (s.fit === 'contain' ? ' fit' : '') + '"><img src="assets/img/' + s.img + '" alt="' + s.name + ' 效果图"></div>';
-    } else {
-      heroHTML = '<div class="drawer-hero"><div class="thumb-fallback" style="position:absolute;inset:0;--c:' + c.color + '">' +
-        '<div class="fb-inner">' +
-        '<div class="fb-mark" style="width:54px;height:54px;font-size:23px;margin-bottom:11px">' + glyphOf(s) + '</div>' +
-        '<div class="fb-name" style="font-size:21px">' + s.name + '</div>' +
-        '<div class="fb-cat">' + c.name + '</div>' +
-        '</div></div></div>';
+  /* ---------- 抽屉 P1–P4：三段式骨架 + 两个 tab + 数据联动 ----------
+     对照 docs/drawer-spec.md。保留我们原有的：锁滚动 / aria-modal / 焦点归还 /
+     ?open= 双向深链 / 减动效兜底 / 合集反链 / 同作者作品 / 上游动态。 */
+  var MD_META = window.SKILLMD_META || {};       // 轻量索引，随首屏加载
+  var MD_TEXT = null;                            // 440KB 正文，点开源码 tab 才注入
+  var mdLoading = false;
+  var drawerTab = 'overview';
+  var paneScroll = { overview: 0, source: 0 };
+
+  function mdKind(id) { return MD_META[id] || ''; }        // 'md' | 'readme' | ''
+  function mdLabel(k) { return k === 'md' ? 'SKILL.md 源码透视' : (k === 'readme' ? 'README 节选' : '源码透视'); }
+  function currentDrawerSkill() {
+    return SKILLS.filter(function (x) { return x.id === state.openId; })[0] || null;
+  }
+
+  /* 效果图：有真图用真图；没有就用 COVER_ART 的逐仓插画（按 1.55 倍放大，见 .shot-cov-wrap） */
+  function shotHTML(s, c) {
+    if (s.img) return '<img class="shot-img" src="assets/img/' + esc(s.img) + '" alt="' + esc(s.name) + ' 效果演示">';
+    return '<div class="shot-cov-wrap">' + CT.coverHTML(s, c) + '</div>';
+  }
+
+  var HOST_LABELS = [['npx', 'npx 通用'], ['claude', 'Claude Code'], ['cursor', 'Cursor'], ['codex', 'Codex']];
+  function hostsHTML() {
+    return HOST_LABELS.map(function (h) {
+      return '<button type="button" class="dw-host' + (installHost === h[0] ? ' on' : '') +
+        '" data-dw-host="' + h[0] + '"><i></i>' + h[1] + '</button>';
+    }).join('');
+  }
+
+  /* 宿主切换时抽屉命令要跟着变 —— 样板漏掉的联动 */
+  function syncDrawerCmd() {
+    var s = currentDrawerSkill();
+    if (!s) return;
+    var txt = cmdFor(s, installHost);
+    var code = document.getElementById('d-cmd');
+    var btn = document.getElementById('d-copy');
+    if (code) code.textContent = txt;
+    if (btn) btn.setAttribute('data-copy', txt);
+    Array.prototype.forEach.call(document.querySelectorAll('.dw-host'), function (h) {
+      h.classList.toggle('on', h.getAttribute('data-dw-host') === installHost);
+    });
+  }
+
+  function loadSkillMd() {
+    var s = currentDrawerSkill();
+    if (!s || !mdKind(s.id) || MD_TEXT) {
+      if (MD_TEXT && s) {
+        var pre0 = document.getElementById('d-src');
+        if (pre0) pre0.textContent = MD_TEXT[s.id] || '（源码快照缺失）';
+      }
+      return;
     }
+    if (mdLoading) return;
+    mdLoading = true;
+    var pre = document.getElementById('d-src');
+    if (pre) pre.textContent = '正在载入源码快照…';
+    var sc = document.createElement('script');
+    sc.src = 'assets/js/skillmd.js';
+    sc.onload = function () {
+      MD_TEXT = window.SKILLMD || {};
+      mdLoading = false;
+      var cur = currentDrawerSkill();
+      var target = document.getElementById('d-src');
+      if (target && cur) target.textContent = MD_TEXT[cur.id] || '（源码快照缺失）';
+    };
+    sc.onerror = function () {
+      mdLoading = false;
+      var target = document.getElementById('d-src');
+      if (target) target.textContent = '源码快照加载失败，可直接到仓库查看完整文件。';
+    };
+    document.head.appendChild(sc);
+  }
+
+  /* 切 tab 记住各自的滚动位置，别像样板那样被内容高度骤减夹到 0 */
+  function setDrawerTab(name) {
+    var btn = document.querySelector('.dtab[data-dtab="' + name + '"]');
+    if (!btn || btn.getAttribute('aria-disabled') === 'true') return;
+    if (drawerTab === name) return;
+    paneScroll[drawerTab] = $dScroll.scrollTop;
+    drawerTab = name;
+    Array.prototype.forEach.call(document.querySelectorAll('.dtab'), function (b) {
+      b.setAttribute('aria-selected', b.getAttribute('data-dtab') === name ? 'true' : 'false');
+    });
+    var ov = document.getElementById('dpane-overview');
+    var sr = document.getElementById('dpane-source');
+    if (ov) ov.hidden = name !== 'overview';
+    if (sr) sr.hidden = name !== 'source';
+    if (name === 'source') loadSkillMd();
+    var max = Math.max(0, $dScroll.scrollHeight - $dScroll.clientHeight);
+    $dScroll.scrollTop = Math.min(paneScroll[name] || 0, max);
+  }
+
+  function syncDrawerHead(s, c) {
+    var cat = document.getElementById('d-cat');
+    var ver = document.getElementById('d-ver');
+    var upd = document.getElementById('d-upd');
+    var cr = document.getElementById('d-creator');
+    var gh = document.getElementById('d-gh');
+    if (cat) { cat.textContent = c.name; cat.style.setProperty('--cc', c.color); }
+    if (ver) {
+      if (s.ver) { ver.textContent = s.ver; ver.removeAttribute('title'); }
+      else { ver.textContent = '—'; ver.title = '无 Release / Tag，以最近提交为准'; }
+    }
+    if (upd) upd.textContent = s.days != null ? '· ' + fmtAgo(s.days) + '更新' : '· —';
+    if (cr) cr.textContent = s.author ? s.author.name : s.owner;
+    if (gh) gh.href = repoUrl(s);
+  }
+
+  function shareDrawer(btn) {
+    var s = currentDrawerSkill();
+    if (!s) return;
+    var url = location.href.split('?')[0].split('#')[0] + '?open=' + encodeURIComponent(s.id);
+    var done = function () {
+      btn.textContent = '✓ 已复制链接';
+      btn.classList.add('done');
+      setTimeout(function () { btn.textContent = '复制分享链接'; btn.classList.remove('done'); }, 1800);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, done);
+    else done();
+  }
+
+  function openDrawer(s) {
+    if (!s) return;
+    var c = CAT_MAP[s.cat] || { color: '#888', name: s.cat };
+    var kind = mdKind(s.id);
+    var cmd = cmdFor(s, installHost);
+
     // 子条目 → 合集的反链
     var fromHTML = '';
     if (s.from) {
@@ -916,7 +1030,7 @@
     if (s.subs && s.subs.length) {
       var groups = {};
       s.subs.forEach(function (x) { (groups[x.cat] = groups[x.cat] || []).push(x); });
-      var gorder = CATS.map(function (c) { return c.key; }).filter(function (k) { return groups[k]; });
+      var gorder = CATS.map(function (cc) { return cc.key; }).filter(function (k) { return groups[k]; });
       subsHTML = '<div class="sec-label">包含 ' + s.subs.length + ' 个 skill</div><div class="sub-list">' +
         gorder.map(function (k) {
           var gc = CAT_MAP[k] || { color: '#888', name: k };
@@ -937,8 +1051,7 @@
         }).join('') + '</div>';
     }
 
-    var sims = similarOf(s);
-    var simHTML = sims.map(function (o) {
+    function simCardHTML(o) {
       var oc = CAT_MAP[o.cat] || { color: '#888', name: o.cat };
       return '<div class="sim-item" data-id="' + o.id + '">' +
         '<div class="sim-th" style="background:linear-gradient(140deg,' + oc.color + ',' + hex2rgba(oc.color, .55) + ')">' +
@@ -948,77 +1061,136 @@
         '</div>' +
         '<div><div class="sim-name">' + o.name + '</div><div class="sim-meta">' + oc.name + ' · ★ ' + fmtNum(o.stars) + '</div></div>' +
         '</div>';
-    }).join('');
-
+    }
+    var sims = similarOf(s);                        // 固定 3 个，不留半空格子
+    var simHTML = sims.map(simCardHTML).join('');
     var sameAuthor = s.author ? SKILLS.filter(function (o) {
       return o.id !== s.id && o.owner.toLowerCase() === s.owner.toLowerCase();
     }).sort(function (a, b) { return (b.stars || 0) - (a.stars || 0); }) : [];
-    var byAuthorHTML = sameAuthor.map(function (o) {
-      var oc = CAT_MAP[o.cat] || { color: '#888', name: o.cat };
-      return '<div class="sim-item" data-id="' + o.id + '">' +
-        '<div class="sim-th" style="background:linear-gradient(140deg,' + oc.color + ',' + hex2rgba(oc.color, .55) + ')">' +
-        (o.img
-          ? '<img src="assets/img/' + o.img + '" alt="" loading="lazy">'
-          : '<span style="display:grid;place-items:center;height:100%;color:#fff;font-family:var(--serif);font-size:14px;font-weight:700">' + glyphOf(o) + '</span>') +
-        '</div>' +
-        '<div><div class="sim-name">' + o.name + '</div><div class="sim-meta">' + oc.name + ' · ★ ' + fmtNum(o.stars) + '</div></div>' +
-        '</div>';
-    }).join('');
+    var byAuthorHTML = sameAuthor.map(simCardHTML).join('');
 
-    $dScroll.innerHTML = heroHTML +
-      '<div class="drawer-body">' +
-      '<div class="drawer-cat"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:' + c.color + ';display:inline-block"></span>' + c.name + '</div>' +
-      '<h2 id="d-title">' + s.name + '</h2>' +
-      '<div class="drawer-repo">' + s.repo + (s.path ? ' / ' + s.path.replace('tree/main/', '') : '') + '</div>' +
-      fromHTML +
-      (s.author
-        ? '<button class="author-pill" data-filter-author="' + s.author.owner + '">' +
-          '<span class="avatar" style="background:' + s.author.color + '">' + s.author.name.slice(0, 1) + '</span>' +
-          '<b>' + s.author.name + '</b><span class="ap-note">' + s.author.note + '</span>' +
-          '<span class="ap-arrow">' + authorMeta(s.author.owner, true) + ' →</span></button>'
-        : '') +
-      '<p class="drawer-desc">' + s.desc + '</p>' +
-      '<div class="drawer-tags">' + s.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') +
-      '<span class="tag">★ ' + fmtNum(s.stars) + '</span></div>' +
-      upstreamHTML(s) +
-      subsHTML +
-      '<div class="drawer-actions">' +
-      '<a class="btn btn-primary" href="' + repoUrl(s) + '" target="_blank" rel="noopener">打开 GitHub 仓库' +
-      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></a>' +
-      '<button class="btn btn-ghost" id="drawer-fav" type="button" data-drawer-fav="' + s.id + '" aria-pressed="' + (isFav(s.id) ? 'true' : 'false') + '">' +
-      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
-      '<span>' + (isFav(s.id) ? '已收藏' : '收藏') + '</span></button>' +
-      '</div>' +
-      '<div class="sec-label">安装</div>' +
-      '<div class="cmd"><code>' + installCmd(s) + '</code><button data-copy="' + installCmd(s) + '">复制</button></div>' +
-      '<p class="hint">需要 Node.js 22+。也可以用 <b>git clone</b> 后把 skill 目录拷进 <code>~/.claude/skills/</code>；具体安装方式以仓库 README 为准。</p>' +
-      (sameAuthor.length ? '<div class="sec-label">' + s.author.name + ' 的其他作品（' + sameAuthor.length + '）</div><div class="sim-list">' + byAuthorHTML + '</div>' : '') +
-      (sims.length ? '<div class="sec-label">同类替代</div><div class="sim-list">' + simHTML + '</div>' : '') +
+    var sourceInner = kind
+      ? '<pre id="d-src"></pre>'
+      : '<div class="dw-empty">该仓库没有可用的 SKILL.md / README 源码快照。<br>' +
+        '<a href="' + repoUrl(s) + '/blob/HEAD/README.md" target="_blank" rel="noopener">到 GitHub 查看完整说明 ↗</a></div>';
+
+    $dScroll.innerHTML =
+      '<div class="dw-body">' +
+        '<div class="dw-title-row">' +
+          '<div class="dw-title-wrap">' +
+            '<h2 id="d-title">' + esc(s.name) + '</h2>' +
+            '<div class="dw-repo">' + esc(s.repo + (s.path ? ' / ' + s.path.replace('tree/main/', '') : '')) + '</div>' +
+          '</div>' +
+          '<div class="dw-stars">★ ' + esc(fmtNum(s.stars)) + '</div>' +
+        '</div>' +
+
+        '<figure class="shot"><div class="shot-in">' +
+          '<div class="shot-cap"><span>' +
+            (s.img ? 'LIVE OUTPUT PREVIEW · 仓库实测效果图' : 'OUTPUT PREVIEW · 按项目定位绘制的示意图') +
+          '</span><span>16:10 GALLERY MATTE</span></div>' +
+          '<div class="shot-canvas">' + shotHTML(s, c) + '</div>' +
+        '</div></figure>' +
+
+        '<div class="dtabs" role="tablist">' +
+          '<button type="button" class="dtab" data-dtab="overview" role="tab" aria-selected="true">功能说明书与安装</button>' +
+          '<button type="button" class="dtab mono" data-dtab="source" role="tab" aria-selected="false"' +
+            (kind ? '' : ' aria-disabled="true"') + '>' + mdLabel(kind) + '</button>' +
+        '</div>' +
+
+        '<section class="dpane" id="dpane-overview" role="tabpanel">' +
+          '<p class="dw-desc">' + esc(s.desc) + '</p>' +
+          '<div class="drawer-tags dw-tags">' +
+            s.tags.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') +
+            '<span class="tag">★ ' + esc(fmtNum(s.stars)) + '</span></div>' +
+          fromHTML +
+          (s.author
+            ? '<button class="author-pill" data-filter-author="' + s.author.owner + '">' +
+              '<span class="avatar" style="background:' + s.author.color + '">' + s.author.name.slice(0, 1) + '</span>' +
+              '<b>' + s.author.name + '</b><span class="ap-note">' + s.author.note + '</span>' +
+              '<span class="ap-arrow">' + authorMeta(s.author.owner, true) + ' →</span></button>'
+            : '') +
+          upstreamHTML(s) + subsHTML +
+
+          '<div class="dw-install">' +
+            '<div class="di-head"><span>一键安装到当前工作区</span>' +
+              (kind === 'md'
+                ? '<span class="di-ok">✓ 已通过 SKILL.md 规范校验</span>'
+                : '<span class="di-ok" style="color:var(--ink-3)">以仓库 README 为准</span>') +
+            '</div>' +
+            '<div class="di-cmd"><code id="d-cmd">' + esc(cmd) + '</code>' +
+              '<button id="d-copy" type="button" data-copy="' + esc(cmd) + '">复制</button></div>' +
+          '</div>' +
+          '<div class="dw-sec">原生兼容宿主环境 · 点一下切换</div>' +
+          '<div class="dw-hosts">' + hostsHTML() + '</div>' +
+
+          '<div class="drawer-actions">' +
+            '<button class="btn btn-ghost" id="drawer-fav" type="button" data-drawer-fav="' + s.id +
+              '" aria-pressed="' + (isFav(s.id) ? 'true' : 'false') + '">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
+              '<span>' + (isFav(s.id) ? '已收藏' : '收藏') + '</span></button>' +
+          '</div>' +
+
+          (sameAuthor.length
+            ? '<div class="sec-label">' + s.author.name + ' 的其他作品（' + sameAuthor.length + '）</div>' +
+              '<div class="sim-list">' + byAuthorHTML + '</div>'
+            : '') +
+          (sims.length
+            ? '<div class="sec-label">同类替代 · 点击直接对比</div><div class="sim-list">' + simHTML + '</div>'
+            : '') +
+          '<p class="dw-hint">需要 Node.js 22+。也可以用 <b>git clone</b> 后把 skill 目录拷进 ' +
+            '<code>~/.claude/skills/</code>；具体安装方式以仓库 README 为准。</p>' +
+        '</section>' +
+
+        '<section class="dpane" id="dpane-source" role="tabpanel" hidden>' +
+          '<div class="dw-src">' + sourceInner + '</div>' +
+        '</section>' +
       '</div>';
 
-    lastFocus = document.activeElement;
+    var wasOpen = $drawer.classList.contains('on');
+    syncDrawerHead(s, c);
+    drawerTab = 'overview';
+    paneScroll = { overview: 0, source: 0 };
+    if (!wasOpen) lastFocus = document.activeElement;
     state.openId = s.id;
     writeURL();
     $drawer.classList.add('on');
+    $drawer.setAttribute('aria-hidden', 'false');
     $overlay.classList.add('on');
     document.body.style.overflow = 'hidden';
     $dScroll.scrollTop = 0;
-    setTimeout(function () { document.getElementById('drawer-close').focus(); }, 60);
+    if (!wasOpen) setTimeout(function () { document.getElementById('drawer-close').focus(); }, 60);
   }
 
   function closeDrawer() {
+    if (!$drawer.classList.contains('on')) return;
+    var closedId = state.openId;
     state.openId = null;
     writeURL();
     $drawer.classList.remove('on');
+    $drawer.setAttribute('aria-hidden', 'true');
     $overlay.classList.remove('on');
     document.body.style.overflow = '';
-    if (lastFocus) lastFocus.focus();
+    // 鼠标点卡片不会让卡片获得焦点，这时 lastFocus 是 BODY；
+    // 退一步按 data-id 找回那张卡片，保证 ESC 之后焦点不会掉在页面根部
+    var back = lastFocus;
+    if (!back || !back.isConnected || back === document.body || back === document.documentElement) {
+      back = closedId
+        ? document.querySelector('.card[data-id="' + closedId + '"], .rank-row[data-id="' + closedId + '"]')
+        : null;
+    }
+    if (back && back.isConnected) back.focus();
+    else {
+      // 从替代方案跳过去的条目未必在当前这页 24 张卡里，最后兜底到搜索框
+      var q = document.getElementById('q');
+      if (q) q.focus();
+      else if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    }
   }
 
   function syncDrawerFav() {
     var b = document.getElementById('drawer-fav');
     if (!b) return;
-    var on = isFav(b.dataset.drawerFav);
+    var on = isFav(b.getAttribute('data-drawer-fav'));
     b.setAttribute('aria-pressed', on ? 'true' : 'false');
     var sp = b.querySelector('span');
     if (sp) sp.textContent = on ? '已收藏' : '收藏';
@@ -1136,6 +1308,10 @@
       render();
       return;
     }
+    var tabBtn = e.target.closest('.dtab');
+    if (tabBtn) { setDrawerTab(tabBtn.getAttribute('data-dtab')); return; }
+    var hostBtn = e.target.closest('[data-dw-host]');
+    if (hostBtn) { setInstallHost(hostBtn.getAttribute('data-dw-host')); return; }
     var copyBtn = e.target.closest('[data-copy]');
     if (copyBtn) {
       var txt = copyBtn.dataset.copy;
@@ -1161,8 +1337,21 @@
   });
 
   document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+  document.getElementById('d-share').addEventListener('click', function () { shareDrawer(this); });
   $overlay.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', function (e) {
+    // 抽屉打开时把 Tab 关在里面，别跑到背后的页面上去
+    if (e.key === 'Tab' && $drawer.classList.contains('on')) {
+      var canFocus = Array.prototype.filter.call(
+        $drawer.querySelectorAll('a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'),
+        function (x) { return x.offsetParent !== null; }
+      );
+      if (!canFocus.length) return;
+      var firstF = canFocus[0], lastF = canFocus[canFocus.length - 1];
+      if (e.shiftKey && document.activeElement === firstF) { e.preventDefault(); lastF.focus(); }
+      else if (!e.shiftKey && document.activeElement === lastF) { e.preventDefault(); firstF.focus(); }
+      return;
+    }
     if (e.key === 'Escape') {
       if ($modal && !$modal.hidden) { closeModal(); return; }
       if ($favPop && !$favPop.hidden) { setFavOpen(false); if ($favBtn) $favBtn.focus(); return; }
@@ -1218,16 +1407,24 @@
     });
   }
 
+  /* 宿主切换：安装器 tab、抽屉里的兼容矩阵、抽屉里的安装命令三处一起更新 */
+  function setInstallHost(host) {
+    if (!HOSTS[host]) return;
+    installHost = host;
+    if ($instTabs) {
+      Array.prototype.forEach.call($instTabs.children, function (x) {
+        x.setAttribute('aria-selected', x.getAttribute('data-host') === host ? 'true' : 'false');
+      });
+    }
+    paintInstaller();
+    if ($drawer.classList.contains('on')) syncDrawerCmd();
+  }
+
   var $instTabs = document.querySelector('.inst-tabs');
   if ($instTabs) {
     $instTabs.addEventListener('click', function (e) {
       var b = e.target.closest('.inst-tab');
-      if (!b) return;
-      installHost = b.dataset.host;
-      Array.prototype.forEach.call($instTabs.children, function (x) {
-        x.setAttribute('aria-selected', x === b ? 'true' : 'false');
-      });
-      paintInstaller();
+      if (b) setInstallHost(b.getAttribute('data-host'));
     });
   }
   var $instCopy = document.getElementById('inst-copy');
