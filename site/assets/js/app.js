@@ -304,11 +304,7 @@
     '- 仓库地址：',
     '- 它产出什么（一句话）：',
     '- 你实际用它做过什么：',
-    '- 有真实效果图吗（链接即可）：',
-    '',
-    '## 我确认',
-    '- [ ] 这是一个开源仓库，能直接 npx skills add 装',
-    '- [ ] 上面写的是我自己用过的感受，不是复制 README'
+    '- 有真实效果图吗（链接即可）：'
   ].join('\n');
   var $modal = document.getElementById('submit-modal');
   function openModal() {
