@@ -1876,6 +1876,13 @@ window.SKILLS = [
     desc: 'Excel 或 JSON 直接渲染成数据大屏：15 套行业模板（药企、电厂、智慧城市、新能源……），ECharts 九类组件，产物是单个 HTML 文件，双击就能投屏，断网也能放。',
     tags: ['数据大屏', 'ECharts', '单文件 HTML']
   }
+,
+  {
+    id: 'handraw-style', name: '手绘风格提示词库', repo: 'yang0/handraw-style',
+    cat: 'image', stars: 7221, img: 'yang0~handraw-style.webp',
+    desc: '365 种手绘与写实画风、170 种排版图型、36 种单色主题，全部编号化。不用再跟模型解释「文艺一点」，报个编号加主题，直接拿到中英双语出图提示词。',
+    tags: ['手绘风格', '提示词库', '排版图型']
+  }
 ];
 
 /* 站外延伸资源（非 GitHub 仓库，单独一块展示） */
@@ -2167,6 +2174,7 @@ window.UPS = {
   'wzdavid/openclaw-desktop': ['2026-06-19', 'v0.4.4', '2026-06-20'],
   'wzdavid/thinkwiki': ['2026-07-13', 'v1.7.3', '2026-07-13'],
   'xbtlin/ai-berkshire': ['2026-11-04', 'v1.0.0', '2026-04-07'],
+  'yang0/handraw-style': ['2026-11-08', '', ''],
   'xiaohuailabs/tacit-mining': ['2026-04-08', '', ''],
   'yaojingang/yao-open-skills': ['2026-10-14', '', ''],
   'yizhiyanhua-ai/fireworks-tech-graph': ['2026-10-21', 'v1.2.0', '2026-07-17'],
