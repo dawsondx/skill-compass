@@ -1883,6 +1883,20 @@ window.SKILLS = [
     desc: '365 种手绘与写实画风、170 种排版图型、36 种单色主题，全部编号化。不用再跟模型解释「文艺一点」，报个编号加主题，直接拿到中英双语出图提示词。',
     tags: ['手绘风格', '提示词库', '排版图型']
   }
+,
+  {
+    id: 'app-logo-design', name: 'App Logo 设计', repo: 'simple0926/app-logo-design',
+    cat: 'image', stars: 2, img: 'simple0926~app-logo-design.webp',
+    desc: '从品牌主张倒推 App 图标：先定陌生人该怎样理解产品，再从六类视觉方向（拟物、扁平、字标、渐变、立体、插画）里挑 1–3 种，最后出 Android / iOS 双平台资源包。',
+    tags: ['App 图标', '品牌主张', '双平台交付']
+  }
+,
+  {
+    id: 'dm-gzh-cover', name: 'DM 公众号封面', repo: 'xxtdxshine/DM-gzh-cover',
+    cat: 'image', stars: 0, img: 'xxtdxshine~DM-gzh-cover.webp',
+    desc: '给公众号名称和完整标题，自动从 5 张 Pexels 候选里选图、向左自然扩图，再按语义排两行或三行中文标题，出 1080×460 摄影风封面，并留版本与素材来源。',
+    tags: ['公众号封面', '摄影风', '自动选图']
+  }
 ];
 
 /* 站外延伸资源（非 GitHub 仓库，单独一块展示） */
@@ -2123,6 +2137,7 @@ window.UPS = {
   'SaSaLiurong/edison': ['2026-06-14', 'v3.0', '2026-06-14'],
   'shengjidaguai-china/goutoujunshi': ['2026-09-15', '', ''],
   'shirenchuang/agentbro': ['2026-08-03', 'v3.1.0', '2026-08-03'],
+  'simple0926/app-logo-design': ['2026-11-07', '', ''],
   'slavingia/skills': ['2026-04-14', '', ''],
   'sligter/landppt': ['2026-11-08', 'v0.5.1', '2026-10-25'],
   'smartschoolai/ai-to-pptx': ['2026-06-12', 'V0.2', '2025-02-10'],
@@ -2176,6 +2191,7 @@ window.UPS = {
   'xbtlin/ai-berkshire': ['2026-11-04', 'v1.0.0', '2026-04-07'],
   'yang0/handraw-style': ['2026-11-08', '', ''],
   'xiaohuailabs/tacit-mining': ['2026-04-08', '', ''],
+  'xxtdxshine/DM-gzh-cover': ['2026-10-22', '', ''],
   'yaojingang/yao-open-skills': ['2026-10-14', '', ''],
   'yizhiyanhua-ai/fireworks-tech-graph': ['2026-10-21', 'v1.2.0', '2026-07-17'],
   'youmind-openlab/skills': ['2026-06-05', '', ''],

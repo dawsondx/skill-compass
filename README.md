@@ -3,7 +3,7 @@
 > **别再从收藏夹里翻链接了。**
 > 给 AI Agent（Claude Code、Cursor、Codex、Gemini CLI）用的开源 Skills 精选库：按「你最后要做出什么」分类，附真实效果预览与一行命令即插即用。
 
-🌐 **[在线站点：skills.dawsondx.top](https://skills.dawsondx.top/)** · 收录 **296** 个仓库 · **11** 个产出物分类 · **14** 位创作者 · 纯静态、零前端依赖
+🌐 **[在线站点：skills.dawsondx.top](https://skills.dawsondx.top/)** · 收录 **298** 个仓库 · **11** 个产出物分类 · **14** 位创作者 · 纯静态、零前端依赖
 
 ![Skill 指北首页](docs/img/hero-home.webp)
 
@@ -123,14 +123,14 @@ node _tools/prerender.mjs
 │   └── assets/
 │       ├── css/style.css       ← 全部样式与主题变量
 │       ├── js/
-│       │   ├── data.js         ← 296 条仓库主数据（唯一真相源）
+│       │   ├── data.js         ← 298 条仓库主数据（唯一真相源）
 │       │   ├── demo-images.js  ← 从仓库 README 补抓的演示图清单
 │       │   ├── cover-art.js    ← 135 个无图仓库的逐仓插画设计稿
 │       │   ├── card-template.js← 卡片 HTML 模板（前端 + 预渲染共用）
 │       │   ├── skillmd-index.js / skillmd.js  ← 源码快照索引 / 正文（按需加载）
 │       │   ├── pulse.js        ← 每周安装热度
 │       │   └── app.js          ← 全部交互
-│       └── img/                ← 161 张自托管演示图（已压成 WebP）
+│       └── img/                ← 163 张自托管演示图（已压成 WebP）
 ├── _tools/                     ← 零依赖抓取与构建脚本（Node 内置模块，无需 npm install）
 ├── docs/
 │   ├── drawer-spec.md          ← 详情抽屉的系统研究与迁移对照说明
