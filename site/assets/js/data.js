@@ -71,8 +71,8 @@ window.SKILLS = [
   {
     id: 'huashu-design', name: '花叔 Design', repo: 'alchaincyf/huashu-design',
     cat: 'design', stars: 28026, img: 'alchaincyf~huashu-design.gif',
-    desc: '一句话拿回能交付的设计：网页、App 原型、可编辑 PPTX、动画、信息图。84 种带样张的风格库，先给六个候选再挑三个方向。',
-    tags: ['网页设计', '原型', '风格库']
+    desc: '一句话拿回网页、App 原型、可编辑 PPTX 或动画：先从 84 种风格库出候选挑方向，涉具体品牌自动抓官方规范，成稿再跑五维设计评审。要一套搞定全案视觉时用它。',
+    tags: ['全案设计', '品牌规范', '五维评审']
   },
   {
     id: 'interfaces-feel-better', name: '界面手感清单', repo: 'jakubkrehel/make-interfaces-feel-better',
@@ -91,20 +91,20 @@ window.SKILLS = [
   {
     id: 'ppt-master', name: 'PPT Master', repo: 'hugohe3/ppt-master',
     cat: 'slides', stars: 70515, img: 'hugohe3~ppt-master.webp',
-    desc: '把文档或一个主题变成真正能编辑的原生 PPTX——形状、转场、动画都在。甲方要 .pptx 原件、还要自己改的时候用它。',
-    tags: ['原生 PPTX', '文档转 PPT', '可编辑']
+    desc: '把文档或主题变成真正能编辑的原生 PPTX——形状、图表、转场都在，还能直接喂公司模板抽配色与版式复用。甲方要 .pptx 原件、还要接着改的时候用它。',
+    tags: ['原生 PPTX', '模板复用', '可编辑']
   },
   {
     id: 'frontend-slides', name: 'Frontend Slides', repo: 'zarazhangrui/frontend-slides',
     cat: 'slides', stars: 31514, img: 'zarazhangrui~frontend-slides.jpg',
-    desc: '用前端能力做网页幻灯片，翻页、滚动、动效都自由。适合线上分享、要嵌视频或交互的演示。',
-    tags: ['HTML 幻灯片', '网页演示', '动效']
+    desc: '先出 3 套视觉预览让你挑方向，再生成零依赖的单文件网页幻灯片，也能把旧 PPTX 转成动态网页。适合线上分享、技术演示和不想撞模板的场合。',
+    tags: ['HTML 幻灯片', '风格预览', 'PPT 转网页']
   },
   {
     id: 'guizang-ppt', name: '归藏 PPT', repo: 'op7418/guizang-ppt-skill',
     cat: 'slides', stars: 28894, img: '',
-    desc: 'HTML 幻灯片：杂志编辑风与瑞士网格两套排版，自带配图提示词和低功耗放映模式。想要设计感强的汇报 deck，又不想碰 PPT。',
-    tags: ['HTML 幻灯片', '杂志风', '配色']
+    desc: 'HTML 横向翻页幻灯片：电子杂志与瑞士网格两套视觉、32 种版式，自带配图提示词与双屏演讲者排练模式。想要设计感强的观点 deck、又不想碰传统 PPT 时用它。',
+    tags: ['HTML 幻灯片', '杂志风', '演讲者模式']
   },
   {
     id: 'dashi-ppt', name: '大师 PPT', repo: 'chuspeeism/dashi-ppt-skill',
@@ -115,14 +115,14 @@ window.SKILLS = [
   {
     id: 'html-ppt', name: 'HTML PPT Studio', repo: 'lewislulu/html-ppt-skill',
     cat: 'slides', stars: 8892, img: 'lewislulu~html-ppt-skill.gif',
-    desc: '24 套主题、31 种版式、20+ 动画，专做发布会级别的网页 deck。要"像网页一样能玩"的演示时选它。',
-    tags: ['HTML 幻灯片', '发布会', '动画']
+    desc: '36 套主题、36 种版式与 47 种 CSS/Canvas 动效，纯静态零构建，按 S 还能弹出带逐字稿和计时器的同步演讲台。要做发布会级别的网页 deck 时选它。',
+    tags: ['HTML 幻灯片', '演讲者模式', 'Canvas 动效']
   },
   {
     id: 'gorden-ppt', name: 'Gorden PPT', repo: 'GordenSun/GordenPPTSkill',
     cat: 'slides', stars: 3827, img: 'GordenSun~GordenPPTSkill.jpg',
-    desc: '17 套中文精修 PPTX 模板加"只改文字"的非破坏性编辑工具。不擅长排版也能出真 .pptx，版式不会被打乱。',
-    tags: ['中文模板', '原生 PPTX', '模板套用']
+    desc: '21 套中文精修模板加「只换字不动版式」的无损编辑，自带出框与同级字号校验。国企大厂汇报能直接交真 .pptx；注意内置模板仅限个人学习，禁商用。',
+    tags: ['中文模板', '无损换字', '授权注意']
   },
   {
     id: 'luobo-ppt', name: '萝卜 PPT', repo: 'zhouwei713/luobo-ppt',
@@ -137,6 +137,33 @@ window.SKILLS = [
     tags: ['流程化', 'HTML 幻灯片', '结构化']
   },
 
+  /* ---------- 2026-11-14 增补：幻灯片与演示 4 条 ---------- */
+  {
+    id: 'juneyaooo-gpt-image2-ppt-skills', name: 'GPT Image 2 PPT', repo: 'JuneYaooo/gpt-image2-ppt-skills',
+    cat: 'slides', stars: 1453, img: '',
+    desc: '用 gpt-image-2 逐页直出整张视觉稿并打包成 16:9 PPTX，内置 10 套精选风格，也能丢进任意 .pptx 仿版式换内容。发布会和创意提案用它最出彩；默认是图片页，要逐字改需开可编辑重建模式。',
+    tags: ['整页出图', '模板克隆', '视觉提案']
+  },
+  {
+    id: 'che626-competition-ppt-template-first-skill', name: '竞赛答辩 PPT', repo: 'che626/competition-ppt-template-first-skill',
+    cat: 'slides', stars: 18, img: '',
+    desc: '面向竞赛与答辩的「模板优先」工作流：先啃报告和论文做证据定位，逐页定制专属背景图，再把文字、图表和证书落到可编辑 PPTX 层。大创、挑战杯、毕设答辩要兼顾视觉质感与数字可核查时用它。',
+    tags: ['竞赛答辩', '证据溯源', '分层可编辑']
+  },
+  {
+    id: 'gnipbao-knowledge-cat-ppt-skill', name: '知识猫 PPT', repo: 'gnipbao/knowledge-cat-ppt-skill',
+    cat: 'slides', stars: 96, img: '',
+    desc: '故事优先的演示路由系统：先厘清受众变化与叙事主线，再按需求自动分流到原生 PPTX、单文件 HTML 或整页图片路线，自带证据追踪与校验器。拿不准该走哪条技术路线、或想先诊断旧稿逻辑时用它。',
+    tags: ['故事优先', '多路线路由', '质量校验']
+  },
+  {
+    id: 'anthropics-pptx', name: 'Anthropic 官方 PPTX', repo: 'anthropics/skills',
+    path: 'tree/main/skills/pptx', skill: 'pptx', from: 'anthropics',
+    cat: 'slides', stars: 184602, img: '',
+    desc: 'Claude 官方的原生 PPTX 读写与生成底座：新建、拆合、套 .potx 模板和改底层 XML 全覆盖，强制跑一轮溢出、重叠与对比度视觉 QA。要做稳妥的通用办公 PPT、或想看官方怎么写复杂文档 skill 时用它。',
+    tags: ['Anthropic 官方', '原生 PPTX', '视觉 QA']
+  },
+
   /* ---------- 图表与可视化 ---------- */
   {
     id: 'diagram-design', name: 'Diagram Design', repo: 'cathrynlavery/diagram-design',
@@ -147,8 +174,8 @@ window.SKILLS = [
   {
     id: 'anatomy', name: 'Anatomy 解剖插画', repo: 'wheresryan22/anatomy',
     cat: 'diagram', stars: 22299, img: 'wheresryan22~anatomy.webp',
-    desc: '等距视角的机器与系统解剖插画，可加 WebGL 着色和 3D 效果。要讲清"这东西内部怎么转"时，比流程图有力。',
-    tags: ['等距插画', '原理图', 'WebGL']
+    desc: '专画精密等轴测图解的技能：把抽象机制拆成逐层堆叠的 SVG、HTML 或 PDF。写深度科普、值得精雕主图时上它，就是生成偏慢。',
+    tags: ['等轴测图', 'SVG 矢量', '零依赖']
   },
   {
     id: 'fireworks-graph', name: 'Fireworks 技术图', repo: 'yizhiyanhua-ai/fireworks-tech-graph',
@@ -789,8 +816,8 @@ window.SKILLS = [
   {
     id: 'baoyu-design', name: 'Baoyu Design', repo: 'JimLiu/baoyu-design',
     cat: 'design', stars: 5523, img: 'JimLiu~baoyu-design.jpg',
-    desc: '把 Claude Design 搬到本地跑的 agent skill：出精致 UI 稿、可交互原型、幻灯片。对界面完成度有要求时用它。',
-    tags: ['UI 稿', '原型', '本地运行']
+    desc: '把 Claude Design 工作流搬到本地跑：一句话出 UI 稿、交互原型、网页幻灯片与 3D 探索，还能在本地编辑器里和 agent 轮流改同一份文件。重界面完成度时用它。',
+    tags: ['UI 稿', '交互原型', '本地运行']
   },
   {
     id: 'baocut', name: 'BaoCut 剪辑', repo: 'JimLiu/baocut',
@@ -1009,8 +1036,8 @@ window.SKILLS = [
   {
     id: 'likaku-mck-ppt-design-skill', name: '麦肯锡风 PPT', repo: 'likaku/mck-ppt-design-skill',
     cat: 'slides', stars: 335, img: '',
-    desc: '咨询公司那套版式被固化成了设计系统：70 种页面布局、图表规范和配色。要交「看起来很贵」的汇报材料时，比通用模板稳。',
-    tags: ['咨询风', '版式系统', '汇报']
+    desc: '咨询公司那套版式被固化成 python-pptx 设计系统：70 种布局、瀑布图与矩阵全是原生对象，出稿前强制跑代码闸门查文字重叠。交战略与行研汇报时比通用模板稳。',
+    tags: ['咨询风', '原生图表', '闸门校验']
   },
   {
     id: 'op7418-guizang-sports-skill', name: '归藏运动数据', repo: 'op7418/guizang-sports-skill',
@@ -1045,8 +1072,8 @@ window.SKILLS = [
   {
     id: 'heygen-com-hyperframes', name: 'HyperFrames', repo: 'heygen-com/hyperframes',
     cat: 'video', stars: 79776, img: '',
-    desc: '写 HTML 就能渲染成视频，专为 agent 设计。要程序化批量出片、又要精确控制每一帧排版时走这条路。',
-    tags: ['HTML 转视频', '程序化', '批量']
+    desc: 'HeyGen 开源的网页转视频引擎：让 agent 写 HTML 动画，再逐帧渲染成 MP4。修改零积分成本，做长视频片头或搭视频流水线时用它。',
+    tags: ['HTML 转视频', '零积分', '底层引擎']
   },
   {
     id: 'remotion-dev-skills', name: 'Remotion Skills', repo: 'remotion-dev/skills',
@@ -1887,15 +1914,83 @@ window.SKILLS = [
   {
     id: 'app-logo-design', name: 'App Logo 设计', repo: 'simple0926/app-logo-design',
     cat: 'image', stars: 2, img: 'simple0926~app-logo-design.webp',
-    desc: '从品牌主张倒推 App 图标：先定陌生人该怎样理解产品，再从六类视觉方向（拟物、扁平、字标、渐变、立体、插画）里挑 1–3 种，最后出 Android / iOS 双平台资源包。',
-    tags: ['App 图标', '品牌主张', '双平台交付']
+    desc: '从品牌主张到双端切图全包的 App 图标技能：先定视觉命题、挑 1–3 种风格生图打磨，定稿直接打包 Android/iOS 工程级图标。做新 App 上线前用它。',
+    tags: ['App 图标', '双端交付', '品牌设计']
   }
 ,
   {
     id: 'dm-gzh-cover', name: 'DM 公众号封面', repo: 'xxtdxshine/DM-gzh-cover',
     cat: 'image', stars: 0, img: 'xxtdxshine~DM-gzh-cover.webp',
-    desc: '给公众号名称和完整标题，自动从 5 张 Pexels 候选里选图、向左自然扩图，再按语义排两行或三行中文标题，出 1080×460 摄影风封面，并留版本与素材来源。',
-    tags: ['公众号封面', '摄影风', '自动选图']
+    desc: '专做摄影风公众号封面的技能：自动从 Pexels 挑图、向左自然扩图，再排好两三行中文标题直接出 1080×460 成图。高频发公众号时用它省心。',
+    tags: ['公众号封面', '自动扩图', '中文排版']
+  },
+  /* ---------- 2026-11-14 第二批增补：科普 / 视频 / 图解等 11 条 ----------
+     Star 与最近提交日期抓于 2026-11-14；无自托管演示图，img 留空。 */
+  {
+    id: 'ericblue-visual-explainer-skill', name: 'Visual Explainer', repo: 'ericblue/visual-explainer-skill',
+    cat: 'image', stars: 85, img: '',
+    desc: '丢一段文字就能出科普信息图：自动拆解概念关系并拼好提示词喂给生图模型。做公众号常规配图时用它最快，记得避开中文小字。',
+    tags: ['信息配图', '图像生成', '低门槛']
+  },
+  {
+    id: 'znyupup-knowledge-explainer-skill', name: 'Knowledge Explainer', repo: 'znyupup/knowledge-explainer-skill',
+    cat: 'video', stars: 67, img: '',
+    desc: 'Markdown 一键变 720p 讲解视频：自动拆场景写 React 代码，再用 Remotion 渲染成片。想快速出知识短视频时用它，自带六套版式。',
+    tags: ['Markdown 转视频', 'Remotion', '一键出片']
+  },
+  {
+    id: 'unclecheng-li-ai-animation-skill', name: 'AI Animation Skill', repo: 'Unclecheng-li/AI-Animation-Skill',
+    cat: 'slides', stars: 625, img: '',
+    desc: '把科普文本转成深色科技风全屏 HTML 演示页，纯 CSS 加 3D 动效实现。想零成本快速录屏做概念演示时用它，模板感会稍重一些。',
+    tags: ['HTML 演示', '3D 动效', '零成本']
+  },
+  {
+    id: 'busybee3333-animated-explainer-skills', name: 'Animated Explainer', repo: 'BusyBee3333/animated-explainer-skills',
+    cat: 'video', stars: 27, img: '',
+    desc: '做出 Kurzgesagt 风格的科普动画网页：用 GSAP 编排挤压拉伸、变形转场和视差镜头。做长视频主体、追求高质感动画时上它。',
+    tags: ['GSAP 动画', '科普长视频', '高质感']
+  },
+  {
+    id: 'brandonvant-claude-skill-whiteboard-explainer', name: 'Whiteboard Explainer', repo: 'brandonvant/claude-skill-whiteboard-explainer',
+    cat: 'video', stars: 13, img: '',
+    desc: '还原手拿马克笔边讲边画的白板动画：先出插画再用蒙版揭开，靠 Whisper 精确卡词同步。追求画音严丝合缝的讲解视频时用它。',
+    tags: ['白板手绘', '词级同步', 'HyperFrames']
+  },
+  {
+    id: 'adithya-s-k-manim-skill', name: 'Manim Skill', repo: 'adithya-s-k/manim_skill',
+    cat: 'video', stars: 1312, img: '',
+    desc: '3Blue1Brown 同款数学动画规则集：约束 agent 规范写出 ManimCE/GL 代码，严谨对齐公式与曲线。讲数学推导或函数可视化时用它。',
+    tags: ['3B1B 风格', '数学公式', 'Manim']
+  },
+  {
+    id: 'iart-ai-explainer-video-skills', name: 'Explainer Video Skills', repo: 'iart-ai/explainer-video-skills',
+    cat: 'video', stars: 104, img: '',
+    desc: 'iart 开源的五合一科普视频工具包，核心技能 wrapped-video 能用一张数据表批量产几百条 9:16 短片。做年度盘点或批量数据视频时用它。',
+    tags: ['批量出片', '数据驱动', '多产线']
+  },
+  {
+    id: 'ck42bb-vox-explainer-skill', name: 'Vox Explainer', repo: 'CK42BB/vox-explainer-skill',
+    cat: 'video', stars: 233, img: '',
+    desc: '一句话全自动生成 Vox 纪录片风短视频：锁定锚帧控风格，包办脚本、配音和拼贴微动。想低门槛出高级感科普短片时用它。',
+    tags: ['Vox 风格', '全自动出片', '拼贴微动']
+  },
+  {
+    id: 'higgsfield-ai-skills', name: 'Higgsfield Video Explainer', repo: 'higgsfield-ai/skills',
+    cat: 'video', stars: 1980, img: '',
+    desc: '按 10 秒分段生成的旁白科普视频技能：先从预设库选好画风、一次性配音再出画面，彻底告别画音不对位。做叙事类讲解视频时用它。',
+    tags: ['分段对齐', '风格预设', '叙事视频']
+  },
+  {
+    id: 'next-token-tv-next-token-skill', name: 'Next Token Skill', repo: 'next-token-tv/next-token-skill',
+    cat: 'knowledge', stars: 9, img: '',
+    desc: '把播客《词元之外》变成 agent 本地知识库：回答直接引主理人观点，并附 B 站/油管时间戳直跳。想快速查播客一手讨论时用它，零依赖。',
+    tags: ['播客检索', '时间戳直跳', '零依赖']
+  },
+  {
+    id: 'oso95-scroll-world', name: 'Scroll World', repo: 'oso95/scroll-world',
+    cat: 'design', stars: 10992, img: '',
+    desc: '把品牌官网做成 Apple 同款“滚动穿梭 3D 世界”：鼠标一滚镜头就在场景间一镜到底丝滑推进。想给产品做高定感视觉落地页时上它。',
+    tags: ['滚动视效', '3D 落地页', '一镜到底']
   }
 ];
 
@@ -1917,6 +2012,7 @@ window.UPS_FETCHED = '2026-11-08';
 window.UPS = {
   'addsumtech/slides_maker': ['2026-11-05', '6.1.0', '2026-10-31'],
   'addyosmani/agent-skills': ['2026-11-01', '0.6.15', '2026-10-31'],
+  'adithya-s-k/manim_skill': ['2026-01-23', '', ''],
   'adrianpunk/Punk-IP': ['2026-11-04', '', ''],
   'adrianpunk/punk-posters': ['2026-11-04', 'v2.0.0', '2026-09-10'],
   'affaan-m/ecc': ['2026-11-06', 'v2.2.3', '2026-10-01'],
@@ -1955,12 +2051,16 @@ window.UPS = {
   'binghe1980/skill-gardener': ['2026-07-04', '', ''],
   'blader/humanizer': ['2026-10-28', 'v3.1.0', '2026-09-28'],
   'bradautomates/claude-video': ['2026-09-25', 'v0.3.2', '2026-09-25'],
+  'brandonvant/claude-skill-whiteboard-explainer': ['2026-07-09', '', ''],
   'browser-act/skills': ['2026-11-04', '', ''],
   'brycewang-stanford/many-ppt-skills': ['2026-09-05', '', ''],
+  'BusyBee3333/animated-explainer-skills': ['2026-07-13', '', ''],
   'bvb6417/ppt-studio': ['2026-10-16', '', ''],
   'career-ops-hq/career-ops': ['2026-11-07', 'v0.17.0', '2026-11-05'],
   'cathrynlavery/diagram-design': ['2026-11-06', '', ''],
+  'che626/competition-ppt-template-first-skill': ['2026-07-13', '', ''],
   'chuspeeism/dashi-ppt-skill': ['2026-11-06', '', ''],
+  'CK42BB/vox-explainer-skill': ['2026-07-11', '', ''],
   'Cocoon-AI/architecture-diagram-generator': ['2026-05-13', '', ''],
   'code-yeongyu/oh-my-openagent': ['2026-11-08', 'v5.1.64', '2026-11-07'],
   'coleam00/excalidraw-diagram-skill': ['2026-03-01', '', ''],
@@ -1979,6 +2079,7 @@ window.UPS = {
   'einsia/browser-bc': ['2026-07-13', 'v0.1.9', '2026-06-28'],
   'elayadesign/ai-design-skills': ['2026-11-01', '', ''],
   'emilkowalski/skills': ['2026-11-04', '', ''],
+  'ericblue/visual-explainer-skill': ['2026-04-03', '', ''],
   'everettfish/ip_illustration_for_yourself': ['2026-08-31', '', ''],
   'everyinc/compound-engineering-plugin': ['2026-11-08', 'v3.37.0', '2026-11-08'],
   'eze-is/web-access': ['2026-10-14', 'v2.6.0', '2026-10-14'],
@@ -1986,6 +2087,7 @@ window.UPS = {
   'garrytan/gstack': ['2026-11-08', 'v1.97.0.0', '2026-11-07'],
   'geekjourneyx/claude-design-card': ['2026-05-27', '', ''],
   'geeklee/srt-whiteboard-animation': ['2026-07-27', 'v1.0.0', '2026-07-27'],
+  'gnipbao/knowledge-cat-ppt-skill': ['2026-06-28', '', ''],
   'gnipbao/minimax-h3-video-reverse-skill': ['2026-10-02', '', ''],
   'gnipbao/story-to-handdrawn-video': ['2026-09-22', '', ''],
   'google/skills': ['2026-11-07', '', ''],
@@ -1999,9 +2101,11 @@ window.UPS = {
   'hexiaofeier/baojie': ['2026-10-30', '2026.10.30', '2026-10-30'],
   'hexiaofeier/tanzi': ['2026-09-07', '', ''],
   'heygen-com/hyperframes': ['2026-11-08', 'v0.9.23', '2026-11-08'],
+  'higgsfield-ai/skills': ['2026-11-05', '', ''],
   'hjxccc/nowledge': ['2026-09-15', '', ''],
   'hugohe3/ppt-master': ['2026-11-07', 'v6.8.0', '2026-10-30'],
   'humanlayer/skills': ['2026-11-01', '', ''],
+  'iart-ai/explainer-video-skills': ['2026-11-11', '', ''],
   'ibelick/ui-skills': ['2026-11-07', 'v0.2.3', '2026-06-22'],
   'icip-cas/pptagent': ['2026-11-02', 'v1.1.38', '2026-09-20'],
   'idiotLeoLYJ/Daliu-Awesome-Skills': ['2026-11-01', '', ''],
@@ -2023,6 +2127,7 @@ window.UPS = {
   'joeseesun/qiaomu-markdown-proxy': ['2026-08-05', 'v2.1.0', '2026-08-05'],
   'joeseesun/qiaomu-opencli-skills': ['2026-04-09', '', ''],
   'JuliusBrussee/caveman': ['2026-11-08', '4.1.0', '2026-11-08'],
+  'JuneYaooo/gpt-image2-ppt-skills': ['2026-08-22', '', ''],
   'jzocb/writing-style-skill': ['2026-03-24', '', ''],
   'kaankiziltug/logo-design-skill': ['2026-11-06', 'v1.4.5', '2026-10-20'],
   'kangarooking/buffett-letters-skill': ['2026-04-17', '', ''],
@@ -2081,6 +2186,7 @@ window.UPS = {
   'narcooo/inkos': ['2026-10-24', 'v1.8.0', '2026-08-17'],
   'nesquena/hermes-webui': ['2026-11-07', 'v0.52.653', '2026-11-07'],
   'netease/skills': ['2026-03-31', '', ''],
+  'next-token-tv/next-token-skill': ['2026-11-12', '', ''],
   'nextlevelbuilder/ui-ux-pro-max-skill': ['2026-11-07', 'v2.15.0', '2026-08-13'],
   'nexu-io/html-video': ['2026-06-21', '', ''],
   'nexu-io/motion-anything': ['2026-07-07', '0.1.0', '2026-07-07'],
@@ -2119,6 +2225,7 @@ window.UPS = {
   'OpenSenseNova/SenseNova-Skills': ['2026-11-03', 'v2026.10', '2026-10-29'],
   'orange2ai/orange-line-illustration': ['2026-06-15', '', ''],
   'orz-ai/hot_news': ['2026-09-09', '', ''],
+  'oso95/scroll-world': ['2026-07-29', '', ''],
   'Panniantong/Agent-Reach': ['2026-11-08', 'v1.6.1', '2026-11-01'],
   'pbakaus/impeccable': ['2026-11-08', '4.8.1', '2026-11-08'],
   'phuryn/pm-skills': ['2026-10-29', 'v2.2.0', '2026-10-10'],
@@ -2165,6 +2272,7 @@ window.UPS = {
   'tt-a1i/archify': ['2026-10-31', 'v3.2.0', '2026-10-19'],
   'turixai/turix-cua': ['2026-09-14', 'v0.4', '2026-03-06'],
   'tw93/kami': ['2026-11-08', 'V1.20.0', '2026-10-29'],
+  'Unclecheng-li/AI-Animation-Skill': ['2026-04-16', '', ''],
   'unnoo/zsxq-skill': ['2026-11-06', 'v2.2.0', '2026-08-28'],
   'vercel-labs/agent-browser': ['2026-11-08', 'v0.41.2', '2026-11-03'],
   'vercel-labs/agent-skills': ['2026-10-27', '', ''],
@@ -2207,5 +2315,6 @@ window.UPS = {
   'zhouwei713/luobo-ppt': ['2026-10-22', '', ''],
   'zhouwei713/title-matrix': ['2026-09-14', '', ''],
   'ziguishian/xhs-visual-director-skill': ['2026-07-03', '', ''],
+  'znyupup/knowledge-explainer-skill': ['2026-04-29', '', ''],
   'zzzlc0405/photo-abstract-editorial': ['2026-08-19', '', '']
 };
