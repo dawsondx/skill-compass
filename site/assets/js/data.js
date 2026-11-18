@@ -1991,6 +1991,45 @@ window.SKILLS = [
     cat: 'design', stars: 10992, img: '',
     desc: '把品牌官网做成 Apple 同款“滚动穿梭 3D 世界”：鼠标一滚镜头就在场景间一镜到底丝滑推进。想给产品做高定感视觉落地页时上它。',
     tags: ['滚动视效', '3D 落地页', '一镜到底']
+  },
+
+  /* ---------- 2026-11-18 增补：用户指定的 8 个仓库（6 个新收录，2 个已存在未动） ----------
+     来源：用户给定 GitHub 链接。Star 与最近提交日期抓于 2026-11-18；无自托管演示图，img 留空。 */
+  {
+    id: 'larashero3-dotcom-lieflat-less-ai-tone', name: 'Lieflat 去 AI 味', repo: 'larashero3-dotcom/lieflat-less-ai-tone',
+    cat: 'writing', stars: 7871, img: '',
+    desc: '基于 520 万字语料、100+ 项指标的中文去 AI 味 skill：先出带研究参照、原文例句和改法的检测报告，确认后再做最小改写并复测。专治对举、破折号、空洞比喻这类深层套路，不乱删正常表达。',
+    tags: ['去 AI 味', '语料研究', '最小改写']
+  },
+  {
+    id: 'hexiaofeier-hehe-survey-analysis-workbook', name: '盒盒问卷分析', repo: 'hexiaofeier/hehe-survey-analysis-workbook',
+    cat: 'business', stars: 1, img: '',
+    desc: '用户调研统计分析 skill：Excel / CSV / SAV 问卷逐题统计、人群交叉与差异追查，无效样本全量标记由你决定纳入，交付可复核的 Excel 工作簿和带目录的 HTML 简报。',
+    tags: ['问卷统计', '交叉分析', 'Excel 交付']
+  },
+  {
+    id: 'qingyuna-answer-me-with-html', name: 'Answer me with HTML', repo: 'QingYunA/answer-me-with-html',
+    cat: 'slides', stars: 6516, img: '',
+    desc: '让 agent 用一页可读 HTML 回答复杂问题：只写 Markdown 草稿，CLI 负责 SVG、CSS 和标签，token 约为手写 HTML 的 1/8、快 2.6 倍。讲原理、读代码、对比方案时甩掉终端文字墙。',
+    tags: ['HTML 讲解页', '省 token', '可读排版']
+  },
+  {
+    id: 'zenstory-ai-novel-to-game', name: '小说改游戏', repo: 'zenstory-ai/novel-to-game',
+    cat: 'writing', stars: 1131, img: '',
+    desc: '把小说改编成可玩游戏的 5 件套：通读全书出带出处的设定圣经，选玩法、做世界与美术方向，按本机渲染栈搭出可玩版本，最后以新玩家身份盲测验收，附完整设计文档。',
+    tags: ['小说改编', '可玩游戏', '盲测验收']
+  },
+  {
+    id: 'chengyi-ai-native-subtitle-quote-image', name: '原生字幕金句图', repo: 'chengyi-ai/native-subtitle-quote-image',
+    cat: 'image', stars: 2888, img: '',
+    desc: '从本地视频或 YouTube 精确取帧，保留画面原生字幕或把审核过的台词画上去，拼成 3:4 社交长图并逐张质检。两种字幕模式绝不混用，做影视金句配图时用它。',
+    tags: ['视频截帧', '字幕长图', '社交配图']
+  },
+  {
+    id: 'yuan1z0825-nature-skills', name: 'Nature Skills 科研库', repo: 'Yuan1z0825/nature-skills',
+    cat: 'pack', stars: 54002, img: '',
+    desc: '面向科研的 23 个 skill 合集：Nature 风格论文润色、投稿级科研绘图、审稿模拟、文献检索与引用核验、论文转 PPT/Word/专利。写英文论文或做学术图时按场景挑一个用。',
+    tags: ['科研写作', '学术绘图', '技能合集']
   }
 ];
 
@@ -2059,6 +2098,7 @@ window.UPS = {
   'career-ops-hq/career-ops': ['2026-11-18', 'v0.18.0', '2026-11-10'],
   'cathrynlavery/diagram-design': ['2026-11-12', '', ''],
   'che626/competition-ppt-template-first-skill': ['2026-07-13', 'v0.6.0', '2026-07-13'],
+  'chengyi-ai/native-subtitle-quote-image': ['2026-11-06', '', ''],
   'chuspeeism/dashi-ppt-skill': ['2026-11-06', '', ''],
   'CK42BB/vox-explainer-skill': ['2026-07-11', '', ''],
   'Cocoon-AI/architecture-diagram-generator': ['2026-05-13', '', ''],
@@ -2099,6 +2139,7 @@ window.UPS = {
   'Hchen1218/heytea-style': ['2026-09-04', 'v2.0.0', '2026-08-25'],
   'helloianneo/ian-xiaohei-illustrations': ['2026-10-27', 'v1.0.0', '2026-05-28'],
   'hexiaofeier/baojie': ['2026-10-30', '2026.10.30', '2026-10-30'],
+  'hexiaofeier/hehe-survey-analysis-workbook': ['2026-11-10', '', ''],
   'hexiaofeier/tanzi': ['2026-09-07', '', ''],
   'heygen-com/hyperframes': ['2026-11-18', 'v0.9.65', '2026-11-18'],
   'higgsfield-ai/skills': ['2026-11-05', '', ''],
@@ -2145,6 +2186,7 @@ window.UPS = {
   'KKKKhazix/khazix-skills': ['2026-11-15', 'v1.2.2', '2026-11-12'],
   'kunchenguid/no-mistakes': ['2026-11-16', 'v1.111.0', '2026-11-05'],
   'larashero3-dotcom/lieflat-gongwen': ['2026-11-11', '', ''],
+  'larashero3-dotcom/lieflat-less-ai-tone': ['2026-11-11', '', ''],
   'larashero3-dotcom/writing-dna-skill': ['2026-11-11', '', ''],
   'larksuite/cli': ['2026-11-18', 'v1.0.100', '2026-11-10'],
   'LearnPrompt/luban-skill': ['2026-07-10', 'v2.1.0', '2026-07-10'],
@@ -2230,6 +2272,7 @@ window.UPS = {
   'pbakaus/impeccable': ['2026-11-16', 'v0.1.27', '2026-11-18'],
   'phuryn/pm-skills': ['2026-11-08', 'v2.3.0', '2026-11-08'],
   'pskoett/self-improving-agent': ['2026-10-22', '', ''],
+  'QingYunA/answer-me-with-html': ['2026-11-17', '', ''],
   'qqhkx2027/qiuqiu-travel-image': ['2026-09-06', '', ''],
   'qufei1993/skills-hub': ['2026-11-17', 'v1.1.1', '2026-11-13'],
   'raphaelxiao/mck_skills': ['2026-07-19', '', ''],
@@ -2303,12 +2346,14 @@ window.UPS = {
   'yaojingang/yao-open-skills': ['2026-10-14', '', ''],
   'yizhiyanhua-ai/fireworks-tech-graph': ['2026-10-21', 'v1.2.0', '2026-07-17'],
   'youmind-openlab/skills': ['2026-06-05', '', ''],
+  'Yuan1z0825/nature-skills': ['2026-11-16', '', ''],
   'YuppyChen/ai-wechat': ['2026-03-19', '', ''],
   'zarazhangrui/beautiful-feishu-whiteboard': ['2026-06-11', '', ''],
   'zarazhangrui/beautiful-html-templates': ['2026-06-09', '', ''],
   'zarazhangrui/follow-builders': ['2026-11-18', '', ''],
   'zarazhangrui/frontend-slides': ['2026-06-23', 'v2.1.0', '2026-05-26'],
   'zeejay0/gathered-scenes-zine-skill': ['2026-09-03', '', ''],
+  'zenstory-ai/novel-to-game': ['2026-11-17', '', ''],
   'ZeroxZhang/huashu-bookwriter': ['2026-04-12', '', ''],
   'zeroxzhang/md2book': ['2026-04-10', '', ''],
   'zhaoxuya520/reverse-skill': ['2026-11-14', 'v1.0.1', '2026-08-08'],
