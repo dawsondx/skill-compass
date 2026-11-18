@@ -2030,6 +2030,15 @@ window.SKILLS = [
     cat: 'pack', stars: 54002, img: '',
     desc: '面向科研的 23 个 skill 合集：Nature 风格论文润色、投稿级科研绘图、审稿模拟、文献检索与引用核验、论文转 PPT/Word/专利。写英文论文或做学术图时按场景挑一个用。',
     tags: ['科研写作', '学术绘图', '技能合集']
+  },
+
+  /* ---------- 2026-11-18 第二批增补：用户指定的 2 个仓库（1 个新收录，1 个已存在未动） ----------
+     来源：用户给定 GitHub 链接。Star 与最近提交日期抓于 2026-11-18；无自托管演示图，img 留空。 */
+  {
+    id: 'jakubkrehel-skills', name: 'Jakub 界面工程 Skills', repo: 'jakubkrehel/skills',
+    cat: 'pack', stars: 12358, img: '',
+    desc: 'Jakub Krehel（Interfaces 主编）的界面工程 skill 合集：15 个技能覆盖无障碍、排版、配色、布局、界面文案与动效打磨，还能审 PR、还原 Figma、压测组件所有状态。做界面时按场景挑，或整套装上。',
+    tags: ['界面工程', 'UI 打磨', '技能合集']
   }
 ];
 
@@ -2158,6 +2167,7 @@ window.UPS = {
   'jackwener/opencli': ['2026-11-07', 'v2.0.3', '2026-11-07'],
   'jackwener/wechat-article-to-markdown': ['2026-03-22', 'v0.1.0', '2026-03-04'],
   'jakubkrehel/make-interfaces-feel-better': ['2026-11-18', '', ''],
+  'jakubkrehel/skills': ['2026-11-18', '', ''],
   'jamesrochabrun/skills': ['2026-01-14', '2.1.1', '2026-01-14'],
   'jcodesmore/ai-website-cloner-template': ['2026-11-10', 'v0.6.1', '2026-10-05'],
   'jesseovo/last30days-skill-cn': ['2026-11-17', 'v4.0.0', '2026-10-05'],
