@@ -1,0 +1,893 @@
+{
+  "version": 1,
+  "hotQueries": [
+    "去AI味",
+    "做PPT",
+    "画架构图",
+    "小红书封面",
+    "省token",
+    "写公众号",
+    "视频剪辑",
+    "思维蒸馏"
+  ],
+  "stopwords": [
+    "帮我",
+    "帮忙",
+    "请问",
+    "怎么",
+    "如何",
+    "可以",
+    "能否",
+    "能不能",
+    "想要",
+    "想找",
+    "找一个",
+    "找个",
+    "一个",
+    "一款",
+    "一套",
+    "这个",
+    "那个",
+    "什么",
+    "哪些",
+    "有没有",
+    "推荐",
+    "好用",
+    "最好",
+    "工具",
+    "技能",
+    "神器",
+    "助手",
+    "用来",
+    "用于",
+    "适合",
+    "支持",
+    "一下",
+    "一键",
+    "制作",
+    "生成",
+    "做出",
+    "做成",
+    "来做",
+    "去做",
+    "做",
+    "写",
+    "画",
+    "用",
+    "把",
+    "给",
+    "让",
+    "将",
+    "对",
+    "帮",
+    "我",
+    "你",
+    "他",
+    "它",
+    "想",
+    "要",
+    "找",
+    "求",
+    "看",
+    "有",
+    "能",
+    "会",
+    "就",
+    "都",
+    "也",
+    "很",
+    "的",
+    "了",
+    "和",
+    "与",
+    "或",
+    "及",
+    "跟",
+    "在",
+    "里",
+    "中",
+    "上",
+    "下",
+    "skill",
+    "skills",
+    "agent",
+    "agents",
+    "tool",
+    "tools",
+    "for",
+    "with",
+    "to",
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "in",
+    "of"
+  ],
+  "concepts": [
+    {
+      "id": "de_ai_tone",
+      "label": "去 AI 味",
+      "atomic": true,
+      "polarity": true,
+      "terms": [
+        "去ai味",
+        "去ai腔",
+        "去ai痕迹",
+        "去ai感",
+        "反ai味",
+        "反ai",
+        "降ai率",
+        "降ai",
+        "去机器味",
+        "去味",
+        "消除ai痕迹",
+        "消除ai味",
+        "去掉ai味",
+        "不要ai味",
+        "避免ai味",
+        "去模板腔",
+        "反模板",
+        "活人感",
+        "说人话",
+        "像人写",
+        "像真人",
+        "人味",
+        "自然写作",
+        "humanizer",
+        "humanize",
+        "stop-slop",
+        "stopslop",
+        "slop",
+        "avoid-ai",
+        "less-ai",
+        "de-ai",
+        "deai",
+        "quaiwei",
+        "fanaiwei",
+        "huorengan",
+        "shuorenhua"
+      ],
+      "related": [
+        "文风",
+        "改稿",
+        "润色",
+        "风格蒸馏"
+      ]
+    },
+    {
+      "id": "ppt_slides",
+      "label": "幻灯片 / PPT",
+      "atomic": false,
+      "terms": [
+        "ppt",
+        "pptx",
+        "slides",
+        "slide",
+        "deck",
+        "decks",
+        "keynote",
+        "gamma",
+        "powerpoint",
+        "幻灯片",
+        "演示文稿",
+        "演示稿",
+        "发布会稿",
+        "路演"
+      ]
+    },
+    {
+      "id": "diagram_arch",
+      "label": "图表与架构图",
+      "atomic": false,
+      "terms": [
+        "架构图",
+        "流程图",
+        "技术图",
+        "系统架构",
+        "结构图",
+        "示意图",
+        "关系图",
+        "思维导图",
+        "时序图",
+        "路线图",
+        "解剖图",
+        "等轴测",
+        "diagram",
+        "architecture",
+        "flowchart",
+        "mermaid",
+        "excalidraw",
+        "drawio",
+        "draw.io",
+        "uml",
+        "svg图表",
+        "白板",
+        "visio",
+        "信息图",
+        "图解"
+      ]
+    },
+    {
+      "id": "no_mermaid",
+      "label": "无 Mermaid 味",
+      "atomic": true,
+      "polarity": true,
+      "terms": [
+        "无mermaid",
+        "去mermaid",
+        "非mermaid",
+        "不要mermaid",
+        "告别mermaid"
+      ]
+    },
+    {
+      "id": "dashboard_chart",
+      "label": "数据大屏与可视化",
+      "atomic": false,
+      "terms": [
+        "数据大屏",
+        "大屏",
+        "可视化",
+        "看板",
+        "仪表盘",
+        "echarts",
+        "dashboard",
+        "bi",
+        "轨迹图",
+        "地图可视化"
+      ]
+    },
+    {
+      "id": "ui_design",
+      "label": "UI 与网页设计",
+      "atomic": false,
+      "terms": [
+        "ui",
+        "ux",
+        "ui设计",
+        "网页设计",
+        "界面设计",
+        "原型",
+        "设计稿",
+        "设计系统",
+        "设计规范",
+        "落地页",
+        "官网",
+        "landingpage",
+        "figma",
+        "design.md",
+        "小程序界面",
+        "app界面",
+        "前端设计",
+        "交互设计",
+        "界面打磨",
+        "网站克隆",
+        "复刻网站",
+        "个人主页",
+        "个人网站"
+      ]
+    },
+    {
+      "id": "anti_template_ui",
+      "label": "去 AI 模板感网页",
+      "atomic": true,
+      "polarity": true,
+      "terms": [
+        "反模板",
+        "去模板感",
+        "不像模板",
+        "网页去ai味",
+        "落地页去ai味",
+        "反ai落地页",
+        "hallmark",
+        "紫渐变"
+      ]
+    },
+    {
+      "id": "wechat_gzh",
+      "label": "公众号",
+      "atomic": false,
+      "terms": [
+        "公众号",
+        "微信公众号",
+        "gzh",
+        "wechat",
+        "微信文章",
+        "公众号排版",
+        "公众号封面",
+        "公众号配图",
+        "草稿箱",
+        "gongzhonghao"
+      ]
+    },
+    {
+      "id": "xiaohongshu",
+      "label": "小红书",
+      "atomic": false,
+      "terms": [
+        "小红书",
+        "xhs",
+        "redbook",
+        "xiaohongshu",
+        "图文卡片",
+        "小红书封面",
+        "小红书图文",
+        "小红书运营",
+        "小红书排版",
+        "小红书笔记"
+      ]
+    },
+    {
+      "id": "twitter_x",
+      "label": "X / Twitter",
+      "atomic": false,
+      "terms": [
+        "twitter",
+        "推特",
+        "x运营",
+        "x增长",
+        "x文章",
+        "推文",
+        "发推"
+      ]
+    },
+    {
+      "id": "save_token",
+      "label": "省 Token / 降本",
+      "atomic": true,
+      "polarity": true,
+      "terms": [
+        "省token",
+        "省钱",
+        "省额度",
+        "压缩token",
+        "减少token",
+        "降低成本",
+        "精简输出",
+        "skill减肥",
+        "caveman",
+        "token优化",
+        "节省token",
+        "shengtoken"
+      ]
+    },
+    {
+      "id": "zero_api",
+      "label": "零 API 费 / 纯本地",
+      "atomic": true,
+      "polarity": true,
+      "terms": [
+        "零api",
+        "零api费",
+        "免api",
+        "零积分",
+        "免费",
+        "纯本地",
+        "本地跑",
+        "离线",
+        "不上传云端"
+      ]
+    },
+    {
+      "id": "video_edit",
+      "label": "视频剪辑与口播",
+      "atomic": false,
+      "terms": [
+        "视频剪辑",
+        "剪辑",
+        "剪视频",
+        "录屏剪辑",
+        "口误剔除",
+        "时间线",
+        "字幕翻译",
+        "剪口播",
+        "baocut"
+      ]
+    },
+    {
+      "id": "promo_video",
+      "label": "产品宣传片与动效",
+      "atomic": false,
+      "terms": [
+        "宣传片",
+        "产品宣传片",
+        "产品片",
+        "片头",
+        "动效",
+        "动画",
+        "视频生成",
+        "html转视频",
+        "代码出片",
+        "remotion",
+        "gsap",
+        "hyperframes",
+        "mg动画",
+        "seedance"
+      ]
+    },
+    {
+      "id": "whiteboard_video",
+      "label": "白板与科普讲解视频",
+      "atomic": false,
+      "terms": [
+        "白板动画",
+        "白板手绘",
+        "手绘动画",
+        "科普动画",
+        "科普视频",
+        "讲解视频",
+        "解说动画",
+        "数学动画",
+        "manim",
+        "3b1b",
+        "vox",
+        "srt白板"
+      ]
+    },
+    {
+      "id": "voice_tts",
+      "label": "配音与语音",
+      "atomic": false,
+      "terms": [
+        "配音",
+        "旁白",
+        "音色克隆",
+        "tts",
+        "语音合成",
+        "转写",
+        "逐字稿",
+        "录音整理",
+        "voicestudio"
+      ]
+    },
+    {
+      "id": "cover_poster",
+      "label": "封面、海报与配图",
+      "atomic": false,
+      "terms": [
+        "封面",
+        "头图",
+        "缩略图",
+        "海报",
+        "配图",
+        "插画",
+        "卡片图",
+        "长图",
+        "社交配图",
+        "b站封面",
+        "视频封面",
+        "金句图",
+        "纸刊",
+        "zine",
+        "提示词库"
+      ]
+    },
+    {
+      "id": "transparent_bg",
+      "label": "透明底与抠图",
+      "atomic": true,
+      "polarity": true,
+      "terms": [
+        "透明底",
+        "透明背景",
+        "去背景",
+        "抠图",
+        "无背景",
+        "transparent",
+        "png素材"
+      ]
+    },
+    {
+      "id": "logo_brand",
+      "label": "Logo、图标与品牌视觉",
+      "atomic": false,
+      "terms": [
+        "logo",
+        "图标",
+        "icon",
+        "app图标",
+        "品牌视觉",
+        "品牌设计",
+        "吉祥物",
+        "个人ip",
+        "ip形象",
+        "头像",
+        "贴纸",
+        "表情包"
+      ]
+    },
+    {
+      "id": "writing_style",
+      "label": "写作、改稿与排版",
+      "atomic": false,
+      "terms": [
+        "写作",
+        "长文",
+        "改稿",
+        "润色",
+        "文风",
+        "笔调",
+        "标题",
+        "爆款标题",
+        "口播稿",
+        "电子书",
+        "写书",
+        "小说",
+        "排版",
+        "书籍创作"
+      ]
+    },
+    {
+      "id": "gongwen",
+      "label": "公文与规范文档",
+      "atomic": false,
+      "terms": [
+        "公文",
+        "公文写作",
+        "公文排版",
+        "红头文件",
+        "请示",
+        "通知",
+        "汇报材料",
+        "gbt9704",
+        "gb/t9704",
+        "国标排版",
+        "docx"
+      ]
+    },
+    {
+      "id": "academic_paper",
+      "label": "科研、论文与学术",
+      "atomic": false,
+      "terms": [
+        "论文",
+        "科研",
+        "学术",
+        "期刊",
+        "基金",
+        "nature",
+        "文献",
+        "审稿",
+        "学术绘图",
+        "科研绘图",
+        "论文阅读",
+        "答辩",
+        "paper",
+        "scholar",
+        "patent",
+        "专利",
+        "交底书"
+      ]
+    },
+    {
+      "id": "doc_convert",
+      "label": "文档格式转换",
+      "atomic": false,
+      "terms": [
+        "markdown",
+        "转markdown",
+        "转md",
+        "转pdf",
+        "pdf转md",
+        "网页转md",
+        "公众号转md",
+        "转word",
+        "word文档",
+        "docx",
+        "格式转换",
+        "文档转换",
+        "markitdown",
+        "any2pdf",
+        "pandoc",
+        "md转html"
+      ]
+    },
+    {
+      "id": "distill_mind",
+      "label": "思维蒸馏与拆书学习",
+      "atomic": false,
+      "terms": [
+        "思维蒸馏",
+        "人物蒸馏",
+        "内容蒸馏",
+        "蒸馏",
+        "拆书",
+        "读书笔记",
+        "学习页",
+        "隐性知识",
+        "心智模型",
+        "圆桌讨论",
+        "书变skill",
+        "博主蒸馏",
+        "女娲",
+        "nuwa",
+        "仓颉",
+        "cangjie",
+        "distill",
+        "教材点读",
+        "备课",
+        "k12"
+      ]
+    },
+    {
+      "id": "memory_kb",
+      "label": "知识库与持久记忆",
+      "atomic": false,
+      "terms": [
+        "记忆",
+        "持久记忆",
+        "跨会话",
+        "知识库",
+        "笔记",
+        "知识图谱",
+        "代码理解",
+        "obsidian",
+        "memos",
+        "claude-mem",
+        "thinkwiki",
+        "wiki",
+        "知识体检"
+      ]
+    },
+    {
+      "id": "hotspot_radar",
+      "label": "热点、选题与信息源",
+      "atomic": false,
+      "terms": [
+        "热点",
+        "热榜",
+        "选题",
+        "爆款选题",
+        "舆情",
+        "情报",
+        "信息源",
+        "信息采集",
+        "rss",
+        "日报",
+        "社媒读取",
+        "近30天",
+        "last30days",
+        "知识星球",
+        "zsxq",
+        "播客"
+      ]
+    },
+    {
+      "id": "browser_auto",
+      "label": "浏览器自动化与联网",
+      "atomic": false,
+      "terms": [
+        "浏览器",
+        "浏览器自动化",
+        "联网",
+        "抓网页",
+        "抓取",
+        "反爬",
+        "chrome",
+        "cdp",
+        "playwright",
+        "登录态",
+        "网站转cli",
+        "opencli",
+        "电脑操作",
+        "gui操作",
+        "桌面操作"
+      ]
+    },
+    {
+      "id": "feishu_wecom",
+      "label": "飞书与企业微信",
+      "atomic": false,
+      "terms": [
+        "飞书",
+        "lark",
+        "多维表",
+        "飞书白板",
+        "飞书文档",
+        "企业微信",
+        "企微",
+        "wecom"
+      ]
+    },
+    {
+      "id": "skill_meta",
+      "label": "Skill 管理与进化",
+      "atomic": false,
+      "terms": [
+        "skill管理",
+        "包管理",
+        "进化",
+        "打磨",
+        "重构",
+        "优化skill",
+        "录屏转skill",
+        "行为克隆",
+        "多agent",
+        "子agent",
+        "编排",
+        "安装器",
+        "配置切换",
+        "提示词",
+        "prompt"
+      ]
+    },
+    {
+      "id": "code_eng",
+      "label": "编程工程与代码审查",
+      "atomic": false,
+      "terms": [
+        "代码审查",
+        "codereview",
+        "review",
+        "git",
+        "pr",
+        "提交",
+        "编程准则",
+        "claude.md",
+        "agents.md",
+        "需求澄清",
+        "拷问需求",
+        "长任务",
+        "逆向",
+        "渗透",
+        "安全",
+        "网安",
+        "微信支付",
+        "aws",
+        "vercel"
+      ]
+    },
+    {
+      "id": "business_pm",
+      "label": "商业、产品与职场",
+      "atomic": false,
+      "terms": [
+        "求职",
+        "简历",
+        "面试",
+        "cv",
+        "产品经理",
+        "pm",
+        "prd",
+        "商业分析",
+        "商业诊断",
+        "行业研究",
+        "研报",
+        "咨询",
+        "麦肯锡",
+        "营销",
+        "seo",
+        "增长",
+        "创业",
+        "一人公司",
+        "变现",
+        "产品化",
+        "投资",
+        "价值投资",
+        "巴菲特",
+        "芒格",
+        "金融",
+        "管理",
+        "组织设计",
+        "bp"
+      ]
+    },
+    {
+      "id": "excel_survey",
+      "label": "Excel 与问卷数据分析",
+      "atomic": false,
+      "terms": [
+        "excel",
+        "表格",
+        "数据清洗",
+        "对账",
+        "数据分析",
+        "问卷",
+        "问卷分析",
+        "交叉分析",
+        "统计",
+        "csv",
+        "sav"
+      ]
+    },
+    {
+      "id": "creators_cn",
+      "label": "创作者别名",
+      "atomic": false,
+      "terms": []
+    }
+  ],
+  "authorAliases": {
+    "alchaincyf": [
+      "花叔",
+      "huashu",
+      "hs"
+    ],
+    "oil-oil": [
+      "欧呦",
+      "ouyou",
+      "oy",
+      "oil"
+    ],
+    "op7418": [
+      "归藏",
+      "guizang",
+      "gz"
+    ],
+    "jimliu": [
+      "宝玉",
+      "baoyu",
+      "by"
+    ],
+    "kkkkhazix": [
+      "卡兹克",
+      "kazike",
+      "kzk",
+      "数字生命卡兹克"
+    ],
+    "lijigang": [
+      "李继刚",
+      "lijigang",
+      "ljg"
+    ],
+    "kangarooking": [
+      "袋鼠帝",
+      "daishudi",
+      "dsd",
+      "袋鼠"
+    ],
+    "spacezephyr": [
+      "空格的键盘",
+      "空格",
+      "spacezephyr",
+      "kongge"
+    ],
+    "zarazhangrui": [
+      "zara",
+      "zarazhang",
+      "zarazhangrui"
+    ],
+    "nexu-io": [
+      "nexu",
+      "nexu-io"
+    ],
+    "larashero3-dotcom": [
+      "lieflat",
+      "larashero",
+      "larashero3"
+    ],
+    "liyupi": [
+      "鱼皮",
+      "yupi",
+      "liyupi",
+      "程序员鱼皮"
+    ],
+    "anthropics": [
+      "anthropic",
+      "claude",
+      "官方"
+    ],
+    "microsoft": [
+      "微软",
+      "ms",
+      "microsoft"
+    ],
+    "vercel-labs": [
+      "vercel"
+    ],
+    "larksuite": [
+      "飞书",
+      "feishu",
+      "lark"
+    ],
+    "tjxj": [
+      "tjxj (beihai)",
+      "tjxj",
+      "beihai",
+      "北海",
+      "z-skills"
+    ]
+  }
+}

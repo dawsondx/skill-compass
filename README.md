@@ -3,7 +3,7 @@
 > **别再从收藏夹里翻链接了。**
 > 给 AI Agent（Claude Code、Cursor、Codex、Gemini CLI）用的开源 Skills 精选库：按「你最后要做出什么」分类，附真实效果预览与一行命令即插即用。
 
-🌐 **[在线站点：skills.dawsondx.top](https://skills.dawsondx.top/)** · 收录 **320** 个仓库 · **11** 个产出物分类 · **14** 位创作者 · 纯静态、零前端依赖
+🌐 **[在线站点：skills.dawsondx.top](https://skills.dawsondx.top/)** · 收录 **323** 个仓库 · **11** 个产出物分类 · **17** 位创作者 · 纯静态、零前端依赖
 
 ![Skill 指北首页](docs/img/hero-home.webp)
 
@@ -123,11 +123,13 @@ node _tools/prerender.mjs
 │   └── assets/
 │       ├── css/style.css       ← 全部样式与主题变量
 │       ├── js/
-│       │   ├── data.js         ← 320 条仓库主数据（唯一真相源）
+│       │   ├── data.js         ← 323 条仓库主数据（唯一真相源）
 │       │   ├── demo-images.js  ← 从仓库 README 补抓的演示图清单
 │       │   ├── cover-art.js    ← 135 个无图仓库的逐仓插画设计稿
 │       │   ├── card-template.js← 卡片 HTML 模板（前端 + 预渲染共用）
 │       │   ├── skillmd-index.js / skillmd.js  ← 源码快照索引 / 正文（按需加载）
+│       │   ├── search-index.js ← 离线构建的语义搜索索引（JTBD 意图 / 概念簇 / Top-5 近邻）
+│       │   ├── search-engine.js← 零依赖混合搜索引擎（归一化 / 分词 / 极性保护 / 加权排序）
 │       │   ├── pulse.js        ← 每周安装热度
 │       │   └── app.js          ← 全部交互
 │       └── img/                ← 163 张自托管演示图（已压成 WebP）
@@ -164,6 +166,10 @@ node _tools/prerender.mjs
 
 | 命令 | 作用 |
 |---|---|
+| `node _tools/add-skill.mjs inspect <url>` | 侦察新仓库（GitHub 取数 / 防重 / 作者准入侦察） |
+| `node _tools/add-skill.mjs commit <json>` | 一键收录新 Skill（写入数据 / 补图与 SKILL.md / 语义搜索 / 预渲染 / 验收） |
+| `node _tools/build-search-index.mjs` | 重建离线语义搜索索引（可选 `--llm` 为新增条目增量扩充意图） |
+| `node _tools/eval-search.mjs --strict` | 跑 34 条黄金查询集的搜索质量 A/B 评测 |
 | `node _tools/prerender.mjs` | 重生成首屏卡片 / JSON-LD / noscript（改模板后必跑） |
 | `node _tools/prerender.mjs --check` | 只校验不写盘，CI 可用 |
 | `node _tools/fetch-upstream.mjs --write` | 刷新仓库最近提交 / 版本 / Star |

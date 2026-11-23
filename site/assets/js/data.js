@@ -16,24 +16,27 @@ window.CATS = [
   { key: 'business',  name: '商业与职场',    icon: 'briefcase', color: '#166534', desc: '求职、商业诊断、产品管理' }
 ];
 
-/* 知名创作者 / 官方出品：只收录「多产 + 高星 + 有辨识度」三类信号叠加的发布人
+/* 知名创作者 / 官方出品：双轨精选门槛 —— 个人创作者需满足「多产（≥3 仓或 ≥15 子技能合集）+ 口碑/辨识度」，官方仅收一线生态底座
    kind: creator = 个人创作者，official = 官方或大厂团队
    count = 本站收录该发布人的作品数（运行时按 repo 的 owner 现算，这里不写死，避免对不上） */
 window.AUTHORS = [
-  { owner: 'alchaincyf',   name: '花叔',        kind: 'creator',  color: '#C2410C', note: '设计 / 艺术动画 / 研报 / 办公自动化，全站最多产' },
-  { owner: 'oil-oil',      name: '欧呦',        kind: 'creator',  color: '#0D9488', note: '自媒体全流程：写作 / 剪辑 / 封面 / 分发' },
-  { owner: 'op7418',       name: '归藏',        kind: 'creator',  color: '#E2603F', note: '幻灯片、插画、去 AI 味与产品宣传片' },
-  { owner: 'JimLiu',       name: '宝玉',        kind: 'creator',  color: '#B45309', note: '效率 skill 合集、本地设计、带时间线剪辑' },
-  { owner: 'KKKKhazix',    name: '卡兹克',      kind: 'creator',  color: '#BE185D', note: 'AI skill 合集、热点站、活人感写作' },
-  { owner: 'lijigang',     name: '李继刚',      kind: 'creator',  color: '#7C3AED', note: 'Codex 技能集，拆解与结构化思考' },
-  { owner: 'mattpocock',   name: 'Matt Pocock', kind: 'creator',  color: '#0F766E', note: '工程实践 skill，全站星数第一' },
-  { owner: 'thedotmack',   name: 'thedotmack',  kind: 'creator',  color: '#1D4ED8', note: 'claude-mem 持久记忆' },
-  { owner: 'pbakaus',      name: 'pbakaus',     kind: 'creator',  color: '#4B5563', note: 'impeccable 设计词汇' },
-  { owner: 'kangarooking', name: '袋鼠帝',      kind: 'creator',  color: '#9F1239', note: '自媒体工作流：封面 / 选题 / 视频下载 / Agent 工程，一个合集 16 个 skill' },
-  { owner: 'anthropics',   name: 'Anthropic',   kind: 'official', color: '#17130E', note: '官方 skill 仓库，标准参考实现' },
-  { owner: 'microsoft',    name: 'Microsoft',   kind: 'official', color: '#0891B2', note: 'MarkItDown 文档转换' },
-  { owner: 'vercel-labs',  name: 'Vercel',      kind: 'official', color: '#166534', note: 'skills CLI 与浏览器自动化' },
-  { owner: 'larksuite',    name: '飞书',        kind: 'official', color: '#1D4ED8', note: '飞书官方 CLI' }
+  { owner: 'alchaincyf',        name: '花叔',          kind: 'creator',  color: '#C2410C', note: '设计 / 艺术动画 / 研报 / 办公自动化，全站最多产' },
+  { owner: 'oil-oil',           name: '欧呦',          kind: 'creator',  color: '#0D9488', note: '自媒体全流程：写作 / 剪辑 / 封面 / 分发' },
+  { owner: 'SpaceZephyr',       name: '空格的键盘',     kind: 'creator',  color: '#0F766E', note: '高产全栈工具箱：产品 / 设计 / 选题 / 动效 / SkillDeck，全站并列第二多产' },
+  { owner: 'kangarooking',      name: '袋鼠帝',        kind: 'creator',  color: '#9F1239', note: '自媒体工作流：封面 / 选题 / 视频下载 / Agent 工程，一个合集 16 个 skill' },
+  { owner: 'op7418',            name: '归藏',          kind: 'creator',  color: '#E2603F', note: '幻灯片、插画、去 AI 味与产品宣传片' },
+  { owner: 'zarazhangrui',      name: 'Zara Zhang',    kind: 'creator',  color: '#1E40AF', note: 'Frontend Slides 网页幻灯片、飞书白板配色与 AI Builders 追踪' },
+  { owner: 'lijigang',          name: '李继刚',        kind: 'creator',  color: '#7C3AED', note: 'Codex 技能集，拆解与结构化思考' },
+  { owner: 'JimLiu',            name: '宝玉',          kind: 'creator',  color: '#B45309', note: '效率 skill 合集、本地设计、带时间线剪辑' },
+  { owner: 'KKKKhazix',         name: '卡兹克',        kind: 'creator',  color: '#BE185D', note: 'AI skill 合集、热点站、活人感写作' },
+  { owner: 'nexu-io',           name: 'Nexu',          kind: 'creator',  color: '#4B5563', note: '本地优先创意套件：Open Design 设计台、HTML Video 与 Motion Anything' },
+  { owner: 'larashero3-dotcom', name: 'Lieflat',       kind: 'creator',  color: '#9A3412', note: '语料量化写作流派：中文去 AI 味、国标语料公文与写作 DNA' },
+  { owner: 'liyupi',            name: '鱼皮',          kind: 'creator',  color: '#0369A1', note: '编程知识宝典、人物蒸馏与 AI 宣传片工厂' },
+  { owner: 'tjxj',              name: 'tjxj (beihai)', kind: 'creator',  color: '#92400E', note: 'z-skills 中文工具箱（23 个技能）：动态 SVG 图解、人生轨迹长图、诗词成书与知识管理' },
+  { owner: 'anthropics',        name: 'Anthropic',     kind: 'official', color: '#17130E', note: '官方 skill 仓库，标准参考实现' },
+  { owner: 'microsoft',         name: 'Microsoft',     kind: 'official', color: '#0891B2', note: 'MarkItDown 文档转换与 Skill 优化' },
+  { owner: 'vercel-labs',       name: 'Vercel',        kind: 'official', color: '#166534', note: 'skills CLI 与浏览器自动化' },
+  { owner: 'larksuite',         name: '飞书',          kind: 'official', color: '#1D4ED8', note: '飞书官方 CLI' }
 ];
 
 window.SKILLS = [
@@ -2039,6 +2042,27 @@ window.SKILLS = [
     cat: 'pack', stars: 12358, img: '',
     desc: 'Jakub Krehel（Interfaces 主编）的界面工程 skill 合集：15 个技能覆盖无障碍、排版、配色、布局、界面文案与动效打磨，还能审 PR、还原 Figma、压测组件所有状态。做界面时按场景挑，或整套装上。',
     tags: ['界面工程', 'UI 打磨', '技能合集']
+  },
+
+  /* ---------- 2026-11-23 新增：由 add-skill.mjs 自动收录 3 条 ---------- */
+  {
+    id: 'guage1029-guage-svg-gen', name: 'Guage SVG 技术图', repo: 'guage1029/guage-svg-gen',
+    cat: 'diagram', stars: 36, img: '',
+    desc: '面向 coding agent 的确定性纯代码 SVG 生图技能：先写 layout.json 布局契约再输出宣言式 SVG，强制过结构、语言、莫兰迪配色与几何包围盒四道硬门禁。做架构图、流程图、时序图、泳道图且不想出现文字溢出或箭头穿模时用它。',
+    tags: ['SVG 图表', '确定性布局', '四道门禁']
+  },
+  {
+    id: 'zeroxzhang-consulting-report-forge', name: '咨询报告工坊', repo: 'ZeroxZhang/consulting-report-forge',
+    cat: 'business', stars: 41, img: '',
+    desc: '证据驱动的咨询决策报告制作 skill：从业务调研、数据建模到结论先行的视觉论证，交付 16:9 离线 HTML 与同版 PDF，强制检查图表与版式多样性及模块留白。做战略分析、行研、经营复盘或投资报告时用它（新版已迁入 zerox-skills）。',
+    tags: ['咨询报告', 'HTML+PDF', '行研分析']
+  },
+  {
+    id: 'tjxj-z-life-trajectory', name: '人生轨迹长图', repo: 'tjxj/z-skills',
+    cat: 'image', stars: 680, img: '',
+    path: 'tree/main/z-life-trajectory', skill: 'z-life-trajectory', from: 'tjxj-z-skills',
+    desc: '把任意一位名人的一生做成 3:4 超长动态 SVG 人生线路图（可直接粘进公众号）并录制成 3:4 竖屏视频，内置 22 种数据卡片与 50 个动态图标及排版自检。做人物辞职、退休、获奖、周年等生平回顾长图或传记短视频时用它。',
+    tags: ['人生轨迹', '动态 SVG', '公众号长图']
   }
 ];
 
@@ -2143,6 +2167,7 @@ window.UPS = {
   'GordenSun/GordenPPTSkill': ['2026-06-22', '', ''],
   'gordensun/gordensuperpptskills': ['2026-06-07', '', ''],
   'Graphify-Labs/graphify': ['2026-11-17', '0.9.112', '2026-11-17'],
+  'guage1029/guage-svg-gen': ['2026-11-20', 'v0.17.27', '2026-11-20'],
   'handsomestwei/patent-disclosure-skill': ['2026-11-15', '', ''],
   'hardikpandya/stop-slop': ['2026-03-17', '', ''],
   'Hchen1218/heytea-style': ['2026-09-04', 'v2.0.0', '2026-08-25'],
@@ -2321,7 +2346,7 @@ window.UPS = {
   'thedotmack/claude-mem': ['2026-11-18', 'v16.0.0', '2026-11-18'],
   'thu-maic/openmaic': ['2026-11-18', '0.3.33', '2026-11-18'],
   'titanwings/distilly': ['2026-10-13', '', ''],
-  'tjxj/z-skills': ['2026-11-14', '', ''],
+  'tjxj/z-skills': ['2026-11-21', '', ''],
   'tt-a1i/archify': ['2026-11-17', '1.1.0', '2026-11-08'],
   'turixai/turix-cua': ['2026-09-14', 'v0.4', '2026-03-06'],
   'tw93/kami': ['2026-11-10', 'V1.20.0', '2026-10-29'],
@@ -2364,6 +2389,7 @@ window.UPS = {
   'zarazhangrui/frontend-slides': ['2026-06-23', 'v2.1.0', '2026-05-26'],
   'zeejay0/gathered-scenes-zine-skill': ['2026-09-03', '', ''],
   'zenstory-ai/novel-to-game': ['2026-11-17', '', ''],
+  'ZeroxZhang/consulting-report-forge': ['2026-10-14', '', ''],
   'ZeroxZhang/huashu-bookwriter': ['2026-04-12', '', ''],
   'zeroxzhang/md2book': ['2026-04-10', '', ''],
   'zhaoxuya520/reverse-skill': ['2026-11-14', 'v1.0.1', '2026-08-08'],

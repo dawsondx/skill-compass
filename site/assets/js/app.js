@@ -74,6 +74,8 @@
   window.addEventListener('pagehide', saveSnap);
 
   var state = { cat: 'all', q: '', sort: 'recommend', onlyImg: false, recentOnly: false, openId: null, author: 'all', fav: false, view: 'grid', page: 1 };
+  var baseSort = 'recommend';                  // 记住无搜索时的用户排序偏好
+  var sortLockedInSearch = false;              // 搜索态下用户是否手动改过排序
   var $grid = document.getElementById('grid');
   var $pager = document.getElementById('pager');
   /* 每页数量：桌面 24 / 窄屏 12。
@@ -100,6 +102,10 @@
   var $filterReset = document.getElementById('filter-reset');
   var $filterReset2 = document.getElementById('filter-reset-2');
   var $q = document.getElementById('q');
+  var $searchWrap = document.getElementById('search-wrap');
+  var $qClear = document.getElementById('q-clear');
+  var $qKbd = document.getElementById('q-kbd');
+  var $qSuggest = document.getElementById('q-suggest');
   var $sortBtn = document.getElementById('sort-btn');
   var $sortLabel = document.getElementById('sort-label');
   var $sortMenu = document.getElementById('sort-menu');
@@ -367,6 +373,7 @@
 
   /* ---------- 排序下拉（自定义，不用原生 select）---------- */
   var SORTS = [
+    { v: 'relevance', t: '按相关性' },
     { v: 'recommend', t: '推荐排序' },
     { v: 'updated', t: '最近更新' },
     { v: 'stars', t: '按 Star 数' },
@@ -374,7 +381,7 @@
   ];
   function sortText(v) {
     for (var i = 0; i < SORTS.length; i++) if (SORTS[i].v === v) return SORTS[i].t;
-    return SORTS[0].t;
+    return '推荐排序';
   }
   function isSort(v) {
     for (var i = 0; i < SORTS.length; i++) if (SORTS[i].v === v) return true;
@@ -391,8 +398,10 @@
       }
     });
     if (!$sortMenu) return;
+    var hasQ = !!state.q.trim();
     Array.prototype.forEach.call($sortMenu.children, function (li) {
       if (!li.dataset || !li.dataset.value) return;
+      if (li.dataset.value === 'relevance') li.hidden = !hasQ;
       li.setAttribute('aria-selected', li.dataset.value === state.sort ? 'true' : 'false');
     });
   }
@@ -586,6 +595,37 @@
     });
   }
 
+  /* ---------- 混合搜索引擎实例（消费 search-index.js 离线语义索引） ---------- */
+  var SKILL_BY_ID = {};
+  SKILLS.forEach(function (s) { SKILL_BY_ID[s.id] = s; });
+  var searchEngine = (window.SkillSearch && window.SkillSearch.createEngine)
+    ? window.SkillSearch.createEngine(SKILLS, {
+      cats: CATS,
+      searchIndex: window.SEARCH_INDEX || null,
+      pulse: PULSE || null
+    })
+    : null;
+
+  function syncSearchBoxUI() {
+    var hasQ = !!state.q.trim();
+    if ($qClear) $qClear.hidden = !hasQ;
+    if ($qKbd) $qKbd.hidden = hasQ;
+  }
+
+  function applyQuery(nextQ) {
+    var prevHas = !!state.q.trim();
+    var nextHas = !!String(nextQ || '').trim();
+    state.q = String(nextQ || '');
+    if (nextHas && !prevHas) {
+      if (!sortLockedInSearch) state.sort = 'relevance';
+    } else if (!nextHas && prevHas) {
+      sortLockedInSearch = false;
+      if (state.sort === 'relevance') state.sort = baseSort;
+    }
+    syncSearchBoxUI();
+    syncSortUI();
+  }
+
   /* 把 state 回写到所有筛选控件（从结果栏摘掉某个条件后，整组要跟着同步） */
   function syncFilterUI() {
     syncCats();
@@ -594,6 +634,7 @@
     if ($flagUpd) $flagUpd.setAttribute('aria-pressed', state.recentOnly ? 'true' : 'false');
     if ($flagFav) $flagFav.setAttribute('aria-pressed', state.fav ? 'true' : 'false');
     if ($q && $q.value !== state.q) $q.value = state.q;
+    syncSearchBoxUI();
     if ($statImg) $statImg.classList.toggle('on', state.onlyImg);
   }
 
@@ -664,7 +705,7 @@
   function dropFilter(k) {
     if (k === 'cat') state.cat = 'all';
     else if (k === 'author') state.author = 'all';
-    else if (k === 'q') state.q = '';
+    else if (k === 'q') applyQuery('');
     else if (k === 'img') state.onlyImg = false;
     else if (k === 'recent') state.recentOnly = false;
     else if (k === 'fav') state.fav = false;
@@ -672,17 +713,35 @@
     render();
   }
 
+  function rescueGlobalSearch() {
+    state.cat = 'all';
+    state.author = 'all';
+    state.onlyImg = false;
+    state.recentOnly = false;
+    state.fav = false;
+    syncFilterUI();
+    render();
+  }
+
   /* ---------- 过滤 + 排序 ---------- */
-  function matches(s, terms) {
+  function facetMatches(s) {
     if (state.cat !== 'all' && s.cat !== state.cat) return false;
     if (state.onlyImg && !s.img) return false;
     if (state.recentOnly && !(s.days != null && s.days <= 30)) return false;
     if (state.fav && !isFav(s.id)) return false;
     if (state.author !== 'all' && s.owner.toLowerCase() !== state.author.toLowerCase()) return false;
+    return true;
+  }
+
+  function hasNonQueryFilter() {
+    return state.cat !== 'all' || state.author !== 'all' || state.onlyImg || state.recentOnly || state.fav;
+  }
+
+  function fallbackSearchMatches(s, terms) {
+    if (!facetMatches(s)) return false;
     if (!terms.length) return true;
     var hay = (s.name + ' ' + s.repo + ' ' + s.desc + ' ' + s.tags.join(' ') + ' ' + s.catName + ' ' + s.id
       + ' ' + (s.author ? s.author.name + ' ' + s.author.owner : '')).toLowerCase();
-    // 合集里的子 skill 也进搜索：否则「袋鼠封面」「爆款选题」搜不到那个合集
     if (s.subs) {
       hay += ' ' + s.subs.map(function (x) {
         return x.name + ' ' + x.one + ' ' + x.dir + ' ' + ((CAT_MAP[x.cat] || {}).name || '');
@@ -742,8 +801,15 @@
     }, { rootMargin: '400px 0px' });
   }
 
-  function cardHTML(s) {
-    return CT.cardHTML(s, { cat: CAT_MAP[s.cat], mark: markOf(s), fav: isFav(s.id) });
+  function cardHTML(s, meta) {
+    meta = meta || null;
+    return CT.cardHTML(s, {
+      cat: CAT_MAP[s.cat],
+      mark: markOf(s),
+      fav: isFav(s.id),
+      highlight: meta ? meta.highlight : null,
+      matchBadge: meta ? meta.badge : ''
+    });
   }
 
   /* ---------- 渲染 ---------- */
@@ -754,20 +820,23 @@
 
   /* 榜单视图的一行：宽屏按表格对齐（名次/缩略/名称/一句话/分类/★/更新/收藏/箭头），
      窄屏靠 CSS 塌成卡片行。列顺序改这里的同时也要改 headHTML 与 .rank-* 的 grid 模板 */
-  function rowHTML(s, i) {
+  function rowHTML(s, i, meta) {
+    meta = meta || null;
+    var hl = meta && typeof meta.highlight === 'function' ? meta.highlight : null;
     var c = CAT_MAP[s.cat] || {};
     var thumb = s.img
       ? '<span class="rr-thumb"><img data-src="assets/img/' + s.img + '" alt=""></span>'
       : '<span class="rr-thumb">' + esc(s.name.slice(0, 1)) + '</span>';
     var n = i + 1;
+    var badgeHTML = (meta && meta.badge) ? '<span class="rr-match">' + esc(meta.badge) + '</span>' : '';
     return '<div class="rank-row" tabindex="0" role="button" data-id="' + s.id + '" aria-label="' + esc(s.name) + '，查看详情">' +
       '<span class="rr-num">' + (n < 10 ? '0' + n : n) + '</span>' +
       thumb +
       '<span class="rr-name-c">' +
-        '<span class="rr-name">' + esc(s.name) + '</span>' +
+        '<span class="rr-name">' + (hl ? hl(s.name) : esc(s.name)) + badgeHTML + '</span>' +
         '<span class="rr-repo">' + esc(s.repo) + '</span>' +
       '</span>' +
-      '<span class="rr-desc">' + esc(s.desc) + '</span>' +
+      '<span class="rr-desc">' + (hl ? hl(s.desc) : esc(s.desc)) + '</span>' +
       '<span class="rr-cat"><i style="background:' + (c.color || '#888') + '"></i>' + esc(c.name || s.cat) + '</span>' +
       '<span class="rr-star">★ ' + (s.stars ? fmtNum(s.stars) : '—') + '</span>' +
       '<span class="rr-upd" title="最近提交 ' + (s.upd || '—') + '">' + (s.days != null ? fmtAgo(s.days) : '—') + '</span>' +
@@ -853,8 +922,31 @@
     if (lastFingerprint !== null && fp !== lastFingerprint) state.page = 1;
     lastFingerprint = fp;
 
-    var terms = state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    var list = sortList(SKILLS.filter(function (s) { return matches(s, terms); }));
+    var qTrim = state.q.trim();
+    var list = [];
+    var metaById = null;
+    var hlFn = null;
+    var searchRes = null;
+
+    if (qTrim && searchEngine) {
+      searchRes = searchEngine.search(qTrim, facetMatches);
+      metaById = {};
+      if (window.SkillSearch && searchRes.query && searchRes.query.highlightTerms.length) {
+        var hlTerms = searchRes.query.highlightTerms;
+        hlFn = function (txt) { return window.SkillSearch.highlightHTML(txt, hlTerms); };
+      }
+      searchRes.items.forEach(function (it) {
+        metaById[it.skill.id] = { badge: it.badge, tier: it.tier, highlight: hlFn };
+      });
+      var rawSkills = searchRes.items.map(function (it) { return it.skill; });
+      list = state.sort === 'relevance' ? rawSkills : sortList(rawSkills);
+    } else if (qTrim) {
+      var terms = qTrim.toLowerCase().split(/\s+/).filter(Boolean);
+      list = sortList(SKILLS.filter(function (s) { return fallbackSearchMatches(s, terms); }));
+    } else {
+      list = sortList(SKILLS.filter(facetMatches));
+    }
+
     var per = pageSize();
     var pages = Math.max(1, Math.ceil(list.length / per));
     if (state.page > pages) state.page = pages;          // 筛完结果变少时夹回最后一页
@@ -866,6 +958,7 @@
 
     $grid.className = (state.view === 'list' ? 'grid list' : 'grid') + (state.page === 1 ? ' page-first' : '');
     syncViewUI();
+    syncSortUI();
     // 「重置全部筛选」只在有筛选条件时露出，跟筛选控件待在同一条里，不用滚回去找
     if ($filterReset) $filterReset.hidden = !isFiltered();
     if ($filterReset2) $filterReset2.hidden = !isFiltered();
@@ -874,7 +967,18 @@
     $resultText.innerHTML = (isFiltered() ? '筛选出 ' : '展示 ') + '<b>' + list.length + '</b> 个' +
       '<span class="fb-all">（共收录 <b>' + SKILLS.length + '</b> 个）</span>';
     if ($activeFilters) $activeFilters.innerHTML = activeFiltersHTML();
-    $resultHint.textContent = '';
+
+    // 结果栏辅助提示：跨分类救援 + 核心匹配数
+    var hintParts = [];
+    if (searchRes && hasNonQueryFilter() && searchRes.totalBeforeFilter > list.length) {
+      hintParts.push(
+        '全站共 <b>' + searchRes.totalBeforeFilter + '</b> 个匹配 · ' +
+        '<button class="rescue-btn" type="button" data-rescue-all="1">在全部场景中查看</button>'
+      );
+    } else if (searchRes && list.length > 0 && searchRes.exactTierCount > 0 && searchRes.exactTierCount < list.length) {
+      hintParts.push('含 ' + searchRes.exactTierCount + ' 个核心匹配与 ' + (list.length - searchRes.exactTierCount) + ' 个相关延伸');
+    }
+    $resultHint.innerHTML = hintParts.join(' · ');
 
     if (!list.length) {
       var noFilter = state.cat === 'all' && state.author === 'all' && !state.q &&
@@ -885,16 +989,28 @@
           '<button class="empty-reset" type="button" data-reset="1">看全部 skill</button></div>';
         return;
       }
+      var rescueHTML = (searchRes && hasNonQueryFilter() && searchRes.totalBeforeFilter > 0)
+        ? '<button class="empty-reset empty-rescue" type="button" data-rescue-all="1">在全部场景中查看这 ' + searchRes.totalBeforeFilter + ' 个匹配 →</button>'
+        : '';
+      var hotChips = (searchEngine && searchEngine.hotQueries && searchEngine.hotQueries.length)
+        ? '<div class="empty-chips">' + searchEngine.hotQueries.slice(0, 6).map(function (hq) {
+          return '<button class="empty-chip" type="button" data-try-q="' + esc(hq) + '">' + esc(hq) + '</button>';
+        }).join('') + '</div>'
+        : '';
       $grid.innerHTML = '<div class="empty"><div class="big">没找到匹配的 skill</div>' +
-        '<div>换个说法试试，比如「PPT」「配图」「架构图」「省 token」，或者点上面的分类</div>' +
+        '<div>换个口语说法试试，或者点下面的热门场景：</div>' +
+        hotChips +
+        '<div class="empty-acts">' + rescueHTML +
         (noFilter ? '' : '<button class="empty-reset" type="button" data-reset="1">清空全部筛选</button>') +
-        '</div>';
+        '</div></div>';
       return;
     }
 
     if (state.view === 'list') {
       // 排名要接着上一页算，不能直接从 1 开始
-      $grid.innerHTML = headHTML() + pageList.map(function (s, i) { return rowHTML(s, start + i); }).join('');
+      $grid.innerHTML = headHTML() + pageList.map(function (s, i) {
+        return rowHTML(s, start + i, metaById ? metaById[s.id] : null);
+      }).join('');
       $grid.querySelectorAll('.rank-row').forEach(function (el, i) {
         el.style.animationDelay = Math.min(i * 12, 200) + 'ms';
       });
@@ -904,7 +1020,9 @@
       return;
     }
 
-    $grid.innerHTML = pageList.map(cardHTML).join('');
+    $grid.innerHTML = pageList.map(function (s) {
+      return cardHTML(s, metaById ? metaById[s.id] : null);
+    }).join('');
     $grid.querySelectorAll('.card').forEach(function (el, i) {
       el.style.animationDelay = Math.min(i * 18, 260) + 'ms';
     });
@@ -919,6 +1037,14 @@
   var lastFocus = null;
 
   function similarOf(s) {
+    // 优先使用离线构建期预计算的 TF-IDF 语义近邻（涵盖概念簇 + JTBD 意图 + 描述语义）
+    if (searchEngine && searchEngine.similarIdsOf) {
+      var ids = searchEngine.similarIdsOf(s.id);
+      if (ids && ids.length) {
+        var hits = ids.map(function (id) { return SKILL_BY_ID[id]; }).filter(Boolean);
+        if (hits.length >= 3) return hits.slice(0, 3);
+      }
+    }
     return SKILLS.filter(function (o) { return o.id !== s.id; })
       .map(function (o) {
         var shared = o.tags.filter(function (t) { return s.tags.indexOf(t) > -1; }).length;
@@ -1290,6 +1416,7 @@
   /* ---------- 事件 ---------- */
   function resetAll() {
     state.cat = 'all'; state.author = 'all'; state.q = '';
+    baseSort = 'recommend'; sortLockedInSearch = false;
     state.sort = 'recommend'; state.onlyImg = false; state.recentOnly = false; state.fav = false;
     state.page = 1;
     syncFilterUI();
@@ -1341,6 +1468,11 @@
       if (x) dropFilter(x.dataset.drop);
     });
   }
+  if ($resultHint) {
+    $resultHint.addEventListener('click', function (e) {
+      if (e.target.closest('[data-rescue-all]')) rescueGlobalSearch();
+    });
+  }
 
   /* 统计数字直接当入口：129 → 清空回全部、72 → 切「有演示图」、11/14 → 跳到对应筛选行。
      hero 里因此不用再写「怎么筛」的使用说明 */
@@ -1387,12 +1519,23 @@
 
   $grid.addEventListener('click', function (e) {
     if (e.target.closest('[data-reset]')) { resetAll(); return; }
-    // 表头排序：点一下按这列排，再点同一列回推荐排序
+    if (e.target.closest('[data-rescue-all]')) { rescueGlobalSearch(); return; }
+    var tryQ = e.target.closest('[data-try-q]');
+    if (tryQ) {
+      applyQuery(tryQ.getAttribute('data-try-q') || '');
+      syncFilterUI();
+      render();
+      return;
+    }
+    // 表头排序：点一下按这列排，再点同一列回默认排序
     var headBtn = e.target.closest('.rank-head [data-sort]');
     if (headBtn) {
       e.stopPropagation();
       var next = headBtn.dataset.sort;
-      state.sort = state.sort === next ? 'recommend' : next;
+      var defSort = state.q.trim() ? 'relevance' : 'recommend';
+      state.sort = state.sort === next ? defSort : next;
+      if (state.q.trim()) sortLockedInSearch = (state.sort !== 'relevance');
+      else baseSort = state.sort;
       syncSortUI();
       render();
       return;
@@ -1482,6 +1625,7 @@
       return;
     }
     if (e.key === 'Escape') {
+      if ($qSuggest && !$qSuggest.hidden) { setSuggestOpen(false); return; }
       if ($modal && !$modal.hidden) { closeModal(); return; }
       if ($favPop && !$favPop.hidden) { setFavOpen(false); if ($favBtn) $favBtn.focus(); return; }
       if ($authorMenu && !$authorMenu.hidden) { setAuthorOpen(false); if ($authorBtn) $authorBtn.focus(); return; }
@@ -1575,14 +1719,67 @@
     });
   }
 
+  /* ---------- 搜索框交互：即时搜索 + 清空按钮 + 热门场景芯片 ---------- */
+  function setSuggestOpen(open) {
+    if (!$qSuggest) return;
+    if (open) {
+      var hot = (searchEngine && searchEngine.hotQueries && searchEngine.hotQueries.length)
+        ? searchEngine.hotQueries
+        : ['去AI味', '做PPT', '画架构图', '小红书封面', '省token', '写公众号'];
+      $qSuggest.innerHTML =
+        '<div class="qs-head">热门场景 · 直接点一下</div>' +
+        '<div class="qs-chips">' + hot.map(function (t) {
+          return '<button class="qs-chip" type="button" role="option" data-qs="' + esc(t) + '">' + esc(t) + '</button>';
+        }).join('') + '</div>';
+    }
+    $qSuggest.hidden = !open;
+  }
+
   var timer = null;
   $q.addEventListener('input', function () {
+    var val = $q.value;
+    if (val.trim()) setSuggestOpen(false);
+    else if (document.activeElement === $q) setSuggestOpen(true);
+    if ($qClear) $qClear.hidden = !val.trim();
+    if ($qKbd) $qKbd.hidden = !!val.trim();
     clearTimeout(timer);
     timer = setTimeout(function () {
-      state.q = $q.value;
+      applyQuery($q.value);
       render();
-    }, 110);
+    }, 90);
   });
+  $q.addEventListener('focus', function () {
+    if (!$q.value.trim()) setSuggestOpen(true);
+  });
+  if ($qClear) {
+    $qClear.addEventListener('click', function () {
+      $q.value = '';
+      applyQuery('');
+      render();
+      $q.focus();
+      setSuggestOpen(true);
+    });
+  }
+  if ($qSuggest) {
+    $qSuggest.addEventListener('mousedown', function (e) {
+      // 阻止先触发 input blur 导致点击失效
+      if (e.target.closest('[data-qs]')) e.preventDefault();
+    });
+    $qSuggest.addEventListener('click', function (e) {
+      var chip = e.target.closest('[data-qs]');
+      if (!chip) return;
+      var qv = chip.getAttribute('data-qs') || '';
+      $q.value = qv;
+      setSuggestOpen(false);
+      applyQuery(qv);
+      render();
+      scrollToGrid();
+    });
+    document.addEventListener('click', function (e) {
+      if ($qSuggest.hidden || ($searchWrap && $searchWrap.contains(e.target))) return;
+      setSuggestOpen(false);
+    });
+  }
   if ($sortBtn) {
     $sortBtn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -1592,6 +1789,8 @@
       var li = e.target.closest('.sort-opt');
       if (!li) return;
       state.sort = li.dataset.value;
+      if (state.q.trim()) sortLockedInSearch = (state.sort !== 'relevance');
+      else baseSort = state.sort;
       syncSortUI();
       setSortOpen(false);
       render();
@@ -1614,7 +1813,15 @@
     var cat = p.get('cat');
     if (cat && (cat === 'all' || CAT_MAP[cat])) state.cat = cat;
     if (p.get('q')) state.q = p.get('q');
-    if (p.get('sort') && isSort(p.get('sort'))) state.sort = p.get('sort');
+    var urlSort = p.get('sort');
+    if (urlSort && isSort(urlSort)) {
+      if (urlSort === 'relevance' && !state.q.trim()) state.sort = 'recommend';
+      else state.sort = urlSort;
+      if (state.q.trim() && urlSort !== 'relevance') sortLockedInSearch = true;
+      if (urlSort !== 'relevance') baseSort = urlSort;
+    } else if (state.q.trim()) {
+      state.sort = 'relevance';
+    }
     if (p.get('img') === '1') state.onlyImg = true;
     if (p.get('recent') === '1') state.recentOnly = true;
     var per = parseInt(p.get('per'), 10);
@@ -1633,7 +1840,8 @@
     if (state.cat !== 'all') p.set('cat', state.cat);
     if (state.author !== 'all') p.set('by', state.author);
     if (state.q) p.set('q', state.q);
-    if (state.sort !== 'recommend') p.set('sort', state.sort);
+    var defaultSort = state.q.trim() ? 'relevance' : 'recommend';
+    if (state.sort !== defaultSort) p.set('sort', state.sort);
     if (state.onlyImg) p.set('img', '1');
     if (state.recentOnly) p.set('recent', '1');
     if (state.view !== 'grid') p.set('view', state.view);

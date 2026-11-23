@@ -55,8 +55,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      # 每次部署前重新生成首屏静态卡片、全量 JSON-LD 与 noscript 目录，
-      # 保证快照数据（refresh 刚提交的 data.js）和 HTML 里的内容不会脱节
+      # 每次部署前重算离线搜索索引，再重新生成首屏静态卡片、全量 JSON-LD 与 noscript 目录，
+      # 保证搜索索引、快照数据（data.js）和 HTML 里的内容不会脱节
+      - name: 构建离线语义搜索索引
+        run: node _tools/build-search-index.mjs
       - name: 预渲染首屏卡片与全量 SEO 数据
         run: node _tools/prerender.mjs
       # 本周安装热度风向标：每天顺手抓一次 skills.sh 的公开安装量。

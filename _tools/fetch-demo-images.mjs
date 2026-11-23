@@ -180,7 +180,8 @@ async function probe(url) {
 }
 
 function safeName(s) {
-  return String(s.repo).replace(/\//g, '~').replace(/[^A-Za-z0-9._~-]/g, '-');
+  const key = s.skill ? `${s.repo}~${s.skill}` : String(s.repo);
+  return key.replace(/\//g, '~').replace(/[^A-Za-z0-9._~-]/g, '-');
 }
 
 async function work(s) {
@@ -192,12 +193,18 @@ async function work(s) {
 }
 
 async function workInner(s) {
-  const base = 'https://raw.githubusercontent.com/' + s.repo + '/HEAD/';
+  const repoBase = 'https://raw.githubusercontent.com/' + s.repo + '/HEAD/';
+  const subDir = s.path ? s.path.replace(/^tree\/[^/]+\//, '').replace(/^\/+|\/+$/g, '') : '';
+  const bases = subDir ? [repoBase + subDir + '/', repoBase] : [repoBase];
   let md = null;
+  let base = repoBase;
   let usedReadme = '';
-  for (const name of READMES) {
-    md = await getText(base + name);
-    if (md) { usedReadme = name; break; }
+  for (const b of bases) {
+    for (const name of READMES) {
+      md = await getText(b + name);
+      if (md) { base = b; usedReadme = name; break; }
+    }
+    if (md) break;
   }
   if (!md) return { id: s.id, status: 'no-readme' };
 
@@ -250,21 +257,38 @@ results.forEach((r) => { if (r) bucket[r.status] = (bucket[r.status] || 0) + 1; 
 console.log(JSON.stringify({ bucket, added: added.length }, null, 1));
 added.forEach((r) => console.log(`  + ${r.id.padEnd(28)} ${(r.bytes / 1024).toFixed(0)}KB  ${r.source.slice(0, 100)}`));
 
+function loadExistingDemoImgs() {
+  const map = {};
+  // 优先从已提交进仓库的 site/assets/js/demo-images.js 读取，避免干净克隆缺少 _data/ 时误清空全量映射
+  if (fs.existsSync(OUT_JS)) {
+    try {
+      const sb = {};
+      vm.createContext(sb);
+      Object.defineProperty(sb, 'window', { value: sb, writable: true, configurable: true });
+      vm.runInContext(fs.readFileSync(OUT_JS, 'utf8'), sb, { filename: 'demo-images.js' });
+      Object.assign(map, sb.DEMO_IMGS || {});
+    } catch (e) {}
+  }
+  return map;
+}
+
 if (!DRY) {
-  // 已有映射 + 本轮新增，写成前端可直接吃的一张表
+  // 已有映射（以仓库里的 demo-images.js 为真相源）+ 本轮新增，写成前端可直接吃的一张表
   let prev = {};
   try { prev = JSON.parse(fs.readFileSync(OUT_JSON, 'utf8')); } catch (e) {}
-  const map = {};
-  Object.keys(prev).forEach((k) => { map[k] = prev[k].file; });
+  const map = loadExistingDemoImgs();
+  Object.keys(prev).forEach((k) => { if (!map[k] && prev[k] && prev[k].file) map[k] = prev[k].file; });
   added.forEach((r) => { if (r.file) map[r.id] = r.file; });
+  fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
   fs.writeFileSync(OUT_JSON, JSON.stringify(
-    Object.fromEntries(Object.entries(map).map(([id, file]) => {
+    Object.fromEntries(Object.entries(map).sort(([a], [b]) => a.localeCompare(b)).map(([id, file]) => {
       const hit = added.find((a) => a.id === id);
       return [id, { file, source: hit ? hit.source : (prev[id] && prev[id].source) || '' }];
     })), null, 1), 'utf8');
+  const sortedMap = Object.fromEntries(Object.entries(map).sort(([a], [b]) => a.localeCompare(b)));
   fs.writeFileSync(OUT_JS,
     '/* 补图清单 · 由 _tools/fetch-demo-images.mjs 生成，别手改\n' +
     '   只收录 data.js 里本来没有 img 的仓库；加载后由 app.js 合并进 SKILLS */\n' +
-    'window.DEMO_IMGS = ' + JSON.stringify(map, null, 0) + ';\n', 'utf8');
-  console.log(`\n→ ${path.relative(ROOT, OUT_JS)}（${Object.keys(map).length} 条）`);
+    'window.DEMO_IMGS = ' + JSON.stringify(sortedMap, null, 0) + ';\n', 'utf8');
+  console.log(`\n→ ${path.relative(ROOT, OUT_JS)}（${Object.keys(sortedMap).length} 条）`);
 }

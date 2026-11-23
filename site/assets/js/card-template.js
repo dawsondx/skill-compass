@@ -691,15 +691,21 @@
       (s.ver ? '<span class="upd-v">' + s.ver + '</span>' : '') +
       '</span>';
 
+    var hl = typeof opt.highlight === 'function' ? opt.highlight : null;
+    var titleHTML = hl ? hl(s.name) : s.name;
+    var descHTML = hl ? hl(s.desc) : s.desc;
+    var tagsHTML = (opt.matchBadge ? '<span class="tag tag-match">' + esc(opt.matchBadge) + '</span>' : '') +
+      s.tags.map(function (t) { return '<span class="tag">' + (hl ? hl(t) : t) + '</span>'; }).join('');
+
     return '<div class="card" tabindex="0" role="button" data-id="' + s.id + '" aria-label="' + s.name + '，查看详情">' +
       thumb +
       '<div class="card-body">' +
-      '<h3 class="card-title">' + s.name + '</h3>' +
+      '<h3 class="card-title">' + titleHTML + '</h3>' +
       '<div class="card-repo">' +
       (s.author ? '<span class="by" style="color:' + s.author.color + '">' + s.author.name + '</span>' : '') +
       s.repo + (s.skill ? ' / ' + s.skill : '') + '</div>' +
-      '<p class="card-desc">' + s.desc + '</p>' +
-      '<div class="card-tags">' + s.tags.map(function (t) { return '<span class="tag">' + t + '</span>'; }).join('') + '</div>' +
+      '<p class="card-desc">' + descHTML + '</p>' +
+      '<div class="card-tags">' + tagsHTML + '</div>' +
       '<div class="card-foot">' +
       '<span class="star"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>' + fmtNum(s.stars) + '</span>' +
       (s.subs ? '<span class="pack-n">' + s.subs.length + ' 个 skill</span>' : '') +

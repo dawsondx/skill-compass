@@ -215,6 +215,8 @@ html = html.replace(/(筛出 )\d+( 个开源 Agent Skills)/, `$1${nSkills}$2`);
 html = html.replace(/(content=")\d+( 个开源 Agent Skills)/g, `$1${nSkills}$2`);
 html = html.replace(/(content="Skill 指北 · )\d+( 个开源 Agent Skills 精选库")/g, `$1${nSkills}$2`);
 html = html.replace(/(id="result-text">共 )\d+( 个)/, `$1${nSkills}$2`);
+html = html.replace(/(id="result-text">展示 <b>)\d+(<\/b> 个（共收录 <b>)\d+(<\/b> 个）)/, `$1${nSkills}$2${nSkills}$3`);
+html = html.replace(/(id="author-label">全部 )\d+( 位作者)/, `$1${nAuthors}$2`);
 html = html.replace(/(，共 )\d+( 个 skill；)/, `$1${nSkills}$2`);
 
 /* 3.5 顶栏快照号：跟着 UPS_FETCHED 走，别留手写的旧值（原来写死过 VOL.26） */

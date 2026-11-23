@@ -158,13 +158,32 @@ async function work(s) {
   return null;
 }
 
+function loadExistingSkillMd() {
+  if (!fs.existsSync(OUT_JS)) return { found: {}, meta: {} };
+  try {
+    const sb = {};
+    vm.createContext(sb);
+    Object.defineProperty(sb, 'window', { value: sb, writable: true, configurable: true });
+    vm.runInContext(fs.readFileSync(OUT_JS, 'utf8'), sb, { filename: 'skillmd.js' });
+    return {
+      found: Object.assign({}, sb.SKILLMD || {}),
+      meta: Object.assign({}, sb.SKILLMD_FROM || {})
+    };
+  } catch (e) {
+    return { found: {}, meta: {} };
+  }
+}
+
 async function main() {
   let list = loadSkills();
+  const isPartial = ONLY.length > 0 || LIMIT > 0;
   if (ONLY.length) list = list.filter((s) => ONLY.includes(s.id));
   if (LIMIT) list = list.slice(0, LIMIT);
 
-  const found = {};
-  const meta = {};
+  // 局部抓取（--ids / --limit）时必须先加载现有全量快照再增量合并，严禁覆盖清空其他条目
+  const prev = isPartial ? loadExistingSkillMd() : { found: {}, meta: {} };
+  const found = prev.found;
+  const meta = prev.meta;
   let done = 0, hits = 0, cursor = 0;
 
   async function runner() {

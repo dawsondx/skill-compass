@@ -1,0 +1,1786 @@
+{
+  "_meta": {
+    "desc": "离线 JTBD 语义扩展表：i=用户痛点/场景意图短语，a=别名/缩写/拼音/社区黑话。_tools/build-search-index.mjs 会将其与 data.js + skillmd.js 合并构建 search-index.js。",
+    "updated": "2026-11-23"
+  },
+  "humanizer-zh": {
+    "i": [
+      "中文去AI味",
+      "去AI味",
+      "消除AI痕迹",
+      "说人话",
+      "像人写的",
+      "降AI率",
+      "中文改稿",
+      "去模板腔",
+      "消除机器味",
+      "AI味太重"
+    ],
+    "a": [
+      "humanizer",
+      "quaiwei",
+      "renwei",
+      "shuorenhua",
+      "gaigao",
+      "去味"
+    ]
+  },
+  "larashero3-dotcom-lieflat-less-ai-tone": {
+    "i": [
+      "中文去AI味",
+      "去AI味",
+      "消除AI痕迹",
+      "降AI率",
+      "最小改写",
+      "去对举破折号",
+      "AI腔检测",
+      "说人话",
+      "论文文章降AI"
+    ],
+    "a": [
+      "lieflat",
+      "less-ai-tone",
+      "quaiwei",
+      "降ai",
+      "检测报告"
+    ]
+  },
+  "oil-tone": {
+    "i": [
+      "中文去AI味",
+      "去AI味",
+      "说人话",
+      "中文文风检查",
+      "砍套话口号",
+      "消除AI腔",
+      "像人写的",
+      "改稿规范"
+    ],
+    "a": [
+      "oiltone",
+      "quaiwei",
+      "shuorenhua",
+      "ouyou"
+    ]
+  },
+  "human-writing": {
+    "i": [
+      "去AI味",
+      "活人感写作",
+      "活人感",
+      "说人话",
+      "像真人在说话",
+      "消除机器味",
+      "中文改稿",
+      "降AI率",
+      "自然中文写作"
+    ],
+    "a": [
+      "huorengan",
+      "quaiwei",
+      "renwei",
+      "kazike",
+      "humanwriting"
+    ]
+  },
+  "conorbronsdon-avoid-ai-writing": {
+    "i": [
+      "去AI味",
+      "审计AI文风",
+      "消除AI腔",
+      "检测AI痕迹",
+      "去掉值得注意的是",
+      "改稿重写",
+      "降AI率",
+      "去模板腔"
+    ],
+    "a": [
+      "avoid-ai",
+      "avoidai",
+      "quaiwei",
+      "ai审计"
+    ]
+  },
+  "stop-slop": {
+    "i": [
+      "英文去AI味",
+      "去AI味",
+      "消除英文AI痕迹",
+      "去掉排比堆砌",
+      "英文改稿",
+      "去模板腔",
+      "去除空洞总结",
+      "英文降AI"
+    ],
+    "a": [
+      "stopslop",
+      "slop",
+      "humanizer",
+      "quaiwei",
+      "英文润色"
+    ]
+  },
+  "blader-humanizer": {
+    "i": [
+      "英文去AI味",
+      "去AI味",
+      "消除AI痕迹",
+      "英文写作改稿",
+      "说人话",
+      "去机器味",
+      "降AI率"
+    ],
+    "a": [
+      "humanizer",
+      "humanize",
+      "quaiwei",
+      "英文改稿"
+    ]
+  },
+  "hallmark": {
+    "i": [
+      "网页去AI味",
+      "去AI味",
+      "反AI味",
+      "反模板落地页",
+      "告别紫渐变",
+      "不像AI做的网站",
+      "高级感官网",
+      "设计去AI味"
+    ],
+    "a": [
+      "hallmark",
+      "fanaiwei",
+      "quaiwei",
+      "落地页",
+      "官网设计"
+    ]
+  },
+  "writing-dna": {
+    "i": [
+      "风格蒸馏",
+      "复刻个人文风",
+      "统一团队文风",
+      "告别AI通用腔",
+      "模仿写作风格",
+      "文风提取",
+      "去AI味"
+    ],
+    "a": [
+      "writingdna",
+      "wenfeng",
+      "模仿风格"
+    ]
+  },
+  "jzocb-writing-style-skill": {
+    "i": [
+      "模仿我的文风",
+      "从改稿自学写作风格",
+      "个人笔调",
+      "长期去AI味",
+      "定制文风"
+    ],
+    "a": [
+      "writing-style",
+      "wenfeng",
+      "笔调"
+    ]
+  },
+  "ui-ux-pro-max": {
+    "i": [
+      "做UI界面",
+      "网页设计系统",
+      "小程序界面设计",
+      "App界面设计",
+      "不撞模板的UI",
+      "配色间距规范"
+    ],
+    "a": [
+      "uiux",
+      "uidesign",
+      "前端界面"
+    ]
+  },
+  "awesome-design-md": {
+    "i": [
+      "品牌设计规范库",
+      "抄大厂视觉语言",
+      "DESIGN.md参考",
+      "统一网页风格",
+      "模仿知名产品界面"
+    ],
+    "a": [
+      "designmd",
+      "design-md",
+      "设计规范"
+    ]
+  },
+  "taste": {
+    "i": [
+      "提升网页审美",
+      "定视觉方向",
+      "不想做丑页面",
+      "浏览器自检界面",
+      "告别通用模板页"
+    ],
+    "a": [
+      "tastekill",
+      "shenmei",
+      "审美"
+    ]
+  },
+  "impeccable": {
+    "i": [
+      "界面设计评审",
+      "网页视觉审计",
+      "让页面更精致",
+      "交互细节优化",
+      "设计提示词"
+    ],
+    "a": [
+      "impeccable",
+      "设计词汇",
+      "界面审计"
+    ]
+  },
+  "huashu-design": {
+    "i": [
+      "全案视觉设计",
+      "一句话做网页原型",
+      "生成可编辑PPTX",
+      "抓品牌官方规范",
+      "84种风格库"
+    ],
+    "a": [
+      "huashu",
+      "花叔设计",
+      "全案设计"
+    ]
+  },
+  "interfaces-feel-better": {
+    "i": [
+      "界面手感打磨",
+      "前端交互细节清单",
+      "空态加载态过渡",
+      "消除页面粗糙感",
+      "UI收尾打磨"
+    ],
+    "a": [
+      "interfaces",
+      "手感",
+      "微交互"
+    ]
+  },
+  "draw-ui": {
+    "i": [
+      "截图还原网页",
+      "一句话出UI设计稿",
+      "做App界面",
+      "做后台管理界面",
+      "小程序设计稿"
+    ],
+    "a": [
+      "drawui",
+      "截图转代码",
+      "出设计稿"
+    ]
+  },
+  "baoyu-design": {
+    "i": [
+      "Claude Design本地平替",
+      "本地出UI稿",
+      "交互原型",
+      "网页幻灯片",
+      "3D探索"
+    ],
+    "a": [
+      "baoyu",
+      "宝玉设计",
+      "claudedesign"
+    ]
+  },
+  "nexu-io-open-design": {
+    "i": [
+      "Claude Design开源平替",
+      "本地设计工作台",
+      "出界面稿接Figma",
+      "UI改版迭代"
+    ],
+    "a": [
+      "opendesign",
+      "figma",
+      "claudedesign"
+    ]
+  },
+  "jcodesmore-ai-website-cloner-template": {
+    "i": [
+      "克隆任意网站",
+      "复刻竞品落地页",
+      "仿站转本地工程",
+      "抄网页版式动效"
+    ],
+    "a": [
+      "cloner",
+      "仿站",
+      "复刻网页"
+    ]
+  },
+  "oso95-scroll-world": {
+    "i": [
+      "苹果风滚动3D官网",
+      "一镜到底滚动视效",
+      "高定感品牌落地页",
+      "Apple同款官网"
+    ],
+    "a": [
+      "scrollworld",
+      "3d落地页",
+      "苹果官网"
+    ]
+  },
+  "beautify-github-readme": {
+    "i": [
+      "美化GitHub仓库主页",
+      "写好看的README",
+      "开源项目门面包装",
+      "生成README头图SVG"
+    ],
+    "a": [
+      "readme",
+      "github美化",
+      "仓库门面"
+    ]
+  },
+  "ppt-master": {
+    "i": [
+      "做可编辑PPT",
+      "文档转原生PPTX",
+      "套公司PPT模板",
+      "甲方要pptx原件",
+      "生成商业汇报PPT"
+    ],
+    "a": [
+      "pptmaster",
+      "pptx",
+      "zuoppt",
+      "做ppt"
+    ]
+  },
+  "frontend-slides": {
+    "i": [
+      "做HTML网页幻灯片",
+      "PPT转动态网页",
+      "线上分享技术演示",
+      "先看风格预览再做deck"
+    ],
+    "a": [
+      "slides",
+      "htmlppt",
+      "网页ppt",
+      "deck"
+    ]
+  },
+  "guizang-ppt": {
+    "i": [
+      "归藏HTML幻灯片",
+      "杂志风网页PPT",
+      "瑞士网格演示稿",
+      "带双屏演讲者模式deck"
+    ],
+    "a": [
+      "guizang",
+      "归藏ppt",
+      "htmlppt"
+    ]
+  },
+  "dashi-ppt": {
+    "i": [
+      "浏览器在线改PPT",
+      "导出HTML PDF PPTX",
+      "边讲边改演示稿"
+    ],
+    "a": [
+      "dashippt",
+      "大师ppt"
+    ]
+  },
+  "html-ppt": {
+    "i": [
+      "发布会级网页PPT",
+      "带Canvas动效幻灯片",
+      "同步演讲台逐字稿计时器",
+      "静态零构建deck"
+    ],
+    "a": [
+      "htmlppt",
+      "发布会ppt",
+      "网页deck"
+    ]
+  },
+  "gorden-ppt": {
+    "i": [
+      "中文精修PPT模板",
+      "国企大厂汇报PPT",
+      "只换字不动版式",
+      "无损改PPT"
+    ],
+    "a": [
+      "gorden",
+      "中文ppt",
+      "汇报ppt"
+    ]
+  },
+  "luobo-ppt": {
+    "i": [
+      "美化粗糙PPT",
+      "拯救难看PPT",
+      "迭代修改原生PPTX"
+    ],
+    "a": [
+      "luoboppt",
+      "ppt美化",
+      "改ppt"
+    ]
+  },
+  "anthropics-pptx": {
+    "i": [
+      "Anthropic官方PPTX",
+      "读写原生PPTX",
+      "套potx模板",
+      "办公PPT视觉自检"
+    ],
+    "a": [
+      "anthropic",
+      "官方ppt",
+      "pptx"
+    ]
+  },
+  "ppt-studio": {
+    "i": [
+      "科研汇报PPT",
+      "学术答辩PPT",
+      "基金申请PPT",
+      "组会汇报幻灯片"
+    ],
+    "a": [
+      "科研ppt",
+      "学术ppt",
+      "组会"
+    ]
+  },
+  "che626-competition-ppt-template-first-skill": {
+    "i": [
+      "竞赛答辩PPT",
+      "挑战杯大创PPT",
+      "毕业答辩PPT",
+      "论文报告转分层可编辑PPTX"
+    ],
+    "a": [
+      "答辩ppt",
+      "毕设答辩",
+      "挑战杯"
+    ]
+  },
+  "likaku-mck-ppt-design-skill": {
+    "i": [
+      "麦肯锡风PPT",
+      "咨询战略汇报PPT",
+      "行研PPT",
+      "原生瀑布图矩阵图PPT"
+    ],
+    "a": [
+      "mck",
+      "麦肯锡",
+      "咨询风ppt"
+    ]
+  },
+  "spacezephyr-space-multi-design-ppt": {
+    "i": [
+      "多风格品牌PPT",
+      "Apple Notion Stripe风PPT",
+      "62种品牌视觉演示稿"
+    ],
+    "a": [
+      "品牌ppt",
+      "多风格ppt"
+    ]
+  },
+  "gordensun-gordensuperpptskills": {
+    "i": [
+      "图片版PPT转可编辑PPTX",
+      "好看又能改字的PPT",
+      "高颜值视觉PPT"
+    ],
+    "a": [
+      "superppt",
+      "图片转ppt"
+    ]
+  },
+  "morgensonne-editdeck": {
+    "i": [
+      "图片PPT转可编辑PPTX",
+      "完整幻灯片交付流水线",
+      "解决AI图片PPT改不了字"
+    ],
+    "a": [
+      "editdeck",
+      "可编辑ppt"
+    ]
+  },
+  "diagram-design": {
+    "i": [
+      "画好看的SVG图表",
+      "无Mermaid味流程图",
+      "文章技术配图",
+      "汇报信息图",
+      "告别丑Mermaid"
+    ],
+    "a": [
+      "diagram",
+      "无mermaid",
+      "svg图表",
+      "画流程图"
+    ]
+  },
+  "anatomy": {
+    "i": [
+      "画等轴测解剖图",
+      "深度科普原理图",
+      "分层结构矢量SVG图解"
+    ],
+    "a": [
+      "anatomy",
+      "等轴测",
+      "原理图",
+      "解剖图"
+    ]
+  },
+  "fireworks-graph": {
+    "i": [
+      "画技术架构图",
+      "自然语言画UML图",
+      "带AI品牌图标流程图",
+      "出版级技术博客配图"
+    ],
+    "a": [
+      "fireworks",
+      "uml",
+      "架构图",
+      "流程图",
+      "技术图"
+    ]
+  },
+  "drawio": {
+    "i": [
+      "生成draw.io图",
+      "代码转架构图",
+      "K8s Terraform SQL画图",
+      "可手工编辑流程图"
+    ],
+    "a": [
+      "draw.io",
+      "drawio",
+      "架构图",
+      "流程图"
+    ]
+  },
+  "arch-diagram": {
+    "i": [
+      "画系统架构图",
+      "深色主题技术架构图",
+      "方案评审架构图"
+    ],
+    "a": [
+      "archdiagram",
+      "架构图",
+      "系统图"
+    ]
+  },
+  "excalidraw": {
+    "i": [
+      "画Excalidraw手绘流程图",
+      "草稿感架构图",
+      "可拖拽编辑手绘图"
+    ],
+    "a": [
+      "excalidraw",
+      "手绘流程图",
+      "白板图"
+    ]
+  },
+  "tt-a1i-archify": {
+    "i": [
+      "一句话画交互架构图",
+      "代码转可点击架构图",
+      "替代Visio画系统分层数据流"
+    ],
+    "a": [
+      "archify",
+      "架构图",
+      "visio替代"
+    ]
+  },
+  "bigdata-dashboard": {
+    "i": [
+      "Excel转数据大屏",
+      "JSON生成可视化大屏",
+      "ECharts行业看板",
+      "单文件HTML数据看板"
+    ],
+    "a": [
+      "dashboard",
+      "echarts",
+      "数据大屏",
+      "可视化看板"
+    ]
+  },
+  "baocut": {
+    "i": [
+      "AI视频剪辑",
+      "可编辑时间线剪视频",
+      "视频加字幕翻译配音",
+      "精细剪辑视频"
+    ],
+    "a": [
+      "baocut",
+      "剪视频",
+      "视频剪辑",
+      "baoyu"
+    ]
+  },
+  "screen-studio-editor": {
+    "i": [
+      "视频剪辑",
+      "录屏剪辑",
+      "自动去口误停顿气口",
+      "口播视频粗剪",
+      "合并补录片段"
+    ],
+    "a": [
+      "screenstudio",
+      "去口误",
+      "剪口播",
+      "录屏剪辑",
+      "剪视频"
+    ]
+  },
+  "srt-whiteboard": {
+    "i": [
+      "字幕转白板手绘动画",
+      "SRT做口播画面",
+      "流式笔迹手绘讲解视频"
+    ],
+    "a": [
+      "whiteboard",
+      "白板动画",
+      "srt"
+    ]
+  },
+  "handdrawn-motion": {
+    "i": [
+      "白板手绘动效视频",
+      "马克笔线稿配音对时",
+      "卡点手绘动画MP4"
+    ],
+    "a": [
+      "白板动画",
+      "手绘动效"
+    ]
+  },
+  "brandonvant-claude-skill-whiteboard-explainer": {
+    "i": [
+      "马克笔白板讲解动画",
+      "Whisper词级音画同步",
+      "边讲边画手绘视频"
+    ],
+    "a": [
+      "whiteboard",
+      "白板动画",
+      "讲解视频"
+    ]
+  },
+  "huashu-motion": {
+    "i": [
+      "做产品宣传片",
+      "自动配乐产品发布视频",
+      "开源项目上线宣传视频"
+    ],
+    "a": [
+      "huashu",
+      "宣传片",
+      "产品视频"
+    ]
+  },
+  "ai-promo-video": {
+    "i": [
+      "网址一键做4K宣传片",
+      "产品自动截屏卡点剪辑",
+      "配AI旁白产品发布片"
+    ],
+    "a": [
+      "promo",
+      "宣传片",
+      "4k视频"
+    ]
+  },
+  "guizang-product-video": {
+    "i": [
+      "做软件更新宣传片",
+      "代码生成产品发布视频",
+      "分镜原创配乐一条龙"
+    ],
+    "a": [
+      "guizang",
+      "宣传片",
+      "产品视频"
+    ]
+  },
+  "debpalash-voicestudio": {
+    "i": [
+      "本地开源AI配音",
+      "音色克隆",
+      "视频旁白生成",
+      "多语言语音合成不上传云端"
+    ],
+    "a": [
+      "voicestudio",
+      "tts",
+      "配音",
+      "克隆声音"
+    ]
+  },
+  "heygen-com-hyperframes": {
+    "i": [
+      "网页HTML动画转MP4视频",
+      "零积分改视频片头",
+      "程序化视频渲染引擎"
+    ],
+    "a": [
+      "hyperframes",
+      "heygen",
+      "html转视频"
+    ]
+  },
+  "remotion-dev-skills": {
+    "i": [
+      "用React写视频",
+      "代码参数化出片",
+      "批量模板视频渲染"
+    ],
+    "a": [
+      "remotion",
+      "react视频",
+      "代码出片"
+    ]
+  },
+  "bradautomates-claude-video": {
+    "i": [
+      "让Agent看懂视频",
+      "拆解视频拉片",
+      "提取带时间戳逐字稿关键帧"
+    ],
+    "a": [
+      "watchvideo",
+      "看视频",
+      "拆解视频",
+      "视频理解"
+    ]
+  },
+  "adithya-s-k-manim-skill": {
+    "i": [
+      "做3Blue1Brown风格数学动画",
+      "Manim公式推导可视化",
+      "数学科普动画"
+    ],
+    "a": [
+      "manim",
+      "3b1b",
+      "数学动画"
+    ]
+  },
+  "video-publisher": {
+    "i": [
+      "视频一键分发多平台",
+      "自动写各平台标题简介封面草稿"
+    ],
+    "a": [
+      "多平台分发",
+      "视频发布"
+    ]
+  },
+  "social-card": {
+    "i": [
+      "做小红书图文卡片",
+      "做公众号封面",
+      "HTML转PNG社媒配图",
+      "21:9封面和轮播图"
+    ],
+    "a": [
+      "xhs",
+      "gzh",
+      "小红书封面",
+      "公众号封面",
+      "guizang"
+    ]
+  },
+  "oil-cover": {
+    "i": [
+      "视频挑帧做封面",
+      "小红书3:4竖版封面",
+      "B站4:3横版封面",
+      "自动出多平台视频封面"
+    ],
+    "a": [
+      "xhs",
+      "bilibili",
+      "小红书封面",
+      "b站封面",
+      "ouyou"
+    ]
+  },
+  "dm-gzh-cover": {
+    "i": [
+      "做公众号封面头图",
+      "摄影风1080x460封面",
+      "自动选图扩图排中文标题"
+    ],
+    "a": [
+      "gzh",
+      "公众号封面",
+      "头图"
+    ]
+  },
+  "dai-cover": {
+    "i": [
+      "短视频B站公众号个人IP封面",
+      "多平台比例封面签名",
+      "固定风格自媒体封面"
+    ],
+    "a": [
+      "daishudi",
+      "袋鼠封面",
+      "封面设计"
+    ]
+  },
+  "ziguishian-xhs-visual-director-skill": {
+    "i": [
+      "小红书视觉统筹",
+      "小红书图文统一调性",
+      "小红书封面和内容配图方案"
+    ],
+    "a": [
+      "xhs",
+      "xiaohongshu",
+      "小红书图文",
+      "小红书封面"
+    ]
+  },
+  "irenerachel-xiaohongshu-layout-factory-skill": {
+    "i": [
+      "小红书固定版式批量出图",
+      "小红书3:4图集PNG",
+      "小红书封面模板复用"
+    ],
+    "a": [
+      "xhs",
+      "xiaohongshu",
+      "小红书排版",
+      "小红书封面"
+    ]
+  },
+  "comeonzhj-auto-redbook-skills": {
+    "i": [
+      "小红书自动写笔记出图发布",
+      "小红书图文卡片自动化"
+    ],
+    "a": [
+      "xhs",
+      "redbook",
+      "xiaohongshu",
+      "小红书自动发布"
+    ]
+  },
+  "mengke-wang-xiaohongshu-ai-workbench": {
+    "i": [
+      "小红书账号运营工作台",
+      "小红书内容选题写作执行"
+    ],
+    "a": [
+      "xhs",
+      "xiaohongshu",
+      "小红书运营"
+    ]
+  },
+  "xiaohei-illustration": {
+    "i": [
+      "公众号文章章节配图",
+      "16:9白底手绘插图",
+      "长文段落配图"
+    ],
+    "a": [
+      "gzh",
+      "文章配图",
+      "手绘配图"
+    ]
+  },
+  "vividvictor-transparent-image-generator": {
+    "i": [
+      "生成透明底PNG素材",
+      "无背景贴纸图标",
+      "自动抠图去白底贴进PPT"
+    ],
+    "a": [
+      "透明底",
+      "抠图",
+      "去背景",
+      "transparent"
+    ]
+  },
+  "oil-visual": {
+    "i": [
+      "透明底概念插图",
+      "火柴人墨线漫画配图",
+      "无背景插图贴PPT"
+    ],
+    "a": [
+      "透明底",
+      "概念图",
+      "ouyou"
+    ]
+  },
+  "logo-generator": {
+    "i": [
+      "一句话生成Logo",
+      "品牌标识多方案设计"
+    ],
+    "a": [
+      "logo",
+      "商标",
+      "标识"
+    ]
+  },
+  "app-logo-design": {
+    "i": [
+      "设计App图标Logo",
+      "打包Android iOS双端切图图标"
+    ],
+    "a": [
+      "applogo",
+      "appicon",
+      "图标设计"
+    ]
+  },
+  "alchaincyf-huashu-icon-set": {
+    "i": [
+      "为项目成套生成统一风格图标",
+      "批量生图抠图落位代码项目"
+    ],
+    "a": [
+      "icon",
+      "图标集",
+      "huashu"
+    ]
+  },
+  "gzh-design": {
+    "i": [
+      "公众号Markdown排版",
+      "一键生成公众号编辑器HTML",
+      "公众号美化样式"
+    ],
+    "a": [
+      "gzh",
+      "wechat",
+      "公众号排版",
+      "排版"
+    ]
+  },
+  "wewrite": {
+    "i": [
+      "写公众号全流程",
+      "抓热点写稿排版进微信草稿箱",
+      "公众号日更自动化"
+    ],
+    "a": [
+      "gzh",
+      "wechat",
+      "写公众号",
+      "草稿箱"
+    ]
+  },
+  "ai-wechat": {
+    "i": [
+      "分阶段写公众号文章",
+      "从选题到成稿可控写作流程"
+    ],
+    "a": [
+      "gzh",
+      "wechat",
+      "写公众号"
+    ]
+  },
+  "dai-article-daily": {
+    "i": [
+      "公众号日更SOP",
+      "抓当日AI热点写公众号",
+      "按固定文风日更"
+    ],
+    "a": [
+      "gzh",
+      "公众号日更",
+      "daishudi"
+    ]
+  },
+  "dai-viral-topic": {
+    "i": [
+      "找爆款选题",
+      "捞公众号X B站YouTube低粉爆款",
+      "起号选题灵感"
+    ],
+    "a": [
+      "选题",
+      "爆款选题",
+      "daishudi"
+    ]
+  },
+  "larashero3-dotcom-lieflat-gongwen": {
+    "i": [
+      "写体制内公文",
+      "正式公文写作与自评分",
+      "告别文章腔写红头文件通知请示"
+    ],
+    "a": [
+      "gongwen",
+      "公文写作",
+      "汇报材料"
+    ]
+  },
+  "gongwen-gbt9704": {
+    "i": [
+      "国标公文排版",
+      "GB/T 9704红头文件排版",
+      "生成合规可编辑公文DOCX"
+    ],
+    "a": [
+      "gongwen",
+      "gbt9704",
+      "公文排版",
+      "红头文件"
+    ]
+  },
+  "norman-bury-research-writing-skill": {
+    "i": [
+      "写学术论文研究报告",
+      "期刊投稿写作规范",
+      "写基金本子"
+    ],
+    "a": [
+      "paper",
+      "论文写作",
+      "科研写作",
+      "基金"
+    ]
+  },
+  "yuan1z0825-nature-skills": {
+    "i": [
+      "Nature风格论文润色",
+      "投稿级科研学术绘图",
+      "模拟审稿文献核验",
+      "论文转PPT Word专利"
+    ],
+    "a": [
+      "nature",
+      "科研合集",
+      "论文润色",
+      "学术绘图"
+    ]
+  },
+  "huashu-report": {
+    "i": [
+      "写机构级行业研究报告",
+      "深度研报图表与排版流水线"
+    ],
+    "a": [
+      "研报",
+      "行研",
+      "huashu"
+    ]
+  },
+  "markitdown": {
+    "i": [
+      "PDF转Markdown",
+      "PDF转MD",
+      "PDF Word PPT Excel转Markdown",
+      "文档洗成干净MD喂给AI",
+      "微软官方格式转换"
+    ],
+    "a": [
+      "pdf转md",
+      "pdf转markdown",
+      "文档转换",
+      "microsoft"
+    ]
+  },
+  "markdown-proxy": {
+    "i": [
+      "网页URL转干净Markdown",
+      "一键抓网页文章存档",
+      "网页去广告转MD"
+    ],
+    "a": [
+      "网页转md",
+      "url转md",
+      "抓网页"
+    ]
+  },
+  "jackwener-wechat-article-to-markdown": {
+    "i": [
+      "抓取微信公众号文章转Markdown",
+      "公众号文章存档清洗",
+      "反检测爬公众号"
+    ],
+    "a": [
+      "公众号转md",
+      "微信文章转md",
+      "gzh"
+    ]
+  },
+  "lovstudio-any2pdf": {
+    "i": [
+      "Markdown文本一键转精美PDF",
+      "不写LaTeX出好看PDF文档"
+    ],
+    "a": [
+      "转pdf",
+      "any2pdf",
+      "pdf排版"
+    ]
+  },
+  "huashu-md-html": {
+    "i": [
+      "Markdown与HTML互转",
+      "文档转精美单页HTML",
+      "Pandoc万能格式转换"
+    ],
+    "a": [
+      "md转html",
+      "格式转换",
+      "huashu"
+    ]
+  },
+  "claude-mem": {
+    "i": [
+      "给Agent加持久记忆",
+      "跨会话记住项目上下文",
+      "不用反复交代背景"
+    ],
+    "a": [
+      "memory",
+      "claudemem",
+      "记忆",
+      "上下文"
+    ]
+  },
+  "memos": {
+    "i": [
+      "Agent记忆操作系统",
+      "超持久记忆与混合检索",
+      "跨任务技能复用"
+    ],
+    "a": [
+      "memos",
+      "memory",
+      "记忆层"
+    ]
+  },
+  "nuwa": {
+    "i": [
+      "蒸馏人物思维方式",
+      "提取大佬心智模型和决策框架",
+      "让高手入驻Agent"
+    ],
+    "a": [
+      "nuwa",
+      "女娲",
+      "思维蒸馏",
+      "人物蒸馏"
+    ]
+  },
+  "colleague": {
+    "i": [
+      "把同事专家经验蒸馏成Skill",
+      "沉淀团队判断方法",
+      "隐性经验复用"
+    ],
+    "a": [
+      "distilly",
+      "同事skill",
+      "思维蒸馏"
+    ]
+  },
+  "cangjie": {
+    "i": [
+      "把书长视频播客蒸馏成Skill",
+      "看完课程变成可执行动作",
+      "内容蒸馏"
+    ],
+    "a": [
+      "cangjie",
+      "仓颉",
+      "内容蒸馏"
+    ]
+  },
+  "virgiliojr94-book-to-skill": {
+    "i": [
+      "把技术书PDF变成可查可调用的Skill",
+      "厚书知识沉淀"
+    ],
+    "a": [
+      "booktoskill",
+      "书变skill",
+      "拆书"
+    ]
+  },
+  "ljg-xray-book": {
+    "i": [
+      "深度拆书",
+      "结构化读书笔记",
+      "三轮认知压缩读透一本书"
+    ],
+    "a": [
+      "拆书",
+      "读书笔记",
+      "lijigang",
+      "ljg"
+    ]
+  },
+  "ljg-xray-paper": {
+    "i": [
+      "快速读论文",
+      "拆解学术论文方法和结论",
+      "判断论文值不值得细读"
+    ],
+    "a": [
+      "读论文",
+      "论文拆解",
+      "lijigang",
+      "ljg"
+    ]
+  },
+  "kepano-obsidian-skills": {
+    "i": [
+      "用Agent管理Obsidian笔记库",
+      "按规范读写Obsidian双链笔记"
+    ],
+    "a": [
+      "obsidian",
+      "ob",
+      "笔记库"
+    ]
+  },
+  "wzdavid-thinkwiki": {
+    "i": [
+      "本地文档笔记知识库问答",
+      "隐私不上传云端问答自己的资料"
+    ],
+    "a": [
+      "thinkwiki",
+      "本地知识库",
+      "rag"
+    ]
+  },
+  "egonex-ai-understand-anything": {
+    "i": [
+      "快速上手陌生代码库",
+      "代码变成可点击知识图谱",
+      "理清系统分层结构"
+    ],
+    "a": [
+      "代码理解",
+      "知识图谱",
+      "读源码"
+    ]
+  },
+  "graphify-labs-graphify": {
+    "i": [
+      "把代码文档SQL PDF抽成关系图谱",
+      "大型系统结构可视化查询"
+    ],
+    "a": [
+      "graphify",
+      "知识图谱",
+      "代码关系图"
+    ]
+  },
+  "agent-reach": {
+    "i": [
+      "零API费读Twitter Reddit YouTube B站小红书",
+      "跨平台社媒舆情调研",
+      "给Agent装眼睛看全网"
+    ],
+    "a": [
+      "agentreach",
+      "社媒读取",
+      "零api",
+      "xhs",
+      "twitter"
+    ]
+  },
+  "mvanhorn-last30days-skill": {
+    "i": [
+      "查最近30天全网热点讨论",
+      "扫描Reddit X YouTube HN带出处报告"
+    ],
+    "a": [
+      "last30days",
+      "近30天",
+      "舆情调研"
+    ]
+  },
+  "jesseovo-last30days-skill-cn": {
+    "i": [
+      "中文互联网近30天热点追踪",
+      "8大中文平台热榜日报",
+      "中文选题调研"
+    ],
+    "a": [
+      "last30days",
+      "中文热点",
+      "选题"
+    ]
+  },
+  "spacezephyr-creator-buddy": {
+    "i": [
+      "找小红书公众号爆款选题",
+      "竞品账号赛道拆解",
+      "自媒体选题总控"
+    ],
+    "a": [
+      "creatorbuddy",
+      "爆款选题",
+      "xhs",
+      "gzh"
+    ]
+  },
+  "unnoo-zsxq-skill": {
+    "i": [
+      "管理知识星球",
+      "知识星球整理精华出日报发帖回评论"
+    ],
+    "a": [
+      "zsxq",
+      "知识星球",
+      "星主"
+    ]
+  },
+  "jackwener-opencli": {
+    "i": [
+      "把任意网站变成命令行CLI",
+      "复用已登录浏览器会话操作内部系统"
+    ],
+    "a": [
+      "opencli",
+      "网站转cli",
+      "登录态"
+    ]
+  },
+  "caveman": {
+    "i": [
+      "省Token降低API费用",
+      "减少65%上下文消耗",
+      "精简Agent回复省钱"
+    ],
+    "a": [
+      "caveman",
+      "省token",
+      "shengtoken",
+      "省钱",
+      "降本"
+    ]
+  },
+  "steipete-agent-scripts": {
+    "i": [
+      "给Skill减肥省Token",
+      "减少Agent上下文开销",
+      "加速降本脚本"
+    ],
+    "a": [
+      "省token",
+      "shengtoken",
+      "减肥",
+      "精简上下文"
+    ]
+  },
+  "codex-team-mode": {
+    "i": [
+      "多Agent并行协作省额度",
+      "便宜模型干粗活主Agent验收",
+      "探索执行评审分工"
+    ],
+    "a": [
+      "teammode",
+      "子agent",
+      "多agent",
+      "省额度",
+      "省token"
+    ]
+  },
+  "qingyuna-answer-me-with-html": {
+    "i": [
+      "用可读HTML回答复杂问题",
+      "比手写HTML更省Token",
+      "Markdown转精美讲解页"
+    ],
+    "a": [
+      "省token",
+      "html讲解页"
+    ]
+  },
+  "agent-browser": {
+    "i": [
+      "Agent操作浏览器上网",
+      "自动打开网页点击填表抓数据",
+      "Vercel浏览器自动化CLI"
+    ],
+    "a": [
+      "agentbrowser",
+      "浏览器自动化",
+      "playwright"
+    ]
+  },
+  "huashu-chrome": {
+    "i": [
+      "接管本机已登录Chrome浏览器",
+      "免重新登录读后台数据操作内部系统"
+    ],
+    "a": [
+      "chrome",
+      "浏览器自动化",
+      "登录态",
+      "huashu"
+    ]
+  },
+  "browser-act-skills": {
+    "i": [
+      "过反爬浏览器自动化",
+      "支持代理和多Session替代Playwright"
+    ],
+    "a": [
+      "browseract",
+      "反爬",
+      "浏览器自动化"
+    ]
+  },
+  "eze-is-web-access": {
+    "i": [
+      "给本机Agent装完整联网搜索能力",
+      "三层通道加Chrome CDP直连上网"
+    ],
+    "a": [
+      "webaccess",
+      "联网",
+      "cdp"
+    ]
+  },
+  "turixai-turix-cua": {
+    "i": [
+      "让Agent操作电脑桌面软件",
+      "操作微信等没有API的桌面App",
+      "GUI电脑自动化"
+    ],
+    "a": [
+      "cua",
+      "电脑操作",
+      "gui",
+      "桌面自动化"
+    ]
+  },
+  "lark-cli": {
+    "i": [
+      "操作飞书消息文档多维表格",
+      "飞书官方命令行CLI"
+    ],
+    "a": [
+      "lark",
+      "feishu",
+      "飞书",
+      "多维表"
+    ]
+  },
+  "larkwing": {
+    "i": [
+      "飞书自动化工作流",
+      "Codex固定流程操作飞书"
+    ],
+    "a": [
+      "lark",
+      "feishu",
+      "飞书工作流"
+    ]
+  },
+  "zarazhangrui-beautiful-feishu-whiteboard": {
+    "i": [
+      "美化飞书白板画板",
+      "35套飞书白板配色方案"
+    ],
+    "a": [
+      "feishu",
+      "lark",
+      "飞书白板"
+    ]
+  },
+  "wecomteam-wecom-cli": {
+    "i": [
+      "操作企业微信消息与资料",
+      "企微官方CLI自动化"
+    ],
+    "a": [
+      "wecom",
+      "企业微信",
+      "企微"
+    ]
+  },
+  "grill-me": {
+    "i": [
+      "写代码前拷问需求",
+      "连环提问澄清模糊需求",
+      "避免返工的需求评审"
+    ],
+    "a": [
+      "grillme",
+      "需求澄清",
+      "拷问"
+    ]
+  },
+  "karpathy-md": {
+    "i": [
+      "Karpathy编程规范CLAUDE.md",
+      "防止AI写代码瞎猜和过度抽象"
+    ],
+    "a": [
+      "karpathy",
+      "claudemd",
+      "编程准则"
+    ]
+  },
+  "darwin": {
+    "i": [
+      "让Skill自我进化优化",
+      "自动评估改进测试回滚Skill"
+    ],
+    "a": [
+      "darwin",
+      "达尔文",
+      "skill进化"
+    ]
+  },
+  "luban": {
+    "i": [
+      "打磨发布高质量Skill",
+      "把草稿Skill改造成可传播公共资产"
+    ],
+    "a": [
+      "luban",
+      "鲁班",
+      "skill打磨"
+    ]
+  },
+  "taotie": {
+    "i": [
+      "借鉴吸收别的Skill强化自己的Skill",
+      "横向优化Skill"
+    ],
+    "a": [
+      "taotie",
+      "饕餮",
+      "skill进化"
+    ]
+  },
+  "git-ship": {
+    "i": [
+      "Git一键提交建PR合并",
+      "自动化同步分支推送工作流"
+    ],
+    "a": [
+      "gitship",
+      "git提交",
+      "pr"
+    ]
+  },
+  "kunchenguid-no-mistakes": {
+    "i": [
+      "Git推送前AI代码审查闸门",
+      "防止垃圾代码合进主分支"
+    ],
+    "a": [
+      "nomistakes",
+      "提交校验",
+      "代码闸门"
+    ]
+  },
+  "career-ops": {
+    "i": [
+      "AI求职找工作",
+      "扫描招聘岗位打分筛选",
+      "自动针对岗位改简历"
+    ],
+    "a": [
+      "careerops",
+      "求职",
+      "改简历",
+      "找工作",
+      "cv"
+    ]
+  },
+  "huashu-excel": {
+    "i": [
+      "处理脏Excel表格",
+      "数据清洗分析对账交付",
+      "靠谱的Excel数据分析"
+    ],
+    "a": [
+      "excel",
+      "数据清洗",
+      "对账",
+      "表格分析",
+      "huashu"
+    ]
+  },
+  "hexiaofeier-hehe-survey-analysis-workbook": {
+    "i": [
+      "用户调研问卷统计分析",
+      "Excel CSV SAV交叉分析",
+      "筛无效样本出分析表格"
+    ],
+    "a": [
+      "问卷分析",
+      "交叉分析",
+      "调研统计"
+    ]
+  },
+  "pm-skills": {
+    "i": [
+      "产品经理写PRD评审",
+      "需求排序路线图埋点竞品分析"
+    ],
+    "a": [
+      "pm",
+      "prd",
+      "产品经理"
+    ]
+  },
+  "dbskill": {
+    "i": [
+      "商业模式诊断",
+      "定价与增长卡点分析",
+      "商业咨询策略"
+    ],
+    "a": [
+      "dontbesilent",
+      "商业诊断",
+      "商业分析"
+    ]
+  },
+  "raphaelxiao-mck-skills": {
+    "i": [
+      "麦肯锡行业研究方法",
+      "快速了解一个行业",
+      "竞争格局与商业分析"
+    ],
+    "a": [
+      "mck",
+      "麦肯锡",
+      "行研",
+      "咨询"
+    ]
+  },
+  "handsomestwei-patent-disclosure-skill": {
+    "i": [
+      "写中国专利交底书",
+      "挖掘专利创新点",
+      "答复专利审查意见"
+    ],
+    "a": [
+      "patent",
+      "专利",
+      "交底书"
+    ]
+  },
+  "ayghri-i-have-adhd": {
+    "i": [
+      "让AI别废话先给结论",
+      "输出精简一眼扫完",
+      "专治绕圈子回复"
+    ],
+    "a": [
+      "adhd",
+      "先给答案",
+      "别废话",
+      "简洁输出"
+    ]
+  },
+  "kangarooking": {
+    "i": [
+      "袋鼠帝自媒体全流程16合集",
+      "小红书公众号封面选题标题视频下载"
+    ],
+    "a": [
+      "daishudi",
+      "袋鼠帝",
+      "自媒体合集"
+    ]
+  },
+  "guage1029-guage-svg-gen": {
+    "i": [
+      "画SVG技术图",
+      "纯代码SVG图表",
+      "画架构图",
+      "画流程图",
+      "画时序图泳道图",
+      "SVG防溢出防遮挡",
+      "出版级SVG配图"
+    ],
+    "a": [
+      "guage",
+      "svggen",
+      "guage-svg-gen",
+      "svg图"
+    ]
+  },
+  "zeroxzhang-consulting-report-forge": {
+    "i": [
+      "写咨询报告",
+      "写行业研究报告",
+      "做商业决策报告",
+      "经营复盘报告",
+      "HTML转PDF研报",
+      "战略投资分析报告",
+      "结论先行研报"
+    ],
+    "a": [
+      "consulting-report-forge",
+      "zerox",
+      "研报",
+      "行研",
+      "决策报告"
+    ]
+  },
+  "tjxj-z-life-trajectory": {
+    "i": [
+      "人生轨迹长图",
+      "名人生平回顾",
+      "人物时间线长图",
+      "传记长图",
+      "公众号动态SVG长图",
+      "人物生平短视频",
+      "人生线路图"
+    ],
+    "a": [
+      "z-life-trajectory",
+      "tjxj",
+      "beihai",
+      "北海",
+      "生平回顾",
+      "人物长图"
+    ]
+  }
+}
