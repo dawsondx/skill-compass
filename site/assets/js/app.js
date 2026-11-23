@@ -204,23 +204,74 @@
   }
   if ($themeBtn) $themeBtn.addEventListener('click', toggleTheme);
 
-  /* ---------- 快速安装器：切宿主换命令 ---------- */
+  /* ---------- 快速安装器：三模式切换（发给 AI 装 / GitHub 链接 / 命令行 npx）+ 记住偏好 ---------- */
+  var INSTALL_MODE_KEY = 'skill-compass-install-mode-v1';
+  var INSTALL_HOST_KEY = 'skill-compass-install-host-v1';
   var HOSTS = {
     npx: '',
     claude: ' -a claude-code',
     cursor: ' -a cursor',
     codex: ' -a codex'
   };
+  var INSTALL_MODES = [
+    { key: 'prompt', label: '发给 AI 装', short: '发给 AI 装', copyBtn: '复制给 AI', prefix: '✦',
+      note: '粘贴到 Claude / Cursor / Codex / WorkBuddy 等任意 AI 对话框即可自动安装，不碰终端、不踩 Node / SSL 坑。' },
+    { key: 'url', label: 'GitHub 链接', short: 'GitHub 链接', copyBtn: '复制链接', prefix: '↗',
+      note: '适合粘贴到支持「GitHub 链接导入」的客户端（WorkBuddy / OpenClaw / SkillDeck 等），或直接 git clone。' },
+    { key: 'cli', label: '命令行 npx', short: '命令行 npx', copyBtn: '复制命令', prefix: '$',
+      note: '适合习惯终端的开发者，需要 Node.js 22+；点下方宿主可自动拼上对应 -a 参数。' }
+  ];
+  var installMode = 'prompt';
   var installHost = 'npx';
+  try {
+    var savedMode = localStorage.getItem(INSTALL_MODE_KEY);
+    if (savedMode === 'prompt' || savedMode === 'url' || savedMode === 'cli') installMode = savedMode;
+    var savedHost = localStorage.getItem(INSTALL_HOST_KEY);
+    if (savedHost && Object.prototype.hasOwnProperty.call(HOSTS, savedHost)) installHost = savedHost;
+  } catch (e) {}
+
+  function modeMeta(mode) {
+    for (var i = 0; i < INSTALL_MODES.length; i++) if (INSTALL_MODES[i].key === mode) return INSTALL_MODES[i];
+    return INSTALL_MODES[0];
+  }
   // 安装器默认演示「推荐排序第一位」那个仓库：它既是首屏第一张卡，也是这个站最想推的东西
   var spotlight = SKILLS[0];
-  function cmdFor(s, host) {
-    if (!s) return '';
-    return 'npx skills add ' + s.repo + (s.skill ? ' --skill ' + s.skill : '') + (HOSTS[host] || '');
+  function payloadFor(s, mode, host) {
+    return CT.installPayload(s, mode || installMode, host || installHost);
   }
   function paintInstaller() {
+    var m = modeMeta(installMode);
     var el = document.getElementById('inst-cmd-text');
-    if (el) el.textContent = cmdFor(spotlight, installHost);
+    var p = document.getElementById('inst-prefix');
+    var btnLabel = document.querySelector('#inst-copy span');
+    if (el) el.textContent = payloadFor(spotlight, installMode, installHost);
+    if (p) p.textContent = m.prefix;
+    if (btnLabel) btnLabel.textContent = m.copyBtn;
+    var tabs = document.querySelector('.inst-tabs');
+    if (tabs) {
+      Array.prototype.forEach.call(tabs.children, function (x) {
+        x.setAttribute('aria-selected', x.getAttribute('data-mode') === installMode ? 'true' : 'false');
+      });
+    }
+  }
+  // 就地刷新当前网格里所有卡片的快捷复制按钮，不用整屏重排
+  function syncCardsInstallUI() {
+    if (!$grid) return;
+    Array.prototype.forEach.call($grid.querySelectorAll('.quick-copy'), function (btn) {
+      var id = btn.getAttribute('data-id');
+      if (!id) {
+        var card = btn.closest('.card');
+        if (card) id = card.dataset.id;
+      }
+      var s = id ? SKILL_BY_ID[id] : null;
+      if (!s) return;
+      var txt = payloadFor(s, installMode, installHost);
+      btn.dataset.cmd = txt;
+      btn.setAttribute('title', txt);
+      btn.setAttribute('aria-label', '复制安装方式：' + txt);
+      var sp = btn.querySelector('.qc-t');
+      if (sp && !btn.classList.contains('done')) sp.textContent = CT.quickCopyText(installMode);
+    });
   }
 
   /* ---------- 本周安装热度风向标 ---------- */
@@ -807,6 +858,8 @@
       cat: CAT_MAP[s.cat],
       mark: markOf(s),
       fav: isFav(s.id),
+      installMode: installMode,
+      installHost: installHost,
       highlight: meta ? meta.highlight : null,
       matchBadge: meta ? meta.badge : ''
     });
@@ -1116,16 +1169,36 @@
         '" data-dw-host="' + h[0] + '"><i></i>' + h[1] + '</button>';
     }).join('');
   }
+  function modesHTML() {
+    return INSTALL_MODES.map(function (m) {
+      return '<button type="button" class="di-mode' + (installMode === m.key ? ' on' : '') +
+        '" data-dw-mode="' + m.key + '" aria-pressed="' + (installMode === m.key ? 'true' : 'false') + '">' +
+        esc(m.label) + (m.key === 'prompt' ? '<em>推荐</em>' : '') + '</button>';
+    }).join('');
+  }
 
-  /* 宿主切换时抽屉命令要跟着变 —— 样板漏掉的联动 */
+  /* 模式或宿主切换时，抽屉安装区（指令 / 说明 / 宿主矩阵显隐）一起联动 */
   function syncDrawerCmd() {
     var s = currentDrawerSkill();
     if (!s) return;
-    var txt = cmdFor(s, installHost);
+    var m = modeMeta(installMode);
+    var txt = payloadFor(s, installMode, installHost);
     var code = document.getElementById('d-cmd');
     var btn = document.getElementById('d-copy');
+    var note = document.getElementById('d-inst-note');
+    var cliWrap = document.getElementById('d-cli-hosts');
     if (code) code.textContent = txt;
-    if (btn) btn.setAttribute('data-copy', txt);
+    if (btn) {
+      btn.setAttribute('data-copy', txt);
+      if (!btn.classList.contains('done')) btn.textContent = '复制';
+    }
+    if (note) note.textContent = m.note;
+    if (cliWrap) cliWrap.hidden = installMode !== 'cli';
+    Array.prototype.forEach.call(document.querySelectorAll('.di-mode'), function (b) {
+      var on = b.getAttribute('data-dw-mode') === installMode;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
     Array.prototype.forEach.call(document.querySelectorAll('.dw-host'), function (h) {
       h.classList.toggle('on', h.getAttribute('data-dw-host') === installHost);
     });
@@ -1212,9 +1285,9 @@
     if (!s) return;
     var url = location.href.split('?')[0].split('#')[0] + '?open=' + encodeURIComponent(s.id);
     var done = function () {
-      btn.textContent = '✓ 已复制链接';
+      btn.textContent = '✓ 已复制分享页';
       btn.classList.add('done');
-      setTimeout(function () { btn.textContent = '复制分享链接'; btn.classList.remove('done'); }, 1800);
+      setTimeout(function () { btn.textContent = '分享给朋友'; btn.classList.remove('done'); }, 1800);
     };
     if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, done);
     else done();
@@ -1224,7 +1297,8 @@
     if (!s) return;
     var c = CAT_MAP[s.cat] || { color: '#888', name: s.cat };
     var kind = mdKind(s.id);
-    var cmd = cmdFor(s, installHost);
+    var cmd = payloadFor(s, installMode, installHost);
+    var mInfo = modeMeta(installMode);
 
     // 子条目 → 合集的反链
     var fromHTML = '';
@@ -1326,16 +1400,21 @@
           upstreamHTML(s) + subsHTML +
 
           '<div class="dw-install">' +
-            '<div class="di-head"><span>一键安装到当前工作区</span>' +
+            '<div class="di-head"><span>安装到你的 AI</span>' +
               (kind === 'md'
-                ? '<span class="di-ok">✓ 已通过 SKILL.md 规范校验</span>'
+                ? '<span class="di-ok">✓ 含规范 SKILL.md</span>'
                 : '<span class="di-ok" style="color:var(--ink-3)">以仓库 README 为准</span>') +
             '</div>' +
+            '<div class="di-modes" role="group" aria-label="选择安装方式">' + modesHTML() + '</div>' +
             '<div class="di-cmd"><code id="d-cmd">' + esc(cmd) + '</code>' +
               '<button id="d-copy" type="button" data-copy="' + esc(cmd) + '">复制</button></div>' +
+            '<p class="di-note" id="d-inst-note">' + esc(mInfo.note) + '</p>' +
+            '<div class="di-cli-hosts" id="d-cli-hosts"' + (installMode === 'cli' ? '' : ' hidden') + '>' +
+              '<div class="dw-sec">命令行宿主环境 · 点一下切换</div>' +
+              '<div class="dw-hosts">' + hostsHTML() + '</div>' +
+            '</div>' +
+            '<div class="di-foot">终端或网络受限？可直接 <a href="' + esc(CT.zipUrl(s)) + '" target="_blank" rel="noopener">下载 ZIP 压缩包 ↗</a></div>' +
           '</div>' +
-          '<div class="dw-sec">原生兼容宿主环境 · 点一下切换</div>' +
-          '<div class="dw-hosts">' + hostsHTML() + '</div>' +
 
           '<div class="drawer-actions">' +
             '<button class="btn btn-ghost" id="drawer-fav" type="button" data-drawer-fav="' + s.id +
@@ -1351,8 +1430,8 @@
           (sims.length
             ? '<div class="sec-label">同类替代 · 点击直接对比</div><div class="sim-list">' + simHTML + '</div>'
             : '') +
-          '<p class="dw-hint">需要 Node.js 22+。也可以用 <b>git clone</b> 后把 skill 目录拷进 ' +
-            '<code>~/.claude/skills/</code>；具体安装方式以仓库 README 为准。</p>' +
+          '<p class="dw-hint">推荐直接复制「发给 AI 装」贴进对话框；也可下载 ZIP 或 <b>git clone</b> 后放进 ' +
+            '<code>~/.claude/skills/</code>（具体目录以你所用客户端与仓库 README 为准）。</p>' +
         '</section>' +
 
         '<section class="dpane" id="dpane-source" role="tabpanel" hidden>' +
@@ -1507,10 +1586,10 @@
     var label = btn.querySelector('.qc-t');
     function done() {
       btn.classList.add('done');
-      if (label) label.textContent = '✓ 已复制';
+      if (label) label.textContent = CT.quickCopyDoneText(installMode);
       setTimeout(function () {
         btn.classList.remove('done');
-        if (label) label.textContent = '$ 一键复制命令';
+        if (label) label.textContent = CT.quickCopyText(installMode);
       }, 1600);
     }
     if (navigator.clipboard && cmd) navigator.clipboard.writeText(cmd).then(done, done);
@@ -1582,6 +1661,8 @@
     }
     var tabBtn = e.target.closest('.dtab');
     if (tabBtn) { setDrawerTab(tabBtn.getAttribute('data-dtab')); return; }
+    var modeBtn = e.target.closest('[data-dw-mode]');
+    if (modeBtn) { setInstallMode(modeBtn.getAttribute('data-dw-mode')); return; }
     var hostBtn = e.target.closest('[data-dw-host]');
     if (hostBtn) { setInstallHost(hostBtn.getAttribute('data-dw-host')); return; }
     var copyBtn = e.target.closest('[data-copy]');
@@ -1680,17 +1761,22 @@
     });
   }
 
-  /* 宿主切换：安装器 tab、抽屉里的兼容矩阵、抽屉里的安装命令三处一起更新 */
+  /* 安装模式与宿主切换：首屏安装器、全部卡片悬浮按钮、抽屉安装区三处联动，并记住本地偏好 */
+  function setInstallMode(mode) {
+    if (mode !== 'prompt' && mode !== 'url' && mode !== 'cli') return;
+    installMode = mode;
+    try { localStorage.setItem(INSTALL_MODE_KEY, mode); } catch (e) {}
+    paintInstaller();
+    syncCardsInstallUI();
+    if ($drawer.classList.contains('on')) syncDrawerCmd();
+  }
   function setInstallHost(host) {
     // npx 的后缀是空字符串，不能用 !HOSTS[host] 判空，否则切回 npx 会被挡掉
     if (!Object.prototype.hasOwnProperty.call(HOSTS, host)) return;
     installHost = host;
-    if ($instTabs) {
-      Array.prototype.forEach.call($instTabs.children, function (x) {
-        x.setAttribute('aria-selected', x.getAttribute('data-host') === host ? 'true' : 'false');
-      });
-    }
+    try { localStorage.setItem(INSTALL_HOST_KEY, host); } catch (e) {}
     paintInstaller();
+    syncCardsInstallUI();
     if ($drawer.classList.contains('on')) syncDrawerCmd();
   }
 
@@ -1698,20 +1784,22 @@
   if ($instTabs) {
     $instTabs.addEventListener('click', function (e) {
       var b = e.target.closest('.inst-tab');
-      if (b) setInstallHost(b.getAttribute('data-host'));
+      if (!b) return;
+      if (b.getAttribute('data-mode')) setInstallMode(b.getAttribute('data-mode'));
+      else if (b.getAttribute('data-host')) setInstallHost(b.getAttribute('data-host'));
     });
   }
   var $instCopy = document.getElementById('inst-copy');
   if ($instCopy) {
     $instCopy.addEventListener('click', function () {
-      var txt = cmdFor(spotlight, installHost);
+      var txt = payloadFor(spotlight, installMode, installHost);
       var label = $instCopy.querySelector('span');
       var done = function () {
         $instCopy.classList.add('done');
         if (label) label.textContent = '已复制';
         setTimeout(function () {
           $instCopy.classList.remove('done');
-          if (label) label.textContent = '复制命令';
+          if (label) label.textContent = modeMeta(installMode).copyBtn;
         }, 1600);
       };
       if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, done);
@@ -1991,6 +2079,7 @@
   syncFavCount();
   renderFavPop();
   paintInstaller();
+  syncCardsInstallUI();
   renderPulse();
   if (state.openId) {
     var target = SKILLS.filter(function (s) { return s.id === state.openId; })[0];

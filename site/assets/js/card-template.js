@@ -52,10 +52,45 @@
     return n.slice(0, 1);
   }
 
-  /* 安装命令：合集里的子 skill 要带 --skill，否则会装整个仓库 */
-  function installCmd(s) {
+  /* 仓库链接 / ZIP 兜底 / 三模式安装内容：
+     prompt = 发给 AI 自动装（默认零门槛，不碰终端不踩 Node/SSL 坑）
+     url    = 纯 GitHub 链接（供客户端导入框或 git clone）
+     cli    = 命令行 npx skills add（开发者模式，支持切宿主） */
+  var CLI_HOST_FLAGS = {
+    npx: '',
+    claude: ' -a claude-code',
+    cursor: ' -a cursor',
+    codex: ' -a codex'
+  };
+  function repoUrl(s) {
     if (!s) return '';
-    return 'npx skills add ' + s.repo + (s.skill ? ' --skill ' + s.skill : '');
+    return 'https://github.com/' + s.repo + (s.path ? '/' + s.path : '');
+  }
+  function zipUrl(s) {
+    if (!s) return '';
+    return 'https://github.com/' + s.repo + '/archive/HEAD.zip';
+  }
+  function installCmd(s, host) {
+    if (!s) return '';
+    return 'npx skills add ' + s.repo + (s.skill ? ' --skill ' + s.skill : '') + (CLI_HOST_FLAGS[host] || '');
+  }
+  function installPayload(s, mode, host) {
+    if (!s) return '';
+    if (mode === 'cli') return installCmd(s, host);
+    var url = repoUrl(s);
+    if (mode === 'url') return url;
+    if (s.skill) return '请帮我安装这个合集里的 ' + s.skill + ' Skill：' + url;
+    return '请帮我安装这个 Skill：' + url;
+  }
+  function quickCopyText(mode) {
+    if (mode === 'cli') return '$ 复制安装命令';
+    if (mode === 'url') return '复制 GitHub 链接';
+    return '✦ 复制给 AI 安装';
+  }
+  function quickCopyDoneText(mode) {
+    if (mode === 'cli') return '✓ 已复制命令';
+    if (mode === 'url') return '✓ 已复制链接';
+    return '✓ 已复制，发给 AI 即可';
   }
 
   /* ---------------- 无图封面：按分类做「假界面画布」 ----------------
@@ -678,10 +713,11 @@
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/></svg>' +
       '</button>';
     thumb += '<div class="thumb-tags">' + corner + '</div>';
-    // 右下角的一键复制：默认藏着，鼠标上来才浮起（触屏设备常显）
-    var cmd = installCmd(s);
-    thumb += '<button class="quick-copy" type="button" data-cmd="' + cmd + '" aria-label="复制安装命令：' + cmd + '" title="' + cmd + '">' +
-      '<span class="qc-t">$ 一键复制命令</span></button>';
+    // 右下角的一键复制：默认「发给 AI 安装」，随全局安装模式切换，鼠标上来浮起（触屏常显）
+    var mode = opt.installMode || 'prompt';
+    var payload = installPayload(s, mode, opt.installHost || 'npx');
+    thumb += '<button class="quick-copy" type="button" data-id="' + s.id + '" data-cmd="' + esc(payload) + '" aria-label="复制安装方式：' + esc(payload) + '" title="' + esc(payload) + '">' +
+      '<span class="qc-t">' + quickCopyText(mode) + '</span></button>';
     thumb += '</div>';
 
     var updHTML = s.days == null ? '' :
@@ -743,7 +779,12 @@
     freshOf: freshOf,
     fmtNum: fmtNum,
     glyphOf: glyphOf,
+    repoUrl: repoUrl,
+    zipUrl: zipUrl,
     installCmd: installCmd,
+    installPayload: installPayload,
+    quickCopyText: quickCopyText,
+    quickCopyDoneText: quickCopyDoneText,
     coverHTML: coverHTML,
     posterHTML: posterHTML,
     cardHTML: cardHTML,

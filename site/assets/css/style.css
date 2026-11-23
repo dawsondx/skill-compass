@@ -2711,12 +2711,26 @@ body.modal-open { overflow: hidden; }
   background: var(--paper-2); font-size: 12.5px; line-height: 1.7; color: var(--ink-2); }
 .dw-empty a { color: var(--accent-ink); }
 
-/* 安装块：与全局宿主选择联动；「已通过校验」只在真有 SKILL.md 时出现 */
+/* 安装块：三模式切换（发给 AI 装 / GitHub 链接 / 命令行 npx）+ ZIP 兜底 */
 .dw-install { margin-bottom: 24px; padding: 16px; border-radius: 12px;
   border: 1px solid var(--line-hi); background: var(--bg); }
 .di-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; font-size: 12px; }
 .di-head > span:first-child { font-family: var(--mono); font-weight: 600; color: var(--ink-2); }
 .di-ok { font-family: var(--mono); font-size: 11px; color: var(--teal); white-space: nowrap; }
+.di-modes { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.di-mode {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 28px; padding: 0 11px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--paper); color: var(--ink-2);
+  font-family: var(--sans); font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.di-mode:hover { border-color: var(--line-hi); color: var(--ink); }
+.di-mode.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+.di-mode em {
+  font-style: normal; font-size: 10px; padding: 1px 5px; border-radius: 999px;
+  background: var(--accent); color: #FFF6F0; font-weight: 600;
+}
 .di-cmd { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px;
   border: 1px solid var(--line); background: var(--paper); overflow-x: auto; }
 .di-cmd code { flex: 1; min-width: 0; font-family: var(--mono); font-size: 12px; color: var(--ink);
@@ -2725,6 +2739,13 @@ body.modal-open { overflow: hidden; }
   background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;
   transition: background .15s; }
 .di-cmd button:hover { background: var(--accent-ink); }
+.di-note { margin: 9px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--ink-2); }
+.di-cli-hosts { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.di-cli-hosts[hidden] { display: none; }
+.di-cli-hosts .dw-hosts { margin-bottom: 4px; }
+.di-foot { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line-2); font-size: 11.5px; color: var(--ink-3); }
+.di-foot a { color: var(--teal); font-weight: 600; text-decoration: none; border-bottom: 1px dashed color-mix(in srgb, var(--teal) 45%, transparent); }
+.di-foot a:hover { color: var(--accent-ink); border-bottom-color: var(--accent-ink); }
 
 /* 宿主兼容矩阵 */
 .dw-hosts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 26px; }
