@@ -654,6 +654,9 @@ async function cmdCommit(fileArg, flags) {
     console.log('\n📄 预渲染首屏卡片与全量 JSON-LD…');
     runNodeScript('_tools/prerender.mjs');
 
+    console.log('\n🌐 同步 SEO / GEO 静态资产（sitemap / llms.txt / skills.json）…');
+    runNodeScript('_tools/build-seo.mjs');
+
     // 8. 全站回归评测 + 新条目即席搜索 Top-3 断言
     console.log('\n🧪 运行全站搜索质量回归评测…');
     runNodeScript('_tools/eval-search.mjs', ['--strict']);

@@ -61,6 +61,8 @@ jobs:
         run: node _tools/build-search-index.mjs
       - name: 预渲染首屏卡片与全量 SEO 数据
         run: node _tools/prerender.mjs
+      - name: 生成 SEO / GEO 静态资产（robots / sitemap / llms.txt / skills.json）
+        run: node _tools/build-seo.mjs
       # 本周安装热度风向标：每天顺手抓一次 skills.sh 的公开安装量。
       # 抓不到就沿用仓库里上次提交的 pulse.js，不让外部站点的抖动挡住部署
       - name: 刷新本周安装热度风向标
@@ -82,3 +84,14 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && github.sha || 'main' }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 推送最新 URL 到 IndexNow（Bing / AI 搜索加速收录）
+        continue-on-error: true
+        run: |
+          node _tools/build-seo.mjs
+          node _tools/ping-indexnow.mjs || echo '⚠ IndexNow 推送失败，不阻断部署'

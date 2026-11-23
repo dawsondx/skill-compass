@@ -24,6 +24,29 @@
 
 ---
 
+## 五大高频场景速查（精选直达）
+
+面向 **Claude Code、Cursor、Codex、Gemini CLI** 等 AI Agent 最常被问到的 5 类高频需求，先看结论直接挑：
+
+| 高频场景 | 一句话选型建议 | 精选开源 Skill（点名称直达效果演示与安装命令） | 站内完整检索 |
+|---|---|---|---|
+| **做 PPT / 演示文稿** | 要交甲方可编辑 `.pptx` 选原生路线；线上分享/发布会选 HTML 网页幻灯片 | [PPT Master](https://skills.dawsondx.top/?open=ppt-master) · [Anthropic 官方 PPTX](https://skills.dawsondx.top/?open=anthropics-pptx) · [Frontend Slides](https://skills.dawsondx.top/?open=frontend-slides) · [归藏 PPT](https://skills.dawsondx.top/?open=guizang-ppt) · [HTML PPT Studio](https://skills.dawsondx.top/?open=html-ppt) · [Gorden PPT](https://skills.dawsondx.top/?open=gorden-ppt) | [做 PPT 全部方案 →](https://skills.dawsondx.top/?q=%E5%81%9APPT) |
+| **去 AI 味 / 降 AI 率** | 中文长文去模板腔看 Humanizer-zh / Lieflat / 活人感写作；英文看 Humanizer / Stop Slop；网页视觉去 AI 味看 Hallmark | [中文去 AI 味](https://skills.dawsondx.top/?open=humanizer-zh) · [Lieflat 去 AI 味](https://skills.dawsondx.top/?open=larashero3-dotcom-lieflat-less-ai-tone) · [活人感写作](https://skills.dawsondx.top/?open=human-writing) · [Oil Tone](https://skills.dawsondx.top/?open=oil-tone) · [Humanizer](https://skills.dawsondx.top/?open=blader-humanizer) · [Hallmark](https://skills.dawsondx.top/?open=hallmark) | [去 AI 味全部方案 →](https://skills.dawsondx.top/?q=%E5%8E%BBAI%E5%91%B3) |
+| **画架构图与技术图** | 要交互式架构图用 Archify；告别丑 Mermaid 味出 SVG 用 Diagram Design / Guage；要手工二改用 draw.io / Excalidraw | [Archify 架构图](https://skills.dawsondx.top/?open=tt-a1i-archify) · [Diagram Design](https://skills.dawsondx.top/?open=diagram-design) · [Fireworks 技术图](https://skills.dawsondx.top/?open=fireworks-graph) · [draw.io 生成器](https://skills.dawsondx.top/?open=drawio) · [Excalidraw 图表](https://skills.dawsondx.top/?open=excalidraw) · [Guage SVG](https://skills.dawsondx.top/?open=guage1029-guage-svg-gen) | [画架构图全部方案 →](https://skills.dawsondx.top/?q=%E7%94%BB%E6%9E%B6%E6%9E%84%E5%9B%BE) |
+| **省 Token / 降本提效** | 长会话压输出约 65% 选 Caveman；跨会话记忆省背景重复选 Claude Mem；给 Skill 减肥选 Agent Scripts | [Caveman 省 Token](https://skills.dawsondx.top/?open=caveman) · [Claude Mem 持久记忆](https://skills.dawsondx.top/?open=claude-mem) · [Agent Scripts](https://skills.dawsondx.top/?open=steipete-agent-scripts) · [Answer me with HTML](https://skills.dawsondx.top/?open=qingyuna-answer-me-with-html) · [Karpathy 编程准则](https://skills.dawsondx.top/?open=karpathy-md) | [省 Token 全部方案 →](https://skills.dawsondx.top/?q=%E7%9C%81token) |
+| **公众号写作与排版** | 已有 Markdown 一键出微信排版选 gzh-design；抓热点到进草稿箱全流程选 WeWrite；配图封面选归藏社媒卡片 / 小黑配图 | [公众号排版](https://skills.dawsondx.top/?open=gzh-design) · [WeWrite 全流程](https://skills.dawsondx.top/?open=wewrite) · [AI 公众号工作流](https://skills.dawsondx.top/?open=ai-wechat) · [归藏社媒卡片](https://skills.dawsondx.top/?open=social-card) · [小黑怪诞配图](https://skills.dawsondx.top/?open=xiaohei-illustration) | [写公众号全部方案 →](https://skills.dawsondx.top/?q=%E5%86%99%E5%85%AC%E4%BC%97%E5%8F%B7) |
+
+### AI / Agent 机器可读入口
+
+如果你正在让 AI 助手、Coding Agent 或检索脚本读取本站数据，可直接消费以下静态接口（每日自动随快照更新）：
+
+- **精简站点地图（LLM 友好）**：<https://skills.dawsondx.top/llms.txt>
+- **全量完整清单（纯文本 Markdown）**：<https://skills.dawsondx.top/llms-full.txt>
+- **结构化 JSON 目录**：<https://skills.dawsondx.top/api/skills.json>
+- **标准站点地图**：<https://skills.dawsondx.top/sitemap.xml>
+
+---
+
 ## 主要功能
 
 | 功能 | 说明 |
@@ -172,6 +195,8 @@ node _tools/prerender.mjs
 | `node _tools/eval-search.mjs --strict` | 跑 34 条黄金查询集的搜索质量 A/B 评测 |
 | `node _tools/prerender.mjs` | 重生成首屏卡片 / JSON-LD / noscript（改模板后必跑） |
 | `node _tools/prerender.mjs --check` | 只校验不写盘，CI 可用 |
+| `node _tools/build-seo.mjs` | 生成 `robots.txt`、`sitemap.xml`、`llms.txt`、`llms-full.txt`、`api/skills.json` |
+| `node _tools/ping-indexnow.mjs` | 向 IndexNow（Bing / AI 搜索）推送最新 URL（支持 `--dry` 预览） |
 | `node _tools/fetch-upstream.mjs --write` | 刷新仓库最近提交 / 版本 / Star |
 | `node _tools/fetch-demo-images.mjs` | 补抓演示图（`--limit 10` 先试跑） |
 | `node _tools/fetch-skillmd.mjs` | 重抓 SKILL.md / README 摘要（约 40 秒） |

@@ -1,0 +1,32 @@
+# Skill 指北 (https://skills.dawsondx.top/)
+# 欢迎国内外搜索引擎爬虫与 AI 检索爬虫索引本站公开内容
+# 面向 AI Agent 与大模型的结构化索引：https://skills.dawsondx.top/llms.txt
+
+User-agent: *
+Allow: /
+Disallow: /server/
+
+# 国内外主流搜索引擎
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Baiduspider
+User-agent: Sogou web spider
+User-agent: Sogou inst spider
+User-agent: 360Spider
+User-agent: YisouSpider
+User-agent: Bytespider
+Allow: /
+
+# AI 搜索与大模型检索爬虫
+User-agent: OAI-SearchBot
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Google-Extended
+User-agent: Applebot
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://skills.dawsondx.top/sitemap.xml

@@ -19,6 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import { PRIORITY_SCENARIOS } from './build-seo.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const HTML_PATH = path.join(ROOT, 'site', 'index.html');
@@ -100,7 +101,7 @@ const gridInner =
   top.map((s) => CT.cardHTML(s, { cat: CAT_MAP[s.cat], mark: '' })).join('\n    ') +
   '\n  ';
 
-/* ---------- 2. 全量 JSON-LD ---------- */
+/* ---------- 2. 全量 JSON-LD（@graph：WebSite + Person + CollectionPage + FAQPage + ItemList） ---------- */
 function escapeHtml(str) {
   return String(str == null ? '' : str)
     .replace(/&/g, '&amp;')
@@ -109,40 +110,137 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+const byId = Object.fromEntries(SKILLS.map((s) => [s.id, s]));
+const siteDesc = `收录 ${nSkills} 个开源 Agent Skills，精选 ${nAuthors} 位创作者与官方仓库，按产出物分类：做 PPT、去 AI 味、画架构图、省 Token、公众号排版、做视频、管知识。附真实效果预览，支持 Claude Code、Cursor、Codex、Gemini CLI 一键安装。`;
+
+const faqEntries = [
+  {
+    q: 'Skill 指北（skills.dawsondx.top）是什么网站？',
+    a: `Skill 指北（${SITE_URL}）是面向 Claude Code、Cursor、Codex、Gemini CLI 等 AI Agent 的开源 Skills 中文精选导航库，由 Dawson 维护。目前收录 ${nSkills} 个高质量开源 Skill 仓库，按「最终交付物」分为 ${CATS.length} 大类，提供真实效果预览、中文人话说明、适用场景判断与一键安装命令，数据快照每日自动同步。`
+  },
+  ...PRIORITY_SCENARIOS.map((sc) => ({
+    q: `AI Agent / Claude Code ${sc.title}有哪些好用的开源 Skill 推荐？`,
+    a: `${sc.summary} 完整清单与实时 Star / 更新状态可访问 Skill 指北（${SITE_URL}?q=${encodeURIComponent(sc.query)}）查看并一键复制安装命令。`
+  }))
+];
+
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'ItemList',
-  name: `Skill 指北 · ${nSkills} 个开源 Agent Skills 精选库`,
-  description: `从收藏夹和头部创作者仓库中挑出的 ${nSkills} 个开源 Agent Skills，按「你想做出什么」分类，附中文用途说明、适用场景与演示图。`,
-  numberOfItems: nSkills,
-  itemListElement: SKILLS.map((s, i) => {
-    const item = {
-      '@type': 'SoftwareSourceCode',
-      name: s.name,
-      description: s.desc,
-      codeRepository: repoUrl(s),
-      keywords: s.tags.concat(s.catName).join(', ')
-    };
-    if (s.author) item.author = { '@type': 'Person', name: s.author.name };
-    return { '@type': 'ListItem', position: i + 1, item };
-  })
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}#website`,
+      name: 'Skill 指北',
+      alternateName: ['Skill Compass', '开源 Agent Skills 精选库'],
+      url: SITE_URL,
+      inLanguage: 'zh-CN',
+      description: siteDesc,
+      publisher: { '@id': `${SITE_URL}#person` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${SITE_URL}?q={search_term_string}`
+        },
+        'query-input': 'required name=search_term_string'
+      }
+    },
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}#person`,
+      name: 'Dawson',
+      alternateName: 'Dawson聊AI提效',
+      url: 'https://view.dawsondx.top/',
+      sameAs: [
+        'https://view.dawsondx.top/',
+        'https://github.com/dawsondx',
+        'https://github.com/dawsondx/skill-compass'
+      ]
+    },
+    {
+      '@type': 'CollectionPage',
+      '@id': `${SITE_URL}#webpage`,
+      url: SITE_URL,
+      name: `Skill 指北 · ${nSkills} 个开源 Agent Skills 精选库`,
+      description: siteDesc,
+      inLanguage: 'zh-CN',
+      isPartOf: { '@id': `${SITE_URL}#website` },
+      author: { '@id': `${SITE_URL}#person` },
+      ...(UPS_AT ? { dateModified: UPS_AT } : {}),
+      about: ['Agent Skills', 'Claude Code Skills', 'Cursor Skills', 'Codex Skills', 'Gemini CLI Skills'],
+      mainEntity: { '@id': `${SITE_URL}#itemlist` }
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${SITE_URL}#faq`,
+      mainEntity: faqEntries.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: f.a
+        }
+      }))
+    },
+    {
+      '@type': 'ItemList',
+      '@id': `${SITE_URL}#itemlist`,
+      name: `Skill 指北 · ${nSkills} 个开源 Agent Skills 精选库`,
+      description: siteDesc,
+      numberOfItems: nSkills,
+      itemListElement: SKILLS.map((s, i) => {
+        const item = {
+          '@type': 'SoftwareSourceCode',
+          name: s.name,
+          description: s.desc,
+          url: `${SITE_URL}?open=${encodeURIComponent(s.id)}`,
+          codeRepository: repoUrl(s),
+          applicationCategory: s.catName,
+          keywords: s.tags.concat(s.catName).join(', ')
+        };
+        if (s.author) item.author = { '@type': s.author.kind === 'official' ? 'Organization' : 'Person', name: s.author.name };
+        return { '@type': 'ListItem', position: i + 1, item };
+      })
+    }
+  ]
 };
 // </script> 不能出现在内联脚本里，转义掉
 const jsonLdText = JSON.stringify(jsonLd).replace(/<\//g, '<\\/');
 const seoBlock = `${SEO_MARK_A}\n<script type="application/ld+json">\n${jsonLdText}\n</script>\n${SEO_MARK_B}`;
 
-/* ---------- 3. noscript 全量目录 ---------- */
+/* ---------- 3. noscript 全量目录（兼顾百度 / 搜狗等不吃 JSON-LD 的搜索引擎与纯文本抓取） ---------- */
+const nosScenarios = PRIORITY_SCENARIOS.map((sc) => {
+  const picks = sc.ids.map((id) => byId[id]).filter(Boolean);
+  const pickLinks = picks
+    .map((s) => `<a href="${escapeHtml(`${SITE_URL}?open=${encodeURIComponent(s.id)}`)}">${escapeHtml(s.name)}</a>`)
+    .join(' · ');
+  return `      <li><strong><a href="${escapeHtml(`${SITE_URL}?q=${encodeURIComponent(sc.query)}`)}">${escapeHtml(sc.title)}</a></strong>：${escapeHtml(sc.summary)}（推荐：${pickLinks}）</li>`;
+}).join('\n');
+
+const nosFaqs = faqEntries.map((f) =>
+  `      <dt>${escapeHtml(f.q)}</dt>\n      <dd>${escapeHtml(f.a)}</dd>`
+).join('\n');
+
 const nosBlock = `${NOS_MARK_A}
 <noscript>
-  <section class="seo-index" aria-label="全部 Skill 完整目录">
-    <h2>全部收录的 Agent Skills（共 ${nSkills} 个）</h2>
-    <p class="seo-index-note">以下是纯文本目录，与上方卡片内容一致；开启 JavaScript 后可用分类、创作者与搜索筛选。</p>
+  <section class="seo-index" aria-label="Skill 指北场景选型与全部目录">
+    <h2>五大高频场景开源 Skill 选型速查</h2>
+    <ul>
+${nosScenarios}
+    </ul>
+    <h2>常见问题（FAQ）</h2>
+    <dl>
+${nosFaqs}
+    </dl>
+    <h2>全部收录的开源 Agent Skills（共 ${nSkills} 个）</h2>
+    <p class="seo-index-note">以下是纯文本目录，与上方卡片内容一致；开启 JavaScript 后可用分类、创作者与语义搜索筛选。AI / Agent 亦可直接读取 <a href="${SITE_URL}llms.txt">llms.txt</a> 与 <a href="${SITE_URL}llms-full.txt">llms-full.txt</a>。</p>
     <ul>
 ${SKILLS.map((s) => {
   const meta = [s.catName, s.author ? s.author.name : '', s.stars ? '★ ' + s.stars : '']
     .filter(Boolean)
     .join(' · ');
-  return `      <li><a href="${escapeHtml(repoUrl(s))}">${escapeHtml(s.name)}</a>：${escapeHtml(s.desc)}<span class="seo-meta">（${escapeHtml(meta)}）</span></li>`;
+  const detailHref = `${SITE_URL}?open=${encodeURIComponent(s.id)}`;
+  return `      <li><a href="${escapeHtml(detailHref)}">${escapeHtml(s.name)}</a>（<a href="${escapeHtml(repoUrl(s))}" rel="noopener">GitHub</a>）：${escapeHtml(s.desc)}<span class="seo-meta">（${escapeHtml(meta)}）</span></li>`;
 }).join('\n')}
     </ul>
   </section>
@@ -210,6 +308,7 @@ html = setNum(html, 's3', CATS.length);
 html = setNum(html, 's4', nAuthors);
 html = setNum(html, 'hero-total', nSkills);
 html = html.replace(/(<title>Skill 指北 · )\d+( 个开源 Agent Skills 精选库)/, `$1${nSkills}$2`);
+html = html.replace(/(收录 )\d+( 个开源 Agent Skills，精选 )\d+( 位创作者)/, `$1${nSkills}$2${nAuthors}$3`);
 html = html.replace(/(筛出 )\d+( 个开源 Agent Skills)/, `$1${nSkills}$2`);
 // 分享卡 / 搜索结果 / 页脚这些散落的数字也一起跟上，别留旧值
 html = html.replace(/(content=")\d+( 个开源 Agent Skills)/g, `$1${nSkills}$2`);
